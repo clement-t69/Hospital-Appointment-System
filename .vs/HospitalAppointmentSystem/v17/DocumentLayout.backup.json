@@ -3,8 +3,8 @@
   "WorkspaceRootPath": "C:\\Users\\thore\\Documents\\GitHub\\dorset_hospital\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1CCE5368-B5F1-4F8A-91DB-DC6331F7BC78}|HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj|c:\\users\\thore\\documents\\github\\dorset_hospital\\hospitalappointmentsystem\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1CCE5368-B5F1-4F8A-91DB-DC6331F7BC78}|HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj|solutionrelative:hospitalappointmentsystem\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1CCE5368-B5F1-4F8A-91DB-DC6331F7BC78}|HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj|c:\\users\\thore\\documents\\github\\dorset_hospital\\hospitalappointmentsystem\\readme.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{1CCE5368-B5F1-4F8A-91DB-DC6331F7BC78}|HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj|solutionrelative:hospitalappointmentsystem\\readme.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1CCE5368-B5F1-4F8A-91DB-DC6331F7BC78}|HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj|c:\\users\\thore\\documents\\github\\dorset_hospital\\hospitalappointmentsystem\\hospitalappointmentsystem.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
@@ -23,25 +23,25 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "Program.cs",
-              "DocumentMoniker": "C:\\Users\\thore\\Documents\\GitHub\\dorset_hospital\\HospitalAppointmentSystem\\Program.cs",
-              "RelativeDocumentMoniker": "HospitalAppointmentSystem\\Program.cs",
-              "ToolTip": "C:\\Users\\thore\\Documents\\GitHub\\dorset_hospital\\HospitalAppointmentSystem\\Program.cs",
-              "RelativeToolTip": "HospitalAppointmentSystem\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAARAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-04T09:58:52.819Z",
+              "Title": "README.md",
+              "DocumentMoniker": "C:\\Users\\thore\\Documents\\GitHub\\dorset_hospital\\HospitalAppointmentSystem\\README.md",
+              "RelativeDocumentMoniker": "HospitalAppointmentSystem\\README.md",
+              "ToolTip": "C:\\Users\\thore\\Documents\\GitHub\\dorset_hospital\\HospitalAppointmentSystem\\README.md",
+              "RelativeToolTip": "HospitalAppointmentSystem\\README.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-03-04T09:50:24.621Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "HospitalAppointmentSystem.csproj",
+              "Title": "HospitalAppointmentSystem",
               "DocumentMoniker": "C:\\Users\\thore\\Documents\\GitHub\\dorset_hospital\\HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj",
               "RelativeDocumentMoniker": "HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj",
               "ToolTip": "C:\\Users\\thore\\Documents\\GitHub\\dorset_hospital\\HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj",
               "RelativeToolTip": "HospitalAppointmentSystem\\HospitalAppointmentSystem.csproj",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
               "WhenOpened": "2025-03-04T09:49:48.164Z",
               "EditorCaption": ""
