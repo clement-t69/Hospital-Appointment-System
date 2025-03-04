@@ -1,2 +1,2 @@
-# dorset_project
-Hospital Appointment System
+# Hospital Appointment System
+
