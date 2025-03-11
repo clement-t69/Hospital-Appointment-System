@@ -1,6 +1,6 @@
 Migration:
-dotnet ef migrations add Name --project HealthApp.Domain --startup-project HealthApp.MVC --context AppDbContext
-dotnet ef database update --project HealthApp.Domain --startup-project HealthApp.MVC --context AppDbContext
+dotnet ef migrations add Name --project HealthApp.Domain --startup-project HealthApp.MVC --context ApplicationDbContext
+dotnet ef database update --project HealthApp.Domain --startup-project HealthApp.MVC --context ApplicationDbContext
 
 Roles:
 - Administrator:

@@ -5,7 +5,7 @@ namespace HealthApp.Domain.Data
 {
     public class DbSeeder
     {
-        public static async Task Seed(AppDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public static async Task Seed(ApplicationDbContext context, UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
         {
             if (!await roleManager.RoleExistsAsync("Doctor"))
                 await roleManager.CreateAsync(new IdentityRole("Doctor"));
