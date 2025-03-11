@@ -1,5 +1,6 @@
 using System.Diagnostics;
-using HealthApp.MVC.Models;
+using HealthApp.MVC;
+using HealthApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HealthApp.MVC.Controllers
