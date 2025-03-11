@@ -1,4 +1,5 @@
 ﻿using HealthApp.Domain.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,7 +7,7 @@ namespace HealthApp.Domain.Data
 {
     public class AppDbContext : IdentityDbContext<User>
     {
-        public AppDbContext(DbContextOptions<DbContext> options) : base(options) { }
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<Patient> Patients { get; set; }
@@ -22,6 +23,12 @@ namespace HealthApp.Domain.Data
             modelBuilder.Entity<Appointment>().ToTable("Appointments");
             modelBuilder.Entity<Prescription>().ToTable("Prescriptions");
             modelBuilder.Entity<MedicalHistory>().ToTable("MedicalHistories");
+
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Id = "your_doctor_guid", Name = "Doctor", NormalizedName = "DOCTOR" },
+                new IdentityRole { Id = "your_patient_guid", Name = "Patient", NormalizedName = "PATIENT" },
+                new IdentityRole { Id = "your_admin_guid", Name = "Admin", NormalizedName = "ADMIN" }
+                );
         }
     }
 }
