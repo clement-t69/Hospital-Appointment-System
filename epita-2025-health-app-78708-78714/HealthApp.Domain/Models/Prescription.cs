@@ -2,7 +2,7 @@
 {
     public class Prescription
     {
-        public int Id { get; set; }
+        public string Id { get; set; }
         public string PatientName { get; set; }
         public string DoctorName { get; set; }
         public string Name { get; set; }
