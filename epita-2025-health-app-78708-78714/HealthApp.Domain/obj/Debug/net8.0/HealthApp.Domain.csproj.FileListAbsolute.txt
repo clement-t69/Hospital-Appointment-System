@@ -1,0 +1,5 @@
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.Domain\obj\Debug\net8.0\HealthApp.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.Domain\obj\Debug\net8.0\HealthApp.Domain.AssemblyInfoInputs.cache
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.Domain\obj\Debug\net8.0\HealthApp.Domain.AssemblyInfo.cs
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.Domain\obj\Debug\net8.0\HealthApp.Domain.csproj.CoreCompileInputs.cache
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.Domain\obj\Debug\net8.0\HealthApp.Domain.sourcelink.json
