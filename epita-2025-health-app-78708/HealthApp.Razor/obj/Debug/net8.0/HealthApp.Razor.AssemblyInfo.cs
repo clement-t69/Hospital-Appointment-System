@@ -11,12 +11,14 @@
 using System;
 using System.Reflection;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute("HealthApp.Domain")]
+[assembly: Microsoft.AspNetCore.Identity.UI.UIFrameworkAttribute("Bootstrap5")]
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("aspnet-HealthApp.Razor-c830bbd7-6571-46e0-affa-0aad3155832b")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("HealthApp.Razor")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cd2788f24c96954906b6dd1b454d68032cea6307")]
-[assembly: System.Reflection.AssemblyProductAttribute("HealthApp.Domain")]
-[assembly: System.Reflection.AssemblyTitleAttribute("HealthApp.Domain")]
+[assembly: System.Reflection.AssemblyProductAttribute("HealthApp.Razor")]
+[assembly: System.Reflection.AssemblyTitleAttribute("HealthApp.Razor")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 
 // Généré par la classe MSBuild WriteCodeFragment.
