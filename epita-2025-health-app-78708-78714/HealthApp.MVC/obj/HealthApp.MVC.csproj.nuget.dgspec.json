@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708\\epita-2025-health-app-78708\\HealthApp.MVC\\HealthApp.MVC.csproj": {}
+    "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\HealthApp.MVC.csproj": {}
   },
   "projects": {
-    "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708\\epita-2025-health-app-78708\\HealthApp.MVC\\HealthApp.MVC.csproj": {
+    "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\HealthApp.MVC.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708\\epita-2025-health-app-78708\\HealthApp.MVC\\HealthApp.MVC.csproj",
+        "projectUniqueName": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\HealthApp.MVC.csproj",
         "projectName": "HealthApp.MVC",
-        "projectPath": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708\\epita-2025-health-app-78708\\HealthApp.MVC\\HealthApp.MVC.csproj",
+        "projectPath": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\HealthApp.MVC.csproj",
         "packagesPath": "C:\\Users\\thore\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708\\epita-2025-health-app-78708\\HealthApp.MVC\\obj\\",
+        "outputPath": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
