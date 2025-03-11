@@ -1,7 +1,12 @@
-﻿namespace HealthApp.Domain.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace HealthApp.Domain.Models
 {
-    public class Administrator: User
+    public class Administrator
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
+
+        [ForeignKey("UserId")]
+        public int UserId { get; set; }
     }
 }

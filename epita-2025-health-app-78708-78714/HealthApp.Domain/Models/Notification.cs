@@ -2,7 +2,7 @@
 
 namespace HealthApp.Domain.Models
 {
-    public class Prescription
+    public class Notification
     {
         public int Id { get; set; }
 
@@ -14,11 +14,7 @@ namespace HealthApp.Domain.Models
         public int PatientId { get; set; }
         public Patient Patient { get; set; }
 
-        public string Name { get; set; }
-        public string Dosage { get; set; }
-        public string Frequency { get; set; }
-        public string Duration { get; set; }
-        public string Pharmacy { get; set; }
-        public DateTime ExpirationDate { get; set; }
+        public string Message { get; set; }
+        public DateTime Date { get; set; }
     }
 }

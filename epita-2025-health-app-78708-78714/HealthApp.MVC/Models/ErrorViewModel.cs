@@ -1,4 +1,4 @@
-namespace HealthApp.MVC.Models
+namespace HealthApp.MVC
 {
     public class ErrorViewModel
     {
