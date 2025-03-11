@@ -32,7 +32,7 @@
               "RelativeDocumentMoniker": "HospitalAppointmentSystem\\Controllers\\PatientController.cs",
               "ToolTip": "C:\\Users\\thore\\Documents\\GitHub\\dorset_hospital\\HospitalAppointmentSystem\\Controllers\\PatientController.cs",
               "RelativeToolTip": "HospitalAppointmentSystem\\Controllers\\PatientController.cs",
-              "ViewState": "AgIAAAwAAAAAAAAAAAAzwCAAAAAeAAAAAAAAAA==",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAswBkAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-03-04T11:27:56.431Z",
               "EditorCaption": ""
@@ -47,8 +47,7 @@
               "RelativeToolTip": "HospitalAppointmentSystem\\Program.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-04T11:19:03.317Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-04T11:19:03.317Z"
             },
             {
               "$type": "Document",
@@ -60,8 +59,7 @@
               "RelativeToolTip": "HospitalAppointmentSystem\\Controllers\\DoctorController.cs",
               "ViewState": "AgIAABoAAAAAAAAAAAAgwCoAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-03-04T11:17:10.631Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-03-04T11:17:10.631Z"
             }
           ]
         }

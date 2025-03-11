@@ -31,5 +31,9 @@ namespace HospitalAppointmentSystem.Controllers
         }
 
         // GET: Patient/Create
+        public IActionResult Create()
+        {
+            return View();
+        }
     }
 }
