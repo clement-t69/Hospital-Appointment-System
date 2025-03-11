@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace HealthApp.Domain.Migrations
 {
-    [DbContext(typeof(AppDbContext))]
+    [DbContext(typeof(ApplicationDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -43,7 +43,7 @@ namespace HealthApp.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Appointments", (string)null);
+                    b.ToTable("Appointments");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.MedicalHistory", b =>
@@ -78,7 +78,7 @@ namespace HealthApp.Domain.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("MedicalHistories", (string)null);
+                    b.ToTable("MedicalHistories");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Prescription", b =>
@@ -124,7 +124,7 @@ namespace HealthApp.Domain.Migrations
 
                     b.HasIndex("PatientId");
 
-                    b.ToTable("Prescriptions", (string)null);
+                    b.ToTable("Prescriptions");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.User", b =>
@@ -139,7 +139,13 @@ namespace HealthApp.Domain.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasMaxLength(256)
                         .HasColumnType("TEXT");
 
@@ -162,6 +168,10 @@ namespace HealthApp.Domain.Migrations
 
                     b.Property<string>("NormalizedUserName")
                         .HasMaxLength(256)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PasswordHash")
@@ -198,7 +208,9 @@ namespace HealthApp.Domain.Migrations
 
                     b.ToTable("AspNetUsers", (string)null);
 
-                    b.UseTptMappingStrategy();
+                    b.HasDiscriminator().HasValue("User");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -229,6 +241,12 @@ namespace HealthApp.Domain.Migrations
                     b.HasData(
                         new
                         {
+                            Id = "your_admin_guid",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
                             Id = "your_doctor_guid",
                             Name = "Doctor",
                             NormalizedName = "DOCTOR"
@@ -238,12 +256,6 @@ namespace HealthApp.Domain.Migrations
                             Id = "your_patient_guid",
                             Name = "Patient",
                             NormalizedName = "PATIENT"
-                        },
-                        new
-                        {
-                            Id = "your_admin_guid",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
                         });
                 });
 
@@ -296,11 +308,9 @@ namespace HealthApp.Domain.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ProviderDisplayName")
@@ -338,11 +348,9 @@ namespace HealthApp.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Value")
@@ -365,14 +373,14 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.ToTable("Doctors", (string)null);
+                    b.HasDiscriminator().HasValue("Doctor");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Patient", b =>
                 {
                     b.HasBaseType("HealthApp.Domain.Models.User");
 
-                    b.ToTable("Patients", (string)null);
+                    b.HasDiscriminator().HasValue("Patient");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.MedicalHistory", b =>
@@ -436,24 +444,6 @@ namespace HealthApp.Domain.Migrations
                     b.HasOne("HealthApp.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("HealthApp.Domain.Models.Doctor", b =>
-                {
-                    b.HasOne("HealthApp.Domain.Models.User", null)
-                        .WithOne()
-                        .HasForeignKey("HealthApp.Domain.Models.Doctor", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("HealthApp.Domain.Models.Patient", b =>
-                {
-                    b.HasOne("HealthApp.Domain.Models.User", null)
-                        .WithOne()
-                        .HasForeignKey("HealthApp.Domain.Models.Patient", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
