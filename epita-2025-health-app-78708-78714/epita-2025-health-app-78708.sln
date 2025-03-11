@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35707.178 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthApp.Domain", "HealthApp.Domain\HealthApp.Domain.csproj", "{439DDCCE-8468-4A7D-A282-4B69B24F4178}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthApp.MVC", "HealthApp.MVC\HealthApp.MVC.csproj", "{B9F9156F-983F-40A8-AD4F-0CD3195B1B51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthApp.Razor", "HealthApp.Razor\HealthApp.Razor.csproj", "{6CF61309-4B80-42ED-B627-F6C8D26C50D0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{439DDCCE-8468-4A7D-A282-4B69B24F4178}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{439DDCCE-8468-4A7D-A282-4B69B24F4178}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{439DDCCE-8468-4A7D-A282-4B69B24F4178}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{439DDCCE-8468-4A7D-A282-4B69B24F4178}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9F9156F-983F-40A8-AD4F-0CD3195B1B51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9F9156F-983F-40A8-AD4F-0CD3195B1B51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9F9156F-983F-40A8-AD4F-0CD3195B1B51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9F9156F-983F-40A8-AD4F-0CD3195B1B51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CF61309-4B80-42ED-B627-F6C8D26C50D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CF61309-4B80-42ED-B627-F6C8D26C50D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CF61309-4B80-42ED-B627-F6C8D26C50D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CF61309-4B80-42ED-B627-F6C8D26C50D0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
