@@ -1,18 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HealthApp.Domain.Models
 {
     public class Appointment
     {
-        public string Id { get; set; }
+        public int Id { get; set; }
         public DateTime Date { get; set; }
-        public string Time { get; set; }
-        public string PatientName { get; set; }
-        public string DoctorName { get; set; }
-        public string Status { get; set; }
+        public TimeSpan Time { get; set; }
+
+        [ForeignKey("DoctorId")]
+        public int DoctorId { get; set; }
+        public Doctor Doctor { get; set; }
+
+        [ForeignKey("PatientId")]
+        public int PatientId { get; set; }
+        public Patient Patient { get; set; }
+
+        public enum Status
+        {
+            Pending,
+            Approved,
+            Rejected,
+            Completed,
+            Cancelled
+        }
     }
 }
