@@ -28,13 +28,13 @@
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\HealthApp.MVC.ampsriq4v1.bundle.scp.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"ampsriq4v1"},{"Name":"integrity","Value":"sha256-TmxklpJisg7QYedAPOEfTTQ7yiSHuRqYo6dXjaZjg88="},{"Name":"label","Value":"_content/HealthApp.MVC/HealthApp.MVC.bundle.scp.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1131"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022TmxklpJisg7QYedAPOEfTTQ7yiSHuRqYo6dXjaZjg88=\u0022"},{"Name":"Last-Modified","Value":"Tue, 11 Mar 2025 19:13:00 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"1131"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022TmxklpJisg7QYedAPOEfTTQ7yiSHuRqYo6dXjaZjg88=\u0022"},{"Name":"Last-Modified","Value":"Wed, 12 Mar 2025 11:15:14 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/HealthApp.MVC/HealthApp.MVC.bundle.scp.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\HealthApp.MVC.ampsriq4v1.bundle.scp.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-TmxklpJisg7QYedAPOEfTTQ7yiSHuRqYo6dXjaZjg88="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1131"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022TmxklpJisg7QYedAPOEfTTQ7yiSHuRqYo6dXjaZjg88=\u0022"},{"Name":"Last-Modified","Value":"Tue, 11 Mar 2025 19:13:00 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"1131"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022TmxklpJisg7QYedAPOEfTTQ7yiSHuRqYo6dXjaZjg88=\u0022"},{"Name":"Last-Modified","Value":"Wed, 12 Mar 2025 11:15:14 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/HealthApp.MVC/js/site.js">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\site.js'))</AssetFile>

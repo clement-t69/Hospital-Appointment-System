@@ -1,0 +1,9 @@
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.csproj.AssemblyReference.cache
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.AssemblyInfoInputs.cache
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.AssemblyInfo.cs
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.csproj.CoreCompileInputs.cache
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.RazorAssemblyInfo.cache
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.RazorAssemblyInfo.cs
+C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net8.0\HealthApp.MVC.sourcelink.json

@@ -88,12 +88,12 @@ namespace HealthApp.Domain.Data
             // Notification
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.Doctor)
-                .WithMany()
+                .WithMany(d => d.Notifications)
                 .HasForeignKey(n => n.DoctorId);
 
             modelBuilder.Entity<Notification>()
                 .HasOne(n => n.Patient)
-                .WithMany()
+                .WithMany(p => p.Notifications)
                 .HasForeignKey(n => n.PatientId);
 
             // Patient
