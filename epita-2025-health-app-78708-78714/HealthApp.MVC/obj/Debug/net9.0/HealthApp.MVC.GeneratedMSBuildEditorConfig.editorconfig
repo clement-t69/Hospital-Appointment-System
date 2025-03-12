@@ -104,16 +104,24 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Administration/Users.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5pc3RyYXRpb25cVXNlcnMuY3NodG1s
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/AccountPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBY2NvdW50UGFnZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/Administration/Users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBZG1pbmlzdHJhdGlvblxVc2Vycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/HomePage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxIb21lUGFnZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/Privacy.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/RegisterPage.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxSZWdpc3RlclBhZ2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Shared/Error.cshtml]

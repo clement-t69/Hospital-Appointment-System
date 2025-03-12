@@ -54,13 +54,13 @@
               "target": "Package",
               "version": "[6.5.1, )"
             },
-            "Microsoft.AspNet.Identity.EntityFramework": {
-              "target": "Package",
-              "version": "[2.2.4, )"
-            },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[8.0.14, )"
+            },
+            "Microsoft.AspNetCore.Identity.UI": {
+              "target": "Package",
+              "version": "[9.0.0, )"
             },
             "Microsoft.Data.Sqlite": {
               "target": "Package",
@@ -177,13 +177,17 @@
         "net9.0": {
           "targetAlias": "net9.0",
           "dependencies": {
+            "EntityFramework": {
+              "target": "Package",
+              "version": "[6.5.1, )"
+            },
             "Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.12, )"
+              "version": "[8.0.13, )"
             },
             "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[9.0.2, )"
+              "version": "[8.0.14, )"
             },
             "Microsoft.AspNetCore.Identity.UI": {
               "target": "Package",

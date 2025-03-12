@@ -20,5 +20,5 @@ namespace HealthApp.MVC.Controllers
             var users = _userManager.Users.ToList();
             return View(users);
         }
-    }
+    } 
 }
