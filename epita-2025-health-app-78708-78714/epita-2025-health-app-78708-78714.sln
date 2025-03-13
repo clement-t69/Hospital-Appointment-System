@@ -10,6 +10,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{E031311F-1C3C-42C9-A090-4891C9C71408}"
 	ProjectSection(SolutionItems) = preProject
 		Reminders.txt = Reminders.txt
+		WebsitePlan.txt = WebsitePlan.txt
 	EndProjectSection
 EndProject
 Global
