@@ -1,0 +1,19 @@
+﻿@{
+    ViewData["Title"] = "Login or Register";
+}
+
+<div class="text-center">
+    <h1 class="display-6 mb-4">Register or Log in</h1>
+
+    <div class="align-items-center">
+        <div class="mb-4">
+            <p class="fs-5">New?</p>
+            <a asp-controller="account" asp-action="register" class="btn btn-primary btn-lg w-32">Register</a>
+        </div>
+
+        <div>
+            <p class="fs-5">Already have an account?</p>
+            <a asp-controller="account" asp-action="login" class="btn btn-primary btn-lg w-32">Log In</a>
+        </div>
+    </div>
+</div>

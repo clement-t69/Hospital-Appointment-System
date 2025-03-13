@@ -28,28 +28,12 @@ build_property._RazorSourceGeneratorDebug =
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/ConfirmEmail.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxDb25maXJtRW1haWwuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/ConfirmEmailChange.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxDb25maXJtRW1haWxDaGFuZ2UuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/ForgotPassword.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxGb3Jnb3RQYXNzd29yZC5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/ForgotPasswordConfirmation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxGb3Jnb3RQYXNzd29yZENvbmZpcm1hdGlvbi5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/Login.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dpbi5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/Logout.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/Manage/ChangePassword.cshtml]
@@ -68,22 +52,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/Register.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/RegisterConfirmation.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZWdpc3RlckNvbmZpcm1hdGlvbi5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/ResendEmailConfirmation.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZXNlbmRFbWFpbENvbmZpcm1hdGlvbi5jc2h0bWw=
-build_metadata.AdditionalFiles.CssScope = 
-
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/ResetPassword.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZXNldFBhc3N3b3JkLmNzaHRtbA==
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/Account/ResetPasswordConfirmation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZXNldFBhc3N3b3JkQ29uZmlybWF0aW9uLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -92,36 +60,48 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxfVmlld0ltcG9ydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/_ValidationScriptsPartial.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/account/edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxlZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/_ViewImports.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/account/forgot_password.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxmb3Jnb3RfcGFzc3dvcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Areas/Identity/Pages/_ViewStart.cshtml]
-build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/account/login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxsb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/AccountPage.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBY2NvdW50UGFnZS5jc2h0bWw=
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/account/login_or_register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxsb2dpbl9vcl9yZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/Administration/Users.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBZG1pbmlzdHJhdGlvblxVc2Vycy5jc2h0bWw=
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/account/logout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxsb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/HomePage.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxIb21lUGFnZS5jc2h0bWw=
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/account/my_appointments.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxteV9hcHBvaW50bWVudHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/Index.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/account/my_messages.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxteV9tZXNzYWdlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Home/RegisterPage.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxSZWdpc3RlclBhZ2UuY3NodG1s
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/account/register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxyZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/admin/users.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWRtaW5cdXNlcnMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/home/cancellation_policy.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcaG9tZVxjYW5jZWxsYXRpb25fcG9saWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/home/index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcaG9tZVxpbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/Shared/Error.cshtml]

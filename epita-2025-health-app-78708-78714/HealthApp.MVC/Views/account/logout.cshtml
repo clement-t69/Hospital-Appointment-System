@@ -1,0 +1,9 @@
+﻿@{
+    ViewData["Title"] = "Logout";
+}
+
+<form id="logoutForm" method="post" asp-controller="account" asp-action="logout"></form>
+
+<script>
+    document.getElementById('logoutForm').submit();
+</script>
