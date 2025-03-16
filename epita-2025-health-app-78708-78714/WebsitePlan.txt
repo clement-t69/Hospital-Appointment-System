@@ -1,6 +1,10 @@
-[WIP]	Views/Shared/_layout.cshtml: 
+﻿✅: DONE
+⏯️: WIP
+❌: TODO
+
+[✅]	Views/Shared/_layout.cshtml: 
 		When not logged:
-		Title (hyperlink to Home)																				Log in (hyperlink to Choose)
+		Title (hyperlink to Home)																		Log in (hyperlink to Choose)
 
 		When logged:
 		Title (hyperlink to Home)		My messages (hyperlink to Messages)		My appointments (hyperlink to Appointments)		My account (hyperlink to Account)	Log out (button to Log out))											
@@ -8,29 +12,31 @@
 		Bottom of the page:
 		Cancellation Policy (hyperlink to Cancellation Policy)
 
-[DONE]	Views/account/login_or_register.cshtml:
+[✅]	Views/account/login_or_register.cshtml:
 		Title: Register or Log in
 		Body: New? (text) Register (button to Register) Already have an account? (text) Log in (button to Log in)
 
-[DONE]	Views/account/register.cshtml
+[✅]	Views/account/register.cshtml
 
-[DONE]	Views/account/login.cshtml
+[✅]	Views/account/login.cshtml
 
-[TODO]	Views/account/my_messages.cshtml (as a patient):
+[⏯️]	Views/account/forgot_password.cshtml : LOGIC TO SEND THE LINK NEED TO BE IMPLEMENTED
+
+[❌]	Views/account/my_messages.cshtml (as a patient):
 		List of messages (can be filtered by content, date, sender)
 		Message : Title, Content, Date, Sender
 		Why a message is received: appointment booked, appointment rescheduled, appointment cancelled, prescription issued, prescription updated, prescription cancelled, reminder 48 hours before appointment
 		When a message is received --> Send an email to the patient
 		Button to write a message (form with Title, Content, Sender, Send button)
 
-[TODO]	Views/account/my_messages.cshtml (as a doctor):
+[❌]	Views/account/my_messages.cshtml (as a doctor):
 		List of messages (can be filtered by content, date, sender)
 		Message : Title, Content, Date, Sender
 		Why a message is received: appointment booked, appointment rescheduled, appointment cancelled
 		When a message is received --> Send an email to the doctor
 		Button to write a message (form with Title, Content, Sender, Send button)
 
-[TODO]	Views/account/my_appointments.cshtml (as a patient):
+[❌]	Views/account/my_appointments.cshtml (as a patient):
 		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
 		Clicking on an appointment opens a form to reschedule or cancel the appointment
 		If a patient wants to cancel an appointment --> Pop-up with a form to enter the reason
@@ -41,7 +47,7 @@
 		The calendar can be filtered by doctor name, status
 		When an appointment is booked --> Send Message to Patient (can be viewed in Account/Messages)
 
-[TODO]	Views/account/my_appointments.cshtml (as a doctor):
+[❌]	Views/account/my_appointments.cshtml (as a doctor):
 		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
 		Clicking on an appointment opens a form to mark the appointment as completed, reschedule, or cancel the appointment
 		If the appointment is virtual --> Pop-up with link to join the virtual consultation
@@ -55,42 +61,42 @@
 		Export appointments data to a CSV or PDF file (button with pop-up to choose CSV or PDF)
 		Track the number of no-shows and cancellations (red icon with number per month)
 
-[TODO]	Views/account/edit.cshtml (as a patient):
+[✅]	Views/account/edit.cshtml (as a patient):
 		Profile (hyperlink to Profile)
 		Medical history (hyperlink to Medical History)
 		Prescriptions (hyperlink to Prescriptions)
-		Change email (form with current email, new email, confirm new email, Change button)
+		Change email (form with current email, new email, confirm new email, Change button) : NEED FIX (POP UP FIXED WHEN ERROR)
 		Change password (form with current password, new password, confirm new password, Change button)
 		Delete account (button to Delete account)
 
-[TODO]	Views/account/edit.cshtml (as a doctor):
+[✅]	Views/account/edit.cshtml (as a doctor):
 		Profile (hyperlink to Profile)
 		Change email (form with current email, new email, confirm new email, Change button)
 		Change password (form with current password, new password, confirm new password, Change button)
 		Delete account (button opening a pop-up telling to contact an Administrator)
 
-[TODO]	Views/home/cancellation_policy.cshtml:
+[⏯️]	Views/home/cancellation_policy.cshtml:
 		Title: Cancellation Policy
 		Body: (text)
 
-[TODO]	Views/account/my_profile.cshtml (as a patient):
+[❌]	Views/account/my_profile.cshtml (as a patient):
 		Title: My profile
 		First name, Last name, Address, Phone number with Edit button (opens a form to edit the information)
 
-[TODO]	Views/account/my_profile.cshtml (as a doctor):
+[❌]	Views/account/my_profile.cshtml (as a doctor):
 		Title: My profile
 		First name, Last name, Address, Phone number, Specialty, Location with Edit button (opens a form to edit the information)
 
-[TODO]	Views/account/my_medical_history.cshtml (as a patient, if not the case, redirect to Error page):
+[❌]	Views/account/my_medical_history.cshtml (as a patient, if not the case, redirect to Error page):
 		List of medical history (can be filtered by date, doctor name, specialty, location)
 
-[TODO]	Views/account/my_prescriptions.cshtml (as a patient, if not the case, redirect to Error page):
+[❌]	Views/account/my_prescriptions.cshtml (as a patient, if not the case, redirect to Error page):
 		List of prescriptions (can be filtered by doctor name, name, dosage, frequency, duration, pharmacy, expiration date)
 		Can request a prescription renewal (button with a form to enter the reason)
 		Reminder to Account/Messages when a prescription is about to expire (48 hours before expiration)
 		Button to share the prescription with a pharmacy (opens a form with pharmacy name)
 
-[TODO]	Views/doctor/patients.cshtml (only as a doctor, if not the case redirect to Error page):
+[❌]	Views/doctor/patients.cshtml (only as a doctor, if not the case redirect to Error page):
 		List of patients (can be filtered by name, email, medical history, prescriptions)
 		When a patient is clicked --> Form to edit patient's medical history, prescriptions (send a message to the patient when a prescription is issued, updated, or cancelled)
 		Send a prescription to a pharmacy (button with field to enter pharmacy name)
@@ -99,4 +105,4 @@
 		Set prescription renewal conditions (text field)
 		Attach special instructions to a prescription (text field)
 
-[TODO]	ADMIN PANEL (cf. Reminders)
+[❌]	ADMIN PANEL (cf. Reminders)

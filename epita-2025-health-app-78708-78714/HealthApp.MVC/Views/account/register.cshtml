@@ -7,8 +7,19 @@
 <div class="container d-flex justify-content-center" style="min-height: 50vh;">
     <div class="row justify-content-center">
         <div>
-            <div class="text-center">
-                <h2>Register</h2>
+            <div style="color: white; user-select: none;">
+                <a>_________________________________________________________________________________________</a>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a class="little-white-button" asp-controller="account" asp-action="login_or_register" style="text-decoration: none; width: 85px;">
+                    <div class="text-content fs-6 px-2 fw-bold text-center">
+                        <div>< Back</div>
+                    </div>
+                </a>
+                <div class="text-center" style="flex-grow: 1;">
+                    <h2>Create a new Account</h2>
+                </div>
+                <div style="width: 100px;"></div>
             </div>
             <section>
                 <form id="account" method="post" asp-route-returnUrl="@ViewData["ReturnUrl"]">
@@ -17,46 +28,40 @@
                         <hr />
                     </div>
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                    <div class="form-floating mb-3">
+                    <div class="rounded_fields form-label mb-3">
                         <input asp-for="FirstName" class="form-control" aria-required="true" placeholder="First Name" style="width: 100%;"  />
-                        <label asp-for="FirstName" class="form-label">First Name</label>
                         <span asp-validation-for="FirstName" class="text-danger"></span>
                     </div>
-                    <div class="form-floating mb-3">
+                    <div class="rounded_fields form-label mb-3">
                         <input asp-for="LastName" class="form-control" aria-required="true" placeholder="Last Name" style="width: 100%;"  />
-                        <label asp-for="LastName" class="form-label">Last Name</label>
                         <span asp-validation-for="LastName" class="text-danger"></span>
                     </div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" style="width: 100%; "/>
-                        <label asp-for="Email" class="form-label">Email</label>
+                    <div class="rounded_fields form-label mb-3">
+                        <input asp-for="Email" class="form-control" autocomplete="username" aria-required="true" placeholder="john.doe@example.com" style="width: 100%; "/>
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
-                    <div class="form-floating mb-3">
+                    <div class="rounded_fields form-label mb-3">
                         <input asp-for="Phone" class="form-control" aria-required="true" placeholder="Phone Number" style="width: 100%; "/>
-                        <label asp-for="Phone" class="form-label">Phone Number</label>
                         <span asp-validation-for="Phone" class="text-danger"></span>
                     </div>
-                    <div class="form-floating mb-3">
+                    <div class="rounded_fields form-label mb-3">
                         <input asp-for="Address" class="form-control" aria-required="true" placeholder="Address" style="width: 100%; " />
-                        <label asp-for="Address" class="form-label">Address</label>
                         <span asp-validation-for="Address" class="text-danger"></span>
                     </div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" style="width: 100%; "/>
-                        <label asp-for="Password" class="form-label">Password</label>
+                    <div class="rounded_fields form-label mb-3">
+                        <input asp-for="Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Password" style="width: 100%; "/>
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
-                    <div class="form-floating mb-3">
+                    <div class="rounded_fields form-label mb-3">
                         <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="Confirm Password" style="width: 100%; "/>
-                        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
                         <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                     </div>
                     <div class="text-center">
-                        <button id="register-submit" type="submit" class="w-100 btn btn-lg btn-primary mb-3">Register</button>
-                        <li class="nav-item" style="list-style-type: none;">
-                            <a asp-area="" asp-controller="account" asp-action="login">Already have an account?</a>
-                        </li>
+                        <button type="submit" class="big-blue-button w-100 btn btn-primary mb-3">
+                            <div class="text-content fs-5 px-3 fw-bold">
+                                <div>📝  Register</div>
+                            </div>
+                        </button>
                     </div>
                 </form>
             </section>

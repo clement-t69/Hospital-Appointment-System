@@ -7,71 +7,49 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HealthApp.styles.css" asp-append-version="true" />
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: grid;
-            grid-template-rows: auto 1fr auto;
-        }
-
-        header {
-            grid-row: 1;
-        }
-
-        .container {
-            grid-row: 2;
-        }
-
-        footer {
-            grid-row: 3;
-        }
-    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light border-bottom box-shadow mb-4" style="background-color: dodgerblue; height: 5em">
+            <div class="container-fluid border-0 style=" style="background-color: dodgerblue">
                 <a asp-area="" asp-controller="home" asp-action="index" class="navbar-brand">
-                    <h1 style="text-align: center; font-size: 1.5em; margin: 0;">Hospital Appointment System</h1>
+                    <h1 style="text-align: center; font-size: 1.5em; color:aliceblue; margin: 0;">Hospital Appointment System</h1>
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav ms-auto">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="my_appointments">My Appointments</a>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_appointments">My Appointments</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="edit">My Account</a>
+                            <li class="nav-item mx-3">
+                                <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="edit">My Account</a>
                             </li>
-                            <li class="nav-item">
-                                <span class="nav-link text-dark" style="cursor: pointer;" onclick="document.getElementById('logoutForm').submit();">Log Out</span>
+                            <li class="nav-item mx-3">
+                                <span class="nav-link fw-bold" style="cursor: pointer; color:aliceblue" onclick="document.getElementById('logoutForm').submit();">Log Out</span>
                                 <form id="logoutForm" method="post" asp-controller="account" asp-action="logout" style="display: none;"></form>
                             </li>
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="account" asp-action="login_or_register">Log In</a>
-                            </li>
+                            <a class="little-white-button" asp-controller="account" asp-action="login_or_register" style="text-decoration: none;">
+                                <div class="text-content fs-6 px-2 fw-bold">
+                                    <div>🔑  Log In</div>
+                                </div>
+                            </a>
                         }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main">
             @RenderBody()
