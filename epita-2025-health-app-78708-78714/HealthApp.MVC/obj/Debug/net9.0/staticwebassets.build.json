@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "/d+CSWVMddJw05OTyVNdDx+aIx1IXXoqWkadeKl0D4I=",
+  "Hash": "ANf1GKnZvhwUdfib5ru01ZPBmvGSo3ikDE/GAEKlJbQ=",
   "Source": "HealthApp.MVC",
   "BasePath": "_content/HealthApp.MVC",
   "Mode": "Default",
@@ -1823,12 +1823,12 @@
       "OriginalItemSpec": "C:\\Users\\thore\\.nuget\\packages\\microsoft.aspnetcore.identity.ui\\9.0.0\\staticwebassets\\V5\\lib\\bootstrap\\dist\\css\\bootstrap-reboot.min.css.map"
     },
     {
-      "Identity": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-c2tiyv64ts.gz",
+      "Identity": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-1ytucm910h.gz",
       "SourceId": "HealthApp.MVC",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\",
       "BasePath": "_content/HealthApp.MVC",
-      "RelativePath": "css/site#[.{fingerprint=c2tiyv64ts}]?.css.gz",
+      "RelativePath": "css/site#[.{fingerprint=1ytucm910h}]?.css.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -1837,8 +1837,8 @@
       "RelatedAsset": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\wwwroot\\css\\site.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "ohgjeh9gg7",
-      "Integrity": "PByBrPbPMT9U5QyMO0GULXmJVSaD8mEYAGWoDp1i2h8=",
+      "Fingerprint": "cd4phlf6c4",
+      "Integrity": "YHdISe6E8Mc6uo43CBzZTjRo4cVg+TgLlD8S03gfc08=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\wwwroot\\css\\site.css"
@@ -3979,8 +3979,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "c2tiyv64ts",
-      "Integrity": "pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=",
+      "Fingerprint": "1ytucm910h",
+      "Integrity": "GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\css\\site.css"
@@ -5227,13 +5227,13 @@
   ],
   "Endpoints": [
     {
-      "Route": "css/site.c2tiyv64ts.css",
-      "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-c2tiyv64ts.gz",
+      "Route": "css/site.1ytucm910h.css",
+      "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-1ytucm910h.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.004237288136"
+          "Quality": "0.001044932079"
         }
       ],
       "ResponseHeaders": [
@@ -5243,15 +5243,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "235"
+          "Value": "956"
         },
         {
           "Name": "ETag",
-          "Value": "\"PByBrPbPMT9U5QyMO0GULXmJVSaD8mEYAGWoDp1i2h8=\""
+          "Value": "\"YHdISe6E8Mc6uo43CBzZTjRo4cVg+TgLlD8S03gfc08=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 11 Mar 2025 09:29:03 GMT"
+          "Value": "Fri, 14 Mar 2025 19:25:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5271,13 +5271,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
+          "Value": "W/\"GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "c2tiyv64ts"
+          "Value": "1ytucm910h"
         },
         {
           "Name": "label",
@@ -5285,12 +5285,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
+          "Value": "sha256-GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE="
         }
       ]
     },
     {
-      "Route": "css/site.c2tiyv64ts.css",
+      "Route": "css/site.1ytucm910h.css",
       "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\wwwroot\\css\\site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -5300,7 +5300,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "362"
+          "Value": "5003"
         },
         {
           "Name": "Content-Type",
@@ -5308,11 +5308,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
+          "Value": "\"GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 11 Mar 2025 09:29:03 GMT"
+          "Value": "Fri, 14 Mar 2025 19:25:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5322,7 +5322,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "c2tiyv64ts"
+          "Value": "1ytucm910h"
         },
         {
           "Name": "label",
@@ -5330,13 +5330,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
+          "Value": "sha256-GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE="
         }
       ]
     },
     {
-      "Route": "css/site.c2tiyv64ts.css.gz",
-      "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-c2tiyv64ts.gz",
+      "Route": "css/site.1ytucm910h.css.gz",
+      "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-1ytucm910h.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -5345,7 +5345,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "235"
+          "Value": "956"
         },
         {
           "Name": "Content-Type",
@@ -5353,11 +5353,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"PByBrPbPMT9U5QyMO0GULXmJVSaD8mEYAGWoDp1i2h8=\""
+          "Value": "\"YHdISe6E8Mc6uo43CBzZTjRo4cVg+TgLlD8S03gfc08=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 11 Mar 2025 09:29:03 GMT"
+          "Value": "Fri, 14 Mar 2025 19:25:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5375,7 +5375,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "c2tiyv64ts"
+          "Value": "1ytucm910h"
         },
         {
           "Name": "label",
@@ -5383,7 +5383,7 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-PByBrPbPMT9U5QyMO0GULXmJVSaD8mEYAGWoDp1i2h8="
+          "Value": "sha256-YHdISe6E8Mc6uo43CBzZTjRo4cVg+TgLlD8S03gfc08="
         }
       ]
     },
@@ -5426,12 +5426,12 @@
     },
     {
       "Route": "css/site.css",
-      "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-c2tiyv64ts.gz",
+      "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-1ytucm910h.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.004237288136"
+          "Quality": "0.001044932079"
         }
       ],
       "ResponseHeaders": [
@@ -5441,15 +5441,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "235"
+          "Value": "956"
         },
         {
           "Name": "ETag",
-          "Value": "\"PByBrPbPMT9U5QyMO0GULXmJVSaD8mEYAGWoDp1i2h8=\""
+          "Value": "\"YHdISe6E8Mc6uo43CBzZTjRo4cVg+TgLlD8S03gfc08=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 11 Mar 2025 09:29:03 GMT"
+          "Value": "Fri, 14 Mar 2025 19:25:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5469,13 +5469,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
+          "Value": "W/\"GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
+          "Value": "sha256-GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE="
         }
       ]
     },
@@ -5490,7 +5490,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "362"
+          "Value": "5003"
         },
         {
           "Name": "Content-Type",
@@ -5498,11 +5498,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0=\""
+          "Value": "\"GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 11 Mar 2025 09:29:03 GMT"
+          "Value": "Fri, 14 Mar 2025 19:25:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5512,13 +5512,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-pAGv4ietcJNk/EwsQZ5BN9+K4MuNYS2a9wl4Jw+q9D0="
+          "Value": "sha256-GWddfCjARu4B5iFEHcLDrqWdLkyRMrMLgo11fZRZTmE="
         }
       ]
     },
     {
       "Route": "css/site.css.gz",
-      "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-c2tiyv64ts.gz",
+      "AssetFile": "C:\\Users\\thore\\Documents\\GitHub\\epita-2025-health-app-78708-78714\\epita-2025-health-app-78708-78714\\HealthApp.MVC\\obj\\Debug\\net9.0\\compressed\\8rsizynqlc-1ytucm910h.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -5527,7 +5527,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "235"
+          "Value": "956"
         },
         {
           "Name": "Content-Type",
@@ -5535,11 +5535,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"PByBrPbPMT9U5QyMO0GULXmJVSaD8mEYAGWoDp1i2h8=\""
+          "Value": "\"YHdISe6E8Mc6uo43CBzZTjRo4cVg+TgLlD8S03gfc08=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Tue, 11 Mar 2025 09:29:03 GMT"
+          "Value": "Fri, 14 Mar 2025 19:25:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -5557,7 +5557,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-PByBrPbPMT9U5QyMO0GULXmJVSaD8mEYAGWoDp1i2h8="
+          "Value": "sha256-YHdISe6E8Mc6uo43CBzZTjRo4cVg+TgLlD8S03gfc08="
         }
       ]
     },

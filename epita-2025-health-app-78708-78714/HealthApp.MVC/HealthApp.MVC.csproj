@@ -39,6 +39,7 @@
   <ItemGroup>
     <Folder Include="Areas\Identity\Data\" />
     <Folder Include="Data\" />
+    <Folder Include="Views\admin\" />
   </ItemGroup>
 
 </Project>

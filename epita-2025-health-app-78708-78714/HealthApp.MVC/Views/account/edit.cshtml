@@ -1,8 +1,299 @@
-﻿@{
+﻿@model HealthApp.MVC.Models.EditAccountViewModel
+
+@{
     ViewData["Title"] = "Account";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Your account</h1>
-    <p>Welcome</a>.</p>
-</div>
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="container d-flex justify-content-center" style="min-height: 50vh; ">
+        <div class="row justify-content-center">
+            <div class="col-md-32">
+                <div style="color: white; user-select: none;">
+                    <a>_________________________________________________________________________________________</a>
+                </div>
+                <div class="text-center">
+                    <h2>My Account</h2>
+                </div>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                }
+
+                @if (ViewBag.IsDoctor == true)
+                {
+                    <hr class="mt-4" />
+                    <div>
+                        <a asp-controller="account" asp-action="my_profile">My Profile</a>
+                    </div>
+                    <hr />
+
+                    <form asp-controller="Account" asp-action="ChangeEmail" method="post" class="mt-4">
+                        <h4>Change Email</h4>
+                        <div class="form-floating mb-3">
+                            <label for="CurrentEmail" class="form-label">Current Email</label>
+                            <input type="email" class="form-control" id="CurrentEmail" name="CurrentEmail" required />
+                        </div>
+                        <div class="form-floating mb-3">
+                            <label for="NewEmail" class="form-label">New Email</label>
+                            <input type="email" class="form-control" id="NewEmail" name="NewEmail" required />
+                        </div>
+                        <div class="form-floating mb-3">
+                            <label for="ConfirmNewEmail" class="form-label">Confirm New Email</label>
+                            <input type="email" class="form-control" id="ConfirmNewEmail" name="ConfirmNewEmail" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Email</button>
+                    </form>
+
+                    <hr />
+
+                    <form asp-controller="Account" asp-action="ChangePassword" method="post" class="mt-4">
+                        <h4>Change Password</h4>
+                        <div class="mb-3">
+                            <label for="CurrentPassword" class="form-label">Current Password</label>
+                            <input type="password" class="form-control" id="CurrentPassword" name="CurrentPassword" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="NewPassword" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="NewPassword" name="NewPassword" required />
+                        </div>
+                        <div class="mb-3">
+                            <label for="ConfirmNewPassword" class="form-label">Confirm NewPassword</label>
+                            <input type="password" class="form-control" id="ConfirmNewPassword" name="ConfirmNewPassword" required />
+                        </div>
+                        <button type="submit" class="btn btn-primary">Change Password</button>
+                    </form>
+
+                    <hr />
+
+                    <button type="button" class="btn btn-danger mt-4" data-bs-toggle="modal"
+                    data-bs-target="#doctorDeleteModal">
+                        Delete Account
+                    </button>
+
+                    <div class="modal fade" id="doctorDeleteModal" tabindex="-1"
+                    aria-labelledby="doctorDeleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="doctorDeleteModalLabel">
+                                        Contact Administrator
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>
+                                        Please contact an administrator to delete your doctor account.
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="mt-4">
+                        <h4>Personal information</h4>
+                        <hr />
+                    </div>
+                    <a class="big-white-button w-100 mb-1" asp-controller="account" asp-action="my_profile" style="text-decoration: none;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>👤 My Profile</div>
+                            <div class="mx-3" style="font-size: 0.9em; color: gray;">@ViewBag.UserFirstName @ViewBag.UserLastName</div>
+                        </div>
+                    </a>
+                    <a class="big-white-button w-100 mb-1" asp-controller="account" asp-action="my_medical_history" style="text-decoration: none;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3">
+                            <div>⚕️ My Medical History</div>
+                        </div>
+                    </a>
+                    <a class="big-white-button w-100 mb-1" asp-controller="account" asp-action="my_appointments" style="text-decoration: none;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3">
+                            <div>📅 My Appointments</div>
+                        </div>
+                    </a>
+                    <a class="big-white-button w-100 mb-1" asp-controller="account" asp-action="my_prescriptions" style="text-decoration: none;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3">
+                            <div>💊 My Prescriptions</div>
+                        </div>
+                    </a>
+                    <a class="big-white-button w-100 mb-1" asp-controller="account" asp-action="my_messages" style="text-decoration: none;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3">
+                            <div>💬 My Messages</div>
+                        </div>
+                    </a>
+
+                    <hr />
+                    <div class="mt-4">
+                        <h4>Login information</h4>
+                        <hr />
+                    </div>
+                    <a class="big-white-button w-100 mb-1" data-bs-toggle="modal" data-bs-target="#changeEmailModal" style="text-decoration: none;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>📧 Change your Email</div>
+                            <div class="mx-3" style="font-size: 0.9em; color: gray;">@ViewBag.UserEmail</div>
+                        </div>
+                    </a>
+
+                    <div class="modal fade @(ViewData.ModelState.ErrorCount > 0 && ViewData.ModelState.ContainsKey("ChangeEmail") ? "show d-block" : "")" id="changeEmailModal" tabindex="-1" aria-labelledby="changeEmailModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="changeEmailModalLabel">Change your Email</h5>
+                                    <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div asp-validation-summary="All" class="text-danger"></div>
+                                    @if (TempData["ErrorMessage"] != null)
+                                    {
+                                        <div class="text-danger">@TempData["ErrorMessage"]</div>
+                                    }
+                                    <form id="changeEmailForm" asp-controller="account" asp-action="change_email" method="post">
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="ChangeEmail.CurrentEmail" type="email" class="form-control" id="CurrentEmail" name="CurrentEmail" aria-required="true" placeholder="Current Email" style="width: 100%;" />
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="ChangeEmail.NewEmail" type="email" class="form-control" id="NewEmail" name="NewEmail" aria-required="true" placeholder="New Email" style="width: 100%;" />
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="ChangeEmail.ConfirmNewEmail" type="email" class="form-control" id="ConfirmNewEmail" name="ConfirmNewEmail" aria-required="true" placeholder="Confirm New Email" style="width: 100%;" />
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <a class="little-blue-button" href="#" onclick="document.getElementById('changeEmailForm').submit(); return false;" style="text-decoration: none;">
+                                        <div class="text-content fs-6 px-2 fw-bold">
+                                            <div>💾 Save your new Email</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (ViewData.ModelState.ErrorCount > 0 || TempData["ErrorMessage"] != null)
+                    {
+                        <script>
+                            document.body.classList.add('modal-open');
+                        </script>
+                    }
+
+                    <a class="big-white-button w-100 mb-1" data-bs-toggle="modal" data-bs-target="#changePasswordModal" style="text-decoration: none;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>🔒 Change your Password</div>
+                            <div class="mx-3" style="font-size: 0.9em; color: gray;">
+                                @{
+                                    for (int i = 0; i < ViewBag.UserPasswordLength; i++)
+                                    {
+                                        @Html.Raw("*")
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </a>
+
+                    <div class="modal fade @(ViewData.ModelState.ErrorCount > 0 && ViewData.ModelState.ContainsKey("ChangePassword") ? "show d-block" : "")" id="changePasswordModal" tabindex="-1" aria-labelledby="changePasswordModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="changePasswordModalLabel">Change your Password</h5>
+                                    <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div asp-validation-summary="All" class="text-danger"></div>
+                                    @if (TempData["ErrorMessage"] != null)
+                                    {
+                                        <div class="text-danger">@TempData["ErrorMessage"]</div>
+                                    }
+                                    <form id="changePasswordForm" asp-controller="account" asp-action="change_password" method="post">
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="ChangePassword.CurrentPassword" type="password" class="form-control" id="CurrentPassword" name="ChangePassword.CurrentPassword" aria-required="true" placeholder="Current Password" style="width: 100%;" />
+                                            <span asp-validation-for="ChangePassword.CurrentPassword" class="text-danger"></span>
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="ChangePassword.NewPassword" type="password" class="form-control" id="NewPassword" name="ChangePassword.NewPassword" aria-required="true" placeholder="New Password" style="width: 100%;" />
+                                            <span asp-validation-for="ChangePassword.NewPassword" class="text-danger"></span>
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="ChangePassword.ConfirmNewPassword" type="password" class="form-control" id="ConfirmNewPassword" name="ChangePassword.ConfirmNewPassword" aria-required="true" placeholder="Confirm New Password" style="width: 100%;" />
+                                            <span asp-validation-for="ChangePassword.ConfirmNewPassword" class="text-danger"></span>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <a class="little-blue-button" href="#" onclick="document.getElementById('changePasswordForm').submit(); return false;" style="text-decoration: none;">
+                                        <div class="text-content fs-6 px-2 fw-bold">
+                                            <div>💾 Save your new Password</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (ViewData.ModelState.ErrorCount > 0)
+                    {
+                        <script>
+                            document.body.classList.add('modal-open');
+                        </script>
+                    }
+
+                    <a class="big-white-button-red w-100 mb-1" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" style="text-decoration: none;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>🗑️ Delete your Account</div>
+                        </div>
+                    </a>
+
+                    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Delete your Account</h5>
+                                    <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete your account? This action cannot be undone.
+                                </div>
+                                <div class="modal-footer">
+                                   <!--<a class="little-red-button" asp-controller="account" asp-action="delete" style="text-decoration: none;">
+                                        <div class="text-content fs-6 px-2 fw-bold">
+                                            <div>🗑️ Delete your Account</div>
+                                        </div>
+                                    </a>-->
+									<!--<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Confirm</button>-->
+                                    <form asp-controller="account" asp-action="delete" method="post">
+                                        <button type="submit" class="btn btn-danger">Confirm Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @section scripts {
+    <script>
+        window.location.href = '@Url.Action("index", "home")';
+    </script>
+    }
+}

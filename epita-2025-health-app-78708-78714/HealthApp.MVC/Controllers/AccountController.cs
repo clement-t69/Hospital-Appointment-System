@@ -1,14 +1,11 @@
 #nullable disable
 
 using HealthApp.Domain.Models;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using HealthApp.MVC.Models;
-using System.Collections.Generic;
-using System.Linq;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.Emit;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -18,6 +15,9 @@ namespace HealthApp.MVC.Controllers
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AccountController> _logger;
+
+        private ChangeEmailInputModel changeEmailModel = new ChangeEmailInputModel();
+        private ChangePasswordInputModel changePasswordModel = new ChangePasswordInputModel();
 
         public AccountController(SignInManager<User> signInManager,
             UserManager<User> userManager, RoleManager<IdentityRole> roleManager,
@@ -140,12 +140,181 @@ namespace HealthApp.MVC.Controllers
             return View(model);
         }
 
-        // FORGOT PASSWORD
-        public async Task<IActionResult> forgot_password(string returnUrl = null)
+        // FORGOT PASSWORD : TODO
+        public IActionResult forgot_password()
         {
-            ViewData["ReturnUrl"] = returnUrl;
             return View();
 
+        }
+
+        // EDIT ACCOUNT
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Edit()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            ViewBag.UserFirstName = user.FirstName;
+            ViewBag.UserLastName = user.LastName;
+            ViewBag.UserEmail = user.Email;
+            ViewBag.UserPasswordLength = user.Password.Length;
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+
+            return View(new EditAccountViewModel
+            {
+                ChangeEmail = new ChangeEmailInputModel(),
+                ChangePassword = new ChangePasswordInputModel()
+            });
+        }
+
+        // ACCESS TO PROFILE, MEDICAL HISTORY, PRESCRIPTIONS
+        [HttpGet]
+        [Authorize]
+        public IActionResult my_profile()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult my_medical_history()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult my_prescriptions()
+        {
+            return View();
+        }
+
+        // CHANGE EMAIL
+        [HttpPost]
+        public async Task<IActionResult> change_email(ChangeEmailInputModel model)
+        {
+            if (model.CurrentEmail != User.Identity.Name)
+            {
+                ModelState.AddModelError("CurrentEmail", "The Current Email does not match your Account Email.");
+                ViewData.ModelState.AddModelError("ChangeEmail", "");
+                return View("edit", new EditAccountViewModel { ChangeEmail = model });
+            }
+
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+
+                var existingUser = await _userManager.FindByEmailAsync(model.NewEmail);
+
+                if (existingUser != null && existingUser.Id != user.Id)
+                {
+                    ModelState.AddModelError("NewEmail", "This email is already in use.");
+                    return RedirectToAction("edit");
+                }
+
+                user.Email = model.NewEmail;
+                user.NormalizedEmail = model.NewEmail.ToUpper();
+                user.UserName = model.NewEmail;
+                user.NormalizedUserName = model.NewEmail.ToUpper();
+
+                var emailResult = await _userManager.UpdateAsync(user);
+
+                if (!emailResult.Succeeded)
+                {
+                    foreach (var error in emailResult.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                        _logger.LogError($"Email change error: {error.Description}");
+                    }
+                    return RedirectToAction("edit");
+                }
+
+                await _userManager.UpdateAsync(user);
+                await _signInManager.RefreshSignInAsync(user);
+                TempData["SuccessMessage"] = "Your Email has been updated successfully.";
+                return RedirectToAction("edit");
+            }
+
+            ViewData.ModelState.AddModelError("ChangeEmail", "");
+            return View("edit", new EditAccountViewModel { ChangeEmail = model });
+        }
+
+        // CHANGE PASSWORD
+        [HttpPost]
+        public async Task<IActionResult> change_password(ChangePasswordInputModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var passwordCheck = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
+
+            if (!passwordCheck)
+            {
+                ModelState.AddModelError("ChangePassword.CurrentPassword", "The Current Password does not match your Account Password.");
+                ViewData.ModelState.AddModelError("ChangePassword", "");
+                return View("edit", new EditAccountViewModel { ChangePassword = model });
+            }
+
+            if (ModelState.IsValid)
+            { 
+                _logger.LogInformation("Password change attempt");
+                var passwordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+                if (!passwordResult.Succeeded)
+                {
+                    foreach (var error in passwordResult.Errors)
+                    {
+                        ModelState.AddModelError("ChangePassword." + error.Code, error.Description);
+                        _logger.LogError($"Password change error: {error.Description}");
+                    }
+                    ViewData.ModelState.AddModelError("ChangePassword", "");
+                    return View("edit", new EditAccountViewModel { ChangePassword = model });
+                }
+
+                await _userManager.UpdateAsync(user);
+                await _signInManager.RefreshSignInAsync(user);
+                TempData["SuccessMessage"] = "Your Password has been updated successfully.";
+                return RedirectToAction("edit");
+            }
+
+            ViewData.ModelState.AddModelError("ChangePassword", "");
+            return View("edit", new EditAccountViewModel { ChangePassword = model });
+        }
+
+        // DELETE ACCOUNT
+        [HttpPost]
+        public async Task<IActionResult> delete()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user != null)
+            {
+                user.Phone = "deleted";
+                user.Address = "deleted";
+
+                var newPassword = Guid.NewGuid().ToString();
+                
+                await _userManager.RemovePasswordAsync(user);
+                await _userManager.AddPasswordAsync(user, newPassword);
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignOutAsync();
+                    return RedirectToAction("index", "home");
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View("edit");
+                }
+            }
+            return RedirectToAction("index", "home");
         }
     }
 }

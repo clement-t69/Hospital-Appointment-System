@@ -4,11 +4,22 @@
     ViewData["Title"] = "Login";
 }
 
-<div class="container d-flex justify-content-center" style="min-height: 50vh;">
+<div class="container d-flex justify-content-center" style="min-height: 60vh;">
     <div class="row justify-content-center">
         <div>
-            <div class="text-center">
-                <h2>Login</h2>
+            <div style="color: white; user-select: none;">
+                <a>_________________________________________________________________________________________</a>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a class="little-white-button" asp-controller="account" asp-action="login_or_register" style="text-decoration: none; width: 85px;">
+                    <div class="text-content fs-6 px-2 fw-bold text-center">
+                        <div>< Back</div>
+                    </div>
+                </a>
+                <div class="text-center" style="flex-grow: 1;">
+                    <h2>Log In to your Account</h2>
+                </div>
+                <div style="width: 100px;"></div>
             </div>
             <section>
                 <form id="account" method="post" asp-route-returnUrl="@ViewData["ReturnUrl"]">
@@ -17,30 +28,33 @@
                         <hr />
                     </div>
                     <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                        <label asp-for="Email" class="form-label">Email</label>
+                    <div class="rounded_fields form-label mb-3">
+                        <input asp-for="Email" class="form-control" autocomplete="username" aria-required="true" placeholder="john.doe@example.com" />
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
-                    <div class="form-floating mb-3">
-                        <input asp-for="Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" style="width: 100%; " />
-                        <label asp-for="Password" class="form-label">Password</label>
+                    <div class="rounded_fields form-label mb-3">
+                        <input asp-for="Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="Password" style="width: 100%; " />
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
-                    <div class="checkbox mb-3 text-center">
-                        <label asp-for="RememberMe" class="form-label">
+                    <div class="checkbox mb-3 text-center rounded-checkbox">
+                        <label asp-for="RememberMe" class="form-label form-check-label mt-2">
                             <input class="form-check-input" asp-for="RememberMe" />
                             @Html.DisplayNameFor(m => m.RememberMe)
                         </label>
                     </div>
                     <div class="text-center">
-                        <button id="login-submit" type="submit" class="w-100 btn btn-lg btn-primary mb-3">Log In</button>
-                        <li class="nav-item" style="list-style-type: none;">
-                            <a asp-area="" asp-controller="account" asp-action="forgot_password">Forgot Password?</a>
-                        </li>
-                        <li class="nav-item" style="list-style-type: none;">
-                            <a asp-area="" asp-controller="account" asp-action="register">Register</a>
-                        </li>
+                        <button type="submit" class="big-blue-button w-100 btn btn-primary mb-3">
+                            <div class="text-content fs-5 px-3 fw-bold">
+                                <div>🔑 Log In</div>
+                            </div>
+                        </button>
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <a class="little-white-button" asp-controller="account" asp-action="forgot_password" style="text-decoration: none; width: 200px;">
+                                <div class="text-content fs-6 px-2 fw-bold text-center">
+                                    <div>Forgot Password?</div>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </form>
             </section>
