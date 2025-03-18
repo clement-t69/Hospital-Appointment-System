@@ -241,7 +241,7 @@ namespace HealthApp.MVC.Controllers
             return View("edit", new EditAccountViewModel { ChangeEmail = model });
         }
 
-        // CHANGE PASSWORD
+        // CHANGE PASSWORD : NEED FIXES 
         [HttpPost]
         public async Task<IActionResult> change_password(ChangePasswordInputModel model)
         {
@@ -282,7 +282,7 @@ namespace HealthApp.MVC.Controllers
             return View("edit", new EditAccountViewModel { ChangePassword = model });
         }
 
-        // DELETE ACCOUNT
+        // DELETE ACCOUNT BY KEEPING INFORMATIONS FOR MEDICAL HISTORY
         [HttpPost]
         public async Task<IActionResult> delete()
         {
@@ -312,6 +312,35 @@ namespace HealthApp.MVC.Controllers
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
                     return View("edit");
+                }
+            }
+            return RedirectToAction("index", "home");
+        }
+
+        // DELETE ACCOUNT BY DELETING ALL INFORMATIONS
+        [HttpPost]
+        public async Task<IActionResult> delete_all()
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+
+                if (user != null)
+                {
+                    var result = await _userManager.DeleteAsync(user);
+                    if (result.Succeeded)
+                    {
+                        await _signInManager.SignOutAsync();
+                        return RedirectToAction("index", "home");
+                    }
+                    else
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View("edit");
+                    }
                 }
             }
             return RedirectToAction("index", "home");
