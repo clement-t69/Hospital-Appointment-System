@@ -245,8 +245,17 @@ namespace HealthApp.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> change_password(ChangePasswordInputModel model)
         {
-            var user = await _userManager.GetUserAsync(User);
+            _logger.LogInformation("************************************ Change Password attempt ******************************************");
 
+            if (!ModelState.IsValid)
+            {
+                ViewData.ModelState.AddModelError("ChangePassword", "");
+                return View("edit", new EditAccountViewModel { ChangePassword = model });
+            }
+
+            _logger.LogInformation("************************************ Change Password ModelState is valid ******************************************");
+
+            var user = await _userManager.GetUserAsync(User);
             var passwordCheck = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
 
             if (!passwordCheck)
@@ -256,30 +265,36 @@ namespace HealthApp.MVC.Controllers
                 return View("edit", new EditAccountViewModel { ChangePassword = model });
             }
 
-            if (ModelState.IsValid)
-            { 
-                _logger.LogInformation("Password change attempt");
-                var passwordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            _logger.LogInformation("************************************ Change Password Current Password is correct ******************************************");
 
-                if (!passwordResult.Succeeded)
-                {
-                    foreach (var error in passwordResult.Errors)
-                    {
-                        ModelState.AddModelError("ChangePassword." + error.Code, error.Description);
-                        _logger.LogError($"Password change error: {error.Description}");
-                    }
-                    ViewData.ModelState.AddModelError("ChangePassword", "");
-                    return View("edit", new EditAccountViewModel { ChangePassword = model });
-                }
-
-                await _userManager.UpdateAsync(user);
-                await _signInManager.RefreshSignInAsync(user);
-                TempData["SuccessMessage"] = "Your Password has been updated successfully.";
-                return RedirectToAction("edit");
+            if (model.NewPassword == model.CurrentPassword)
+            {
+                ModelState.AddModelError("ChangePassword.NewPassword", "The new password must be different from the current password.");
+                ViewData.ModelState.AddModelError("ChangePassword", "");
+                return View("edit", new EditAccountViewModel { ChangePassword = model });
             }
 
-            ViewData.ModelState.AddModelError("ChangePassword", "");
-            return View("edit", new EditAccountViewModel { ChangePassword = model });
+            _logger.LogInformation("************************************ Change Password New Password is different ******************************************");
+
+            var passwordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+
+            if (!passwordResult.Succeeded)
+            {
+                foreach (var error in passwordResult.Errors)
+                {
+                    ModelState.AddModelError("ChangePassword." + error.Code, error.Description);
+                    _logger.LogError($"Password change error: {error.Description}");
+                }
+                ViewData.ModelState.AddModelError("ChangePassword", "");
+                return View("edit", new EditAccountViewModel { ChangePassword = model });
+            }
+
+            _logger.LogInformation("************************************ Change Password Password has been updated ******************************************");
+
+            await _userManager.UpdateAsync(user);
+            await _signInManager.RefreshSignInAsync(user);
+            TempData["SuccessMessage"] = "Your Password has been updated successfully.";
+            return RedirectToAction("edit");
         }
 
         // DELETE ACCOUNT BY KEEPING INFORMATIONS FOR MEDICAL HISTORY

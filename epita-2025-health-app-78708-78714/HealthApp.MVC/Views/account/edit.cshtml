@@ -133,16 +133,13 @@
                                     }
                                     <form id="changePasswordForm" asp-controller="account" asp-action="change_password" method="post">
                                         <div class="rounded_fields form-label mb-3">
-                                            <input asp-for="ChangePassword.CurrentPassword" type="password" class="form-control" id="CurrentPassword" name="ChangePassword.CurrentPassword" aria-required="true" placeholder="Current Password" style="width: 100%;" />
-                                            <span asp-validation-for="ChangePassword.CurrentPassword" class="text-danger"></span>
+                                            <input asp-for="ChangePassword.CurrentPassword" type="password" class="form-control" id="CurrentPassword" name="CurrentPassword" aria-required="true" placeholder="Current Password" style="width: 100%;" />
                                         </div>
                                         <div class="rounded_fields form-label mb-3">
-                                            <input asp-for="ChangePassword.NewPassword" type="password" class="form-control" id="NewPassword" name="ChangePassword.NewPassword" aria-required="true" placeholder="New Password" style="width: 100%;" />
-                                            <span asp-validation-for="ChangePassword.NewPassword" class="text-danger"></span>
+                                            <input asp-for="ChangePassword.NewPassword" type="password" class="form-control" id="NewPassword" name="NewPassword" aria-required="true" placeholder="New Password" style="width: 100%;" />
                                         </div>
                                         <div class="rounded_fields form-label mb-3">
-                                            <input asp-for="ChangePassword.ConfirmNewPassword" type="password" class="form-control" id="ConfirmNewPassword" name="ChangePassword.ConfirmNewPassword" aria-required="true" placeholder="Confirm New Password" style="width: 100%;" />
-                                            <span asp-validation-for="ChangePassword.ConfirmNewPassword" class="text-danger"></span>
+                                            <input asp-for="ChangePassword.ConfirmNewPassword" type="password" class="form-control" id="ConfirmNewPassword" name="ConfirmNewPassword" aria-required="true" placeholder="Confirm New Password" style="width: 100%;" />
                                         </div>
                                     </form>
                                 </div>
