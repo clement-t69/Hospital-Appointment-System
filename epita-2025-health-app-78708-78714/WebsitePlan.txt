@@ -46,6 +46,7 @@
 		Calendar by month on the right with appointments
 		The calendar can be filtered by doctor name, status
 		When an appointment is booked --> Send Message to Patient (can be viewed in Account/Messages)
+		Monday to friday between 9am and 5pm only (15 minutes slots) but not between 12pm and 1pm
 
 [❌]	Views/account/my_appointments.cshtml (as a doctor):
 		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
@@ -60,6 +61,7 @@
 		Generate a report of daily or weekly appointments (button with pop-up to choose daily or weekly)
 		Export appointments data to a CSV or PDF file (button with pop-up to choose CSV or PDF)
 		Track the number of no-shows and cancellations (red icon with number per month)
+		Monday to friday between 9am and 5pm only (15 minutes slots) but not between 12pm and 1pm
 
 [✅]	Views/account/edit.cshtml (as a patient):
 		Profile (hyperlink to Profile)
