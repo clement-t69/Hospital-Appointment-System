@@ -104,6 +104,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcYWNjb3VudFxyZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/care/patients.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcY2FyZVxwYXRpZW50cy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/thore/Documents/GitHub/epita-2025-health-app-78708-78714/epita-2025-health-app-78708-78714/HealthApp.MVC/Views/home/cancellation_policy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcaG9tZVxjYW5jZWxsYXRpb25fcG9saWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

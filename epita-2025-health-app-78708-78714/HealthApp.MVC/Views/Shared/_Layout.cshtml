@@ -22,19 +22,59 @@
                     <ul class="navbar-nav ms-auto">
                         @if (User.Identity.IsAuthenticated)
                         {
-                            <li class="nav-item mx-3">
-                                <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
-                            </li>
-                            <li class="nav-item mx-3">
-                                <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_appointments">My Appointments</a>
-                            </li>
-                            <li class="nav-item mx-3">
-                                <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="edit">My Account</a>
-                            </li>
-                            <li class="nav-item mx-3">
-                                <span class="nav-link fw-bold" style="cursor: pointer; color:aliceblue" onclick="document.getElementById('logoutForm').submit();">Log Out</span>
-                                <form id="logoutForm" method="post" asp-controller="account" asp-action="logout" style="display: none;"></form>
-                            </li>
+                            if (ViewBag.IsDoctor == true)
+                            {
+                                <li class="nav-item mx-3">
+                                    <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
+                                </li>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
+                                <li class="nav-item mx-3">
+                                    <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_appointments">My Appointments</a>
+                                </li>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
+                                <li class="nav-item mx-3">
+                                    <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="care" asp-action="patients">My Patients</a>
+                                </li>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
+                                <li class="nav-item mx-3">
+                                    <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="edit">My Account</a>
+                                </li>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
+                                <li class="nav-item mx-3">
+                                    <span class="nav-link fw-bold" style="cursor: pointer; color:aliceblue" onclick="document.getElementById('logoutForm').submit();">Log Out</span>
+                                    <form id="logoutForm" method="post" asp-controller="account" asp-action="logout" style="display: none;"></form>
+                                </li>
+                            }
+                            else if (ViewBag.IsPatient == true)
+                            {
+                                <li class="nav-item mx-3">
+                                    <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
+                                </li>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
+                                <li class="nav-item mx-3">
+                                    <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_appointments">My Appointments</a>
+                                </li>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
+                                <li class="nav-item mx-3">
+                                    <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="edit">My Account</a>
+                                </li>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
+                                <li class="nav-item mx-3">
+                                    <span class="nav-link fw-bold" style="cursor: pointer; color:aliceblue" onclick="document.getElementById('logoutForm').submit();">Log Out</span>
+                                    <form id="logoutForm" method="post" asp-controller="account" asp-action="logout" style="display: none;"></form>
+                                </li>
+                            }
+                            else if (ViewBag.IsAdmin == true)
+                            {
+                                <li class="nav-item mx-3">
+                                    <a class="nav-link fw-bold" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="edit">My Account</a>
+                                </li>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
+                                <li class="nav-item mx-3">
+                                    <span class="nav-link fw-bold" style="cursor: pointer; color:aliceblue" onclick="document.getElementById('logoutForm').submit();">Log Out</span>
+                                    <form id="logoutForm" method="post" asp-controller="account" asp-action="logout" style="display: none;"></form>
+                                </li>
+                            }
                         }
                         else
                         {
