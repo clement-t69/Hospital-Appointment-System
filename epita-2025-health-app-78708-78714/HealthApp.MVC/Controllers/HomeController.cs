@@ -19,10 +19,15 @@ namespace HealthApp.MVC.Controllers
         public IActionResult index()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
+            if (user == null)
+            {
+                return View();
+            }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Admin");
+
             return View();
         }
 
@@ -37,28 +42,43 @@ namespace HealthApp.MVC.Controllers
         public IActionResult my_messages()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
+            if (user == null)
+            {
+                return View();
+            }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Admin");
+
             return View();
         }
         public IActionResult my_appointments()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
+            if (user == null)
+            {
+                return View();
+            }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Admin");
+
             return View();
         }
         public IActionResult edit()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
+            if (user == null)
+            {
+                return View();
+            }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Admin");
+
             return View();
         }
         [HttpPost]
@@ -72,20 +92,30 @@ namespace HealthApp.MVC.Controllers
         public IActionResult cancellation_policy()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
+            if (user == null)
+            {
+                return View();
+            }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Admin");
+
             return View();
         }
 
         public IActionResult error()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
+            if (user == null)
+            {
+                return View();
+            }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Admin");
+
             return View();
         }
     }
