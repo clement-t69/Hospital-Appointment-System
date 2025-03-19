@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HealthApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.CodeAnalysis.Emit;
+using System.Runtime.InteropServices;
+using System.Data.Entity.Validation;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -39,14 +40,30 @@ namespace HealthApp.MVC.Controllers
         // IF LOGGED IN
         public IActionResult my_messages()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+
             return View();
         }
         public IActionResult my_appointments()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
             return View();
         }
         public IActionResult edit()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
             return View();
         }
         [HttpPost]
@@ -59,6 +76,11 @@ namespace HealthApp.MVC.Controllers
         // FOOTER
         public IActionResult cancellation_policy()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
             return View();
         }
 
@@ -144,7 +166,6 @@ namespace HealthApp.MVC.Controllers
         public IActionResult forgot_password()
         {
             return View();
-
         }
 
         // EDIT ACCOUNT
@@ -161,6 +182,8 @@ namespace HealthApp.MVC.Controllers
 
             var userRoles = await _userManager.GetRolesAsync(user);
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
 
             return View(new EditAccountViewModel
             {
@@ -174,6 +197,11 @@ namespace HealthApp.MVC.Controllers
         [Authorize]
         public IActionResult my_profile()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
             return View();
         }
 
@@ -181,6 +209,11 @@ namespace HealthApp.MVC.Controllers
         [Authorize]
         public IActionResult my_medical_history()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
             return View();
         }
 
@@ -188,6 +221,11 @@ namespace HealthApp.MVC.Controllers
         [Authorize]
         public IActionResult my_prescriptions()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
             return View();
         }
 
@@ -195,22 +233,43 @@ namespace HealthApp.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> change_email(ChangeEmailInputModel model)
         {
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+
+            if (model.CurrentEmail == null || model.NewEmail == null || model.ConfirmNewEmail == null)
+            {
+                TempData["FailMessage"] = "All fields are required.";
+                return RedirectToAction("edit");
+            }
+
             if (model.CurrentEmail != User.Identity.Name)
             {
-                ModelState.AddModelError("CurrentEmail", "The Current Email does not match your Account Email.");
-                ViewData.ModelState.AddModelError("ChangeEmail", "");
-                return View("edit", new EditAccountViewModel { ChangeEmail = model });
+                TempData["FailMessage"] = "The current Email does not match your account Email.";
+                return RedirectToAction("edit");
+            }
+
+            if (model.NewEmail == model.CurrentEmail || model.ConfirmNewEmail == model.CurrentEmail)
+            {
+                TempData["FailMessage"] = "The new Email must be different from the current Email.";
+                return RedirectToAction("edit");
+            }
+
+            if (model.NewEmail != model.ConfirmNewEmail)
+            {
+                TempData["FailMessage"] = "The Emails do not match.";
+                return RedirectToAction("edit");
             }
 
             if (ModelState.IsValid)
             {
-                var user = await _userManager.GetUserAsync(User);
-
                 var existingUser = await _userManager.FindByEmailAsync(model.NewEmail);
 
                 if (existingUser != null && existingUser.Id != user.Id)
                 {
-                    ModelState.AddModelError("NewEmail", "This email is already in use.");
+                    TempData["FailMessage"] = "This Email is already in use.";
                     return RedirectToAction("edit");
                 }
 
@@ -237,44 +296,54 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("edit");
             }
 
-            ViewData.ModelState.AddModelError("ChangeEmail", "");
-            return View("edit", new EditAccountViewModel { ChangeEmail = model });
+            //TempData["FailMessage"] = "The Email change failed.";
+            return RedirectToAction("edit");
         }
 
         // CHANGE PASSWORD : NEED FIXES 
         [HttpPost]
         public async Task<IActionResult> change_password(ChangePasswordInputModel model)
         {
-            _logger.LogInformation("************************************ Change Password attempt ******************************************");
-
-            if (!ModelState.IsValid)
-            {
-                ViewData.ModelState.AddModelError("ChangePassword", "");
-                return View("edit", new EditAccountViewModel { ChangePassword = model });
-            }
-
-            _logger.LogInformation("************************************ Change Password ModelState is valid ******************************************");
+            _logger.LogInformation("*******************************************************************************************************\n************************************ Change Password attempt ******************************************\n*******************************************************************************************************");
 
             var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+
+            _logger.LogInformation("*******************************************************************************************************\n************************************ Change Password tests ********************************************\n*******************************************************************************************************");
+
+            if (model.CurrentPassword == null || model.NewPassword == null || model.ConfirmNewPassword == null)
+            {
+                _logger.LogInformation("*******************************************************************************************************\n************************************ All fields required ********************************************\n*******************************************************************************************************");
+                TempData["FailMessage"] = "All fields are required.";
+                return RedirectToAction("edit");
+            }
+
             var passwordCheck = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
 
             if (!passwordCheck)
             {
-                ModelState.AddModelError("ChangePassword.CurrentPassword", "The Current Password does not match your Account Password.");
-                ViewData.ModelState.AddModelError("ChangePassword", "");
-                return View("edit", new EditAccountViewModel { ChangePassword = model });
+                TempData["FailMessage"] = "The current Password does not match your account Password.";
+                return RedirectToAction("edit");
             }
 
-            _logger.LogInformation("************************************ Change Password Current Password is correct ******************************************");
-
-            if (model.NewPassword == model.CurrentPassword)
+            if (model.NewPassword == model.CurrentPassword || model.ConfirmNewPassword == model.CurrentPassword)
             {
-                ModelState.AddModelError("ChangePassword.NewPassword", "The new password must be different from the current password.");
-                ViewData.ModelState.AddModelError("ChangePassword", "");
-                return View("edit", new EditAccountViewModel { ChangePassword = model });
+                TempData["FailMessage"] = "The new Password must be different from the current Password.";
+                return RedirectToAction("edit");
             }
 
-            _logger.LogInformation("************************************ Change Password New Password is different ******************************************");
+            if (model.NewPassword != model.ConfirmNewPassword)
+            {
+                TempData["FailMessage"] = "The Passwords do not match.";
+                return RedirectToAction("edit");
+            }
+
+            _logger.LogInformation("*******************************************************************************************************\n********************************* Change Password is on its way ***************************************\n*******************************************************************************************************");
+
+            user.Password = model.NewPassword;
 
             var passwordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
 
@@ -285,11 +354,10 @@ namespace HealthApp.MVC.Controllers
                     ModelState.AddModelError("ChangePassword." + error.Code, error.Description);
                     _logger.LogError($"Password change error: {error.Description}");
                 }
-                ViewData.ModelState.AddModelError("ChangePassword", "");
-                return View("edit", new EditAccountViewModel { ChangePassword = model });
+                return RedirectToAction("edit");
             }
 
-            _logger.LogInformation("************************************ Change Password Password has been updated ******************************************");
+            _logger.LogInformation("*******************************************************************************************************\n************************************** Change Password done *******************************************\n*******************************************************************************************************");
 
             await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
