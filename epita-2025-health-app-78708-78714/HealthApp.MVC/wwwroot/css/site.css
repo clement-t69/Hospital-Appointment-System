@@ -7,7 +7,7 @@ body {
 body {
     display: grid;
     grid-template-rows: auto 1fr auto;
-    font-family: 'Marianne';
+    font-family: 'Segoe UI Variable Display'
 }
 
 header {

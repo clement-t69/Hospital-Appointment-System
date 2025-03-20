@@ -26,7 +26,7 @@ namespace HealthApp.MVC.Controllers
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Admin");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
 
             return View();
         }
@@ -49,7 +49,7 @@ namespace HealthApp.MVC.Controllers
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Admin");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
 
             return View();
         }
@@ -63,7 +63,7 @@ namespace HealthApp.MVC.Controllers
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Admin");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
 
             return View();
         }
@@ -77,7 +77,7 @@ namespace HealthApp.MVC.Controllers
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Admin");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
 
             return View();
         }
@@ -99,7 +99,7 @@ namespace HealthApp.MVC.Controllers
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Admin");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
 
             return View();
         }
@@ -114,7 +114,7 @@ namespace HealthApp.MVC.Controllers
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Admin");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
 
             return View();
         }

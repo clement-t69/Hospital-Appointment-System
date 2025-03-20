@@ -7,7 +7,10 @@
 		Title (hyperlink to Home)																		Log in (hyperlink to Choose)
 
 		When logged:
-		Title (hyperlink to Home)		My messages (hyperlink to Messages)		My appointments (hyperlink to Appointments)		My account (hyperlink to Account)	Log out (button to Log out))											
+		Title (hyperlink to Home)		My messages (hyperlink to Messages)			My appointments (hyperlink to Appointments)		My account (hyperlink to Account)		Log out (button to Log out)									
+
+		When logged as an administrator:
+		Title (hyperlink to Home)		Admin panel (hyperlink to Admin Panel)		My account (hyperlink to Account)				Log out (button to Log out)
 
 		Bottom of the page:
 		Cancellation Policy (hyperlink to Cancellation Policy)
@@ -65,19 +68,31 @@
 
 [✅]	Views/account/edit.cshtml (as a patient):
 		Profile (hyperlink to Profile)
+		My appointments (hyperlink to Appointments)
 		Medical history (hyperlink to Medical History)
 		Prescriptions (hyperlink to Prescriptions)
+		My messages (hyperlink to Messages)
 		Change email (form with current email, new email, confirm new email, Change button) : NEED FIX (POP UP FIXED WHEN ERROR)
 		Change password (form with current password, new password, confirm new password, Change button)
 		Delete account (button to Delete account)
 
 [✅]	Views/account/edit.cshtml (as a doctor):
-		Profile (hyperlink to Profile)
+		Profile (hyperlink to Profile
+		My appointments (hyperlink to Appointments)
+		My patients (hyperlink to Patients)
+		My messages (hyperlink to Messages)
 		Change email (form with current email, new email, confirm new email, Change button)
 		Change password (form with current password, new password, confirm new password, Change button)
 		Delete account (button opening a pop-up telling to contact an Administrator)
 
-[⏯️]	Views/home/cancellation_policy.cshtml:
+[✅]	Views/account/edit.cshtml (as a doctor):
+		Profile (hyperlink to Profile)
+		My messages (hyperlink to Messages)
+		Change email (form with current email, new email, confirm new email, Change button)
+		Change password (form with current password, new password, confirm new password, Change button)
+		Delete account (button opening a pop-up telling to contact an Administrator)
+
+[✅]	Views/home/cancellation_policy.cshtml:
 		Title: Cancellation Policy
 		Body: (text)
 
