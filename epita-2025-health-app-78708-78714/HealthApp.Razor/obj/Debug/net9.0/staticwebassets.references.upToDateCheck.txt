@@ -1,3 +1,0 @@
-C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net9.0\staticwebassets.build.json
-C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net9.0\staticwebassets.build.json
-C:\Users\thore\Documents\GitHub\epita-2025-health-app-78708-78714\epita-2025-health-app-78708-78714\HealthApp.MVC\obj\Debug\net9.0\staticwebassets.build.json
