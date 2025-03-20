@@ -9,7 +9,7 @@
                 <a>_________________________________________________________________________________________</a>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <a class="little-white-button" asp-controller="account" asp-action="edit" style="text-decoration: none; width: 85px;">
+                <a class="little-white-button" asp-controller="account" asp-action="edit" style="text-decoration: none; width: 90px;">
                     <div class="text-content fs-6 px-2 fw-bold text-center">
                         <div>< Back</div>
                     </div>
@@ -18,6 +18,26 @@
                     <h2>My Profile</h2>
                 </div>
                 <div style="width: 100px;"></div>
+                
+            </div>
+            <hr />
+            <!-- Encadré sous le titre avec bouton "Edit" en haut à droite -->
+            <div style="position: relative; border: 1px solid #ccc; padding: 20px; margin-top: 10px; width: 500px; text-align: justify; border-radius: 10px; margin: 0 auto;">
+                <!-- Bouton "Edit" en haut à droite -->
+                <a href="#" class="btn btn-secondary" style="position: absolute; top: 10px; right: 10px; font-size: 14px;">
+                    Edit
+                </a>
+
+                <p><strong>"your name"</strong></p>
+                <p>"your address"</p>
+                <p>"your phone number"</p>
+				@if (ViewBag.IsDoctor==true)
+				{
+					<p>"your specialty"</p>
+					<p>"your location"</p>
+				}
+                <!-- <p>"your specialty"</p>   (as a doctor) -->
+                <!-- <p>"your location"</p>   (as a doctor) -->
             </div>
         </div>
     </div>
