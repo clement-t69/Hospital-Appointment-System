@@ -39,6 +39,27 @@
                 <!-- <p>"your specialty"</p>   (as a doctor) -->
                 <!-- <p>"your location"</p>   (as a doctor) -->
             </div>
+            <section>
+                <hr />
+                <!-- Encadré sous le titre avec bouton "Edit" en haut à droite -->
+                <div style="position: relative; border: 1px solid #ccc; padding: 20px; margin-top: 10px; width: 500px; text-align: justify; border-radius: 10px; margin: 0 auto;">
+                    <!-- Bouton "Edit" en haut à droite -->
+                    <a href="#" class="btn btn-secondary" style="position: absolute; top: 10px; right: 10px; font-size: 14px;">
+                        Edit
+                    </a>
+
+                    <p><strong>"your name"</strong></p>
+                    <p>"your address"</p>
+                    <p>"your phone number"</p>
+                    @if (ViewBag.IsDoctor == true)
+                    {
+                        <p>"your specialty"</p>
+                        <p>"your location"</p>
+                    }
+                    <!-- <p>"your specialty"</p>   (as a doctor) -->
+                    <!-- <p>"your location"</p>   (as a doctor) -->
+                </div>
+            </section>
         </div>
     </div>
 </div>
