@@ -1,26 +1,29 @@
-﻿@{
+@{
     ViewData["Title"] = "Cancellation Policy";
 }
 
-
-
 <div class="container d-flex justify-content-center" style="min-height: 50vh;">
     <div class="row justify-content-center">
-        <div class="col-md-32">
+        <div>
             <div style="color: white; user-select: none;">
                 <a>_________________________________________________________________________________________</a>
             </div>
-            <div style="display: flex; justify-content: center; align-items: center;">
-                <div class="text-center" style="flex-grow: 1;">
-                    <h1 style="font-weight: 700">Cancellation Policy</h1>
-                </div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a class="little-white-button" asp-controller="home" asp-action="index" style="text-decoration: none; width: 90px; box-shadow:none;">
+                    <div class="text-content fs-6 px-2 fw-bold text-center">
+                        <div>< Back</div>
+                    </div>
+                </a>
+            </div>
+            <div class="text-center" style="flex-grow: 1;">
+                <h1 style="font-weight: 700">Cancellation Policy</h1>
             </div>
             <section>
-				    <hr />
+				<hr />
                 <div style="font-size: 18px; max-width: 800px; text-align:justify;" >
                         <p>We understand that unforeseen circumstances may arise, requiring you to cancel or reschedule an appointment. However, to ensure efficient scheduling and availability for all patients, we have implemented the following cancellation policy:</p>
 
-                        <p><strong>The No-Show Fee:</strong> this measure allows healthcare facilities, health services, medical centers, and independent healthcare professionals to apply a penalty in the following cases:</p>
+                        <p><strong>The No-Show Fee</strong>: this measure allows healthcare facilities, health services, medical centers, and independent healthcare professionals to apply a penalty in the following cases:</p>
 
                         <ul>
                             <li>Failure to attend a scheduled appointment without prior notice;</li>
