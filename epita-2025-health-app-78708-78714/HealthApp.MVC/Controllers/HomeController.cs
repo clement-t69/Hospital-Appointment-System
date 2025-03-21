@@ -104,7 +104,7 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        public IActionResult error()
+        public IActionResult contact()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
             if (user == null)
