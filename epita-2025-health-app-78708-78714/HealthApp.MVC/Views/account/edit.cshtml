@@ -4,7 +4,7 @@
     ViewData["Title"] = "Account";
 }
 
-@if (User.Identity.IsAuthenticated)
+@if (ViewBag.IsLogged == true)
 {
     <div class="container d-flex justify-content-center" style="min-height: 50vh; ">
         <div class="row justify-content-center">
@@ -548,7 +548,7 @@ else
 {
     @section scripts {
     <script>
-        window.location.href = '@Url.Action("index", "home")';
+        window.location.href = '@Url.Action("login_or_register", "account")';
     </script>
     }
 }
