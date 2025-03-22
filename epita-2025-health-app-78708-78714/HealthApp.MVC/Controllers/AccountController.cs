@@ -30,6 +30,18 @@ namespace HealthApp.MVC.Controllers
             _logger = logger;
         }
 
+        // ERROR
+        public IActionResult error()
+        {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("Doctor");
+            ViewBag.IsPatient = userRoles.Contains("Patient");
+            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            return View();
+        }
+
         // HEADER
         // IF NOT LOGGED IN
         public IActionResult login_or_register()
@@ -42,6 +54,7 @@ namespace HealthApp.MVC.Controllers
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -52,6 +65,7 @@ namespace HealthApp.MVC.Controllers
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -61,6 +75,7 @@ namespace HealthApp.MVC.Controllers
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -78,6 +93,7 @@ namespace HealthApp.MVC.Controllers
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -181,6 +197,7 @@ namespace HealthApp.MVC.Controllers
             ViewBag.UserPasswordLength = user.Password.Length;
 
             var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -199,6 +216,7 @@ namespace HealthApp.MVC.Controllers
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -211,6 +229,7 @@ namespace HealthApp.MVC.Controllers
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -223,6 +242,7 @@ namespace HealthApp.MVC.Controllers
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -235,6 +255,7 @@ namespace HealthApp.MVC.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
@@ -304,19 +325,20 @@ namespace HealthApp.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> change_password(ChangePasswordInputModel model)
         {
-            _logger.LogInformation("*******************************************************************************************************\n************************************ Change Password attempt ******************************************\n*******************************************************************************************************");
+            //_logger.LogInformation("*******************************************************************************************************\n************************************ Change Password attempt ******************************************\n*******************************************************************************************************");
 
             var user = await _userManager.GetUserAsync(User);
             var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("Doctor");
             ViewBag.IsPatient = userRoles.Contains("Patient");
             ViewBag.IsAdmin = userRoles.Contains("Administrator");
 
-            _logger.LogInformation("*******************************************************************************************************\n************************************ Change Password tests ********************************************\n*******************************************************************************************************");
+            //_logger.LogInformation("*******************************************************************************************************\n************************************ Change Password tests ********************************************\n*******************************************************************************************************");
 
             if (model.CurrentPassword == null || model.NewPassword == null || model.ConfirmNewPassword == null)
             {
-                _logger.LogInformation("*******************************************************************************************************\n************************************ All fields required ********************************************\n*******************************************************************************************************");
+                //_logger.LogInformation("*******************************************************************************************************\n************************************ All fields required ********************************************\n*******************************************************************************************************");
                 TempData["FailMessage"] = "All fields are required.";
                 return RedirectToAction("edit");
             }
@@ -341,7 +363,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("edit");
             }
 
-            _logger.LogInformation("*******************************************************************************************************\n********************************* Change Password is on its way ***************************************\n*******************************************************************************************************");
+            //_logger.LogInformation("*******************************************************************************************************\n********************************* Change Password is on its way ***************************************\n*******************************************************************************************************");
 
             user.Password = model.NewPassword;
 
@@ -357,7 +379,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("edit");
             }
 
-            _logger.LogInformation("*******************************************************************************************************\n************************************** Change Password done *******************************************\n*******************************************************************************************************");
+            //_logger.LogInformation("*******************************************************************************************************\n************************************** Change Password done *******************************************\n*******************************************************************************************************");
 
             await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
