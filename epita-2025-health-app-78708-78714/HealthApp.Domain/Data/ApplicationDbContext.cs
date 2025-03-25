@@ -1,15 +1,17 @@
 ﻿using HealthApp.Domain.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace HealthApp.Domain.Data
 {
-    public class ApplicationDbContext: IdentityDbContext<User>
+    public class ApplicationDbContext: IdentityDbContext<IdentityUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
         }
 
+        //public DbSet<User> Users { get; set; }
         public DbSet<Administrator> Administrators { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
@@ -27,25 +29,25 @@ namespace HealthApp.Domain.Data
             // Administrator
             modelBuilder.Entity<Administrator>()
                 .HasOne<User>()
-                .WithMany()
-                .HasForeignKey(a => a.UserId);
+                .WithOne()
+                .HasForeignKey<Administrator>(a => a.UserId);
 
             // Appointment
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Doctor)
-                .WithMany()
+                .WithMany(d => d.Appointments)
                 .HasForeignKey(a => a.DoctorId);
 
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.Patient)
-                .WithMany()
+                .WithMany(p => p.Appointments)
                 .HasForeignKey(a => a.PatientId);
 
             // Doctor
             modelBuilder.Entity<Doctor>()
                 .HasOne<User>()
-                .WithMany()
-                .HasForeignKey(d => d.UserId);
+                .WithOne()
+                .HasForeignKey<Doctor>(d => d.UserId);
 
             modelBuilder.Entity<Doctor>() // Multiple Appointments
                 .HasMany(d => d.Appointments)
@@ -99,8 +101,8 @@ namespace HealthApp.Domain.Data
             // Patient
             modelBuilder.Entity<Patient>()
                 .HasOne<User>()
-                .WithMany()
-                .HasForeignKey(p => p.UserId);
+                .WithOne()
+                .HasForeignKey<Patient>(p => p.UserId);
 
             modelBuilder.Entity<Patient>() // Multiple Appointments
                 .HasMany(p => p.Appointments)
@@ -132,6 +134,14 @@ namespace HealthApp.Domain.Data
                 .HasOne(p => p.Patient)
                 .WithMany(p => p.Prescriptions)
                 .HasForeignKey(p => p.PatientId);
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlite("Data Source=../HealthApp.MVC/HealthApp.db");
+            }
         }
     }
 }

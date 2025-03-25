@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using HealthApp.Domain.Models;
+using Microsoft.AspNetCore.Identity;
 
 namespace HealthApp.MVC.Roles
 {
@@ -7,8 +8,7 @@ namespace HealthApp.MVC.Roles
         public static async Task CreateRoles(IServiceProvider serviceProvider)
         {
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-
-            string[] roleNames = { "Administrator", "Patient", "Doctor" };
+            string[] roleNames = { "administrator", "patient", "doctor" };
 
             foreach (var roleName in roleNames)
             {

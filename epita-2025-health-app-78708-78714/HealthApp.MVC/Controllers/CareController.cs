@@ -1,6 +1,7 @@
 using HealthApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using HealthApp.Domain.Data;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -8,12 +9,15 @@ namespace HealthApp.MVC.Controllers
     {
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly ApplicationDbContext _context;
 
         public CareController(SignInManager<User> signInManager,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger, ApplicationDbContext context
+            )
         {
             _signInManager = signInManager;
             _logger = logger;
+            _context = context;
         }
 
         // ERROR
@@ -26,9 +30,9 @@ namespace HealthApp.MVC.Controllers
             }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
 
@@ -41,10 +45,9 @@ namespace HealthApp.MVC.Controllers
             }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
-
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
 
@@ -57,11 +60,28 @@ namespace HealthApp.MVC.Controllers
             }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
-
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> appointmentCreation (DateTime date, TimeSpan time, string doctorId, string patientId)
+        {
+            var appointment = new Appointment
+            {
+                Date = date,
+                Time = time,
+                DoctorId = doctorId,
+                PatientId = patientId
+            };
+
+            _context.Appointments.Add(appointment);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation($"Appointment created at {date}, with patient {patientId} and doctor {doctorId}");
+            return RedirectToAction("appointments", "care");
         }
     }
 }

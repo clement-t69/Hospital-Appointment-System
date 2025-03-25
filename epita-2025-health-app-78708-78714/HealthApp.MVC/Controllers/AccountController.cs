@@ -7,6 +7,10 @@ using HealthApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Runtime.InteropServices;
 using System.Data.Entity.Validation;
+using System.Data.Entity;
+using HealthApp.Domain.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -36,9 +40,10 @@ namespace HealthApp.MVC.Controllers
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
             return View();
         }
 
@@ -55,9 +60,9 @@ namespace HealthApp.MVC.Controllers
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
 
             return View();
         }
@@ -66,19 +71,22 @@ namespace HealthApp.MVC.Controllers
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
-            return View();
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            return RedirectToAction("appointments", "care");
+
         }
         public IActionResult edit()
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
             return View();
         }
         [HttpPost]
@@ -94,9 +102,10 @@ namespace HealthApp.MVC.Controllers
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
             return View();
         }
 
@@ -158,13 +167,16 @@ namespace HealthApp.MVC.Controllers
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
-                var roleName = "Patient";
+                var roleName = "patient";
 
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    await _signInManager.SignInAsync(user, isPersistent: true);
+                    _logger.LogInformation($"User {user.Email} signed in after registration.");
                     await _userManager.AddToRoleAsync(user, roleName);
-                    _logger.LogInformation($"{model.FirstName} {model.LastName} created a new account with the Email address {model.Email}.");
+
+                    _logger.LogInformation($"\n*****************************\n{model.FirstName} {model.LastName} created a new account with the Email address {model.Email}.\n*****************************\n");
+
                     return RedirectToAction("edit", "account");
                 }
                 else
@@ -186,10 +198,15 @@ namespace HealthApp.MVC.Controllers
 
         // EDIT ACCOUNT
         [HttpGet]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Edit()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
             ViewBag.UserFirstName = user.FirstName;
             ViewBag.UserLastName = user.LastName;
@@ -198,9 +215,9 @@ namespace HealthApp.MVC.Controllers
 
             var userRoles = await _userManager.GetRolesAsync(user);
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
 
             return View(new EditAccountViewModel
             {
@@ -217,9 +234,10 @@ namespace HealthApp.MVC.Controllers
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
             return View();
         }
 
@@ -230,9 +248,10 @@ namespace HealthApp.MVC.Controllers
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
             return View();
         }
 
@@ -243,9 +262,10 @@ namespace HealthApp.MVC.Controllers
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
             return View();
         }
 
@@ -253,12 +273,12 @@ namespace HealthApp.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> change_email(ChangeEmailInputModel model)
         {
-            var user = await _userManager.GetUserAsync(User);
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
 
             if (model.CurrentEmail == null || model.NewEmail == null || model.ConfirmNewEmail == null)
             {
@@ -327,12 +347,12 @@ namespace HealthApp.MVC.Controllers
         {
             //_logger.LogInformation("*******************************************************************************************************\n************************************ Change Password attempt ******************************************\n*******************************************************************************************************");
 
-            var user = await _userManager.GetUserAsync(User);
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
 
             //_logger.LogInformation("*******************************************************************************************************\n************************************ Change Password tests ********************************************\n*******************************************************************************************************");
 

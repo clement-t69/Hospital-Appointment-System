@@ -8,13 +8,9 @@ namespace HealthApp.Domain.Models
         public DateTime Date { get; set; }
         public TimeSpan Time { get; set; }
 
-        [ForeignKey("DoctorId")]
-        public int DoctorId { get; set; }
-        public Doctor Doctor { get; set; }
+        public string DoctorId { get; set; }
 
-        [ForeignKey("PatientId")]
-        public int PatientId { get; set; }
-        public Patient Patient { get; set; }
+        public string PatientId { get; set; }
 
         public enum Status
         {
