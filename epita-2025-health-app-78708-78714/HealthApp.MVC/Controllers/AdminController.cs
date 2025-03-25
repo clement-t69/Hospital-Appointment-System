@@ -26,9 +26,9 @@ namespace HealthApp.MVC.Controllers
             }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
 
@@ -41,10 +41,9 @@ namespace HealthApp.MVC.Controllers
             }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
-
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
 
@@ -57,10 +56,9 @@ namespace HealthApp.MVC.Controllers
             }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
-
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
 
@@ -73,10 +71,9 @@ namespace HealthApp.MVC.Controllers
             }
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("Doctor");
-            ViewBag.IsPatient = userRoles.Contains("Patient");
-            ViewBag.IsAdmin = userRoles.Contains("Administrator");
-
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
     }
