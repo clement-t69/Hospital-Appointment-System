@@ -11,6 +11,7 @@ using System.Data.Entity;
 using HealthApp.Domain.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
+using System.Globalization;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -237,8 +238,42 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
+            ViewBag.UserFirstName = user.FirstName;
+            ViewBag.UserLastName = user.LastName;
+            ViewBag.UserPhone = user.Phone;
+            ViewBag.UserAddress = user.Address;
 
             return View();
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> change_info(ChangeInfoInputModel model, string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+
+            var user = await _userManager.GetUserAsync(User);
+            if (ModelState.IsValid)
+            {
+                user.Phone = model.Phone;
+                user.Address = model.Address;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                TempData["SuccessMessage"] = "Your information has been updated successfully.";
+                return RedirectToAction("my_profile");
+            }
+            else
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
+            }
+            return RedirectToAction("my_profile");
         }
 
         [HttpGet]

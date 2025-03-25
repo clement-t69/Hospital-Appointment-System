@@ -1,3 +1,5 @@
+@model HealthApp.MVC.Models.ChangeInfoInputModel
+
 @{
     ViewData["Title"] = "Profile";
 }
@@ -22,16 +24,71 @@
                 </div>
                 <section>
                     <hr />
+                    @if (TempData["SuccessMessage"]!=null)
+                    {
+                        <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                    }
                     <!-- Encadré sous le titre avec bouton "Edit" en haut à droite -->
                     <div style="position: relative; border: 1px solid #ccc; padding: 20px; margin-top: 10px; width: 500px; text-align: justify; border-radius: 10px; margin: 0 auto;">
                         <!-- Bouton "Edit" en haut à droite -->
-                        <a href="#" class="btn btn-secondary" style="position: absolute; top: 10px; right: 10px; font-size: 14px;">
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#changeInfoModal" style="position: absolute; top: 10px; right: 10px; font-size: 14px;">
                             Edit
-                        </a>
+                        </button>
 
-                        <p><strong>"your name"</strong></p>
-                        <p>"your address"</p>
-                        <p>"your phone number"</p>
+                        
+
+                        <div class="modal fade @(ViewData.ModelState.ErrorCount > 0 && ViewData.ModelState.ContainsKey("ChangeInfo") ? "show d-block" : "")" id="changeInfoModal" tabindex="-1" aria-labelledby="changeInfoModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="changeInfoModalLabel" style="margin-left: 8px">Change your Information</h5>
+                                        <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("my_profile", "account")'" aria-label="Close" style="margin-right: 6px"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div asp-validation-summary="All" class="text-danger"></div>
+                                        @if (TempData["ErrorMessage"] != null)
+                                        {
+                                            <div class="text-danger">@TempData["ErrorMessage"]</div>
+                                        }
+                                        <form id="changeInfoForm" asp-controller="account" asp-action="change_info" method="post">
+                                            
+                                            <div class="rounded_fields form-label mb-3">
+                                                <input placeholder=@ViewBag.UserFirstName style="width: 100%;" readonly />
+                                            </div>
+
+                                            <!-- Last Name (Readonly) -->
+                                            <div class="rounded_fields form-label mb-3">
+                                                <input placeholder=@ViewBag.UserLastName style="width: 100%;" readonly />
+                                            </div>
+
+                                            <!-- phone number -->
+                                            <div class="rounded_fields form-label mb-3">
+                                                <input asp-for="Phone" type="phone" class="form-control" id="Phone" name="Phone" aria-required="true" placeholder="Phone Number" style="width: 100%;" />
+                                            </div>
+
+                                            <!-- location -->
+                                            <div class="rounded_fields form-label mb-3">
+                                                <input asp-for="Address" type="address" class="form-control" id="Address" name="Address" aria-required="true" placeholder="Address" style="width: 100%;" />
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="little-blue-button" href="#" onclick="document.getElementById('changeInfoForm').submit(); return false;" style="text-decoration: none;">
+                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                <div>💾 Save your Information</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <p><strong>@ViewBag.UserFirstName @ViewBag.UserLastName</strong></p>
+                        <p>@ViewBag.UserPhone</p>
+                        <p>@ViewBag.UserAddress</p>
+                        
                         @if (ViewBag.IsDoctor == true)
                         {
                             <p>"your specialty"</p>
