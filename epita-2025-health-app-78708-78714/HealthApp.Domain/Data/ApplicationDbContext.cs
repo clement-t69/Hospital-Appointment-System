@@ -32,27 +32,11 @@ namespace HealthApp.Domain.Data
                 .WithOne()
                 .HasForeignKey<Administrator>(a => a.UserId);
 
-            // Appointment
-            modelBuilder.Entity<Appointment>()
-                .HasOne(a => a.Doctor)
-                .WithMany(d => d.Appointments)
-                .HasForeignKey(a => a.DoctorId);
-
-            modelBuilder.Entity<Appointment>()
-                .HasOne(a => a.Patient)
-                .WithMany(p => p.Appointments)
-                .HasForeignKey(a => a.PatientId);
-
             // Doctor
             modelBuilder.Entity<Doctor>()
                 .HasOne<User>()
                 .WithOne()
                 .HasForeignKey<Doctor>(d => d.UserId);
-
-            modelBuilder.Entity<Doctor>() // Multiple Appointments
-                .HasMany(d => d.Appointments)
-                .WithOne(a => a.Doctor)
-                .HasForeignKey(a => a.DoctorId);
 
             modelBuilder.Entity<Doctor>() // Multiple Doctor Availabilities
                 .HasMany(d => d.DoctorAvailabilities)
@@ -103,11 +87,6 @@ namespace HealthApp.Domain.Data
                 .HasOne<User>()
                 .WithOne()
                 .HasForeignKey<Patient>(p => p.UserId);
-
-            modelBuilder.Entity<Patient>() // Multiple Appointments
-                .HasMany(p => p.Appointments)
-                .WithOne(a => a.Patient)
-                .HasForeignKey(a => a.PatientId);
 
             modelBuilder.Entity<Patient>() // Multiple Medical Histories
                 .HasMany(p => p.MedicalHistories)

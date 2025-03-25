@@ -2,22 +2,24 @@ using HealthApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using HealthApp.Domain.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace HealthApp.MVC.Controllers
 {
     public class CareController : Controller
     {
+        private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<AccountController> _logger;
         private readonly ApplicationDbContext _context;
 
         public CareController(SignInManager<User> signInManager,
-            ILogger<AccountController> logger, ApplicationDbContext context
-            )
+            ILogger<AccountController> logger, ApplicationDbContext context, UserManager<User> userManager)
         {
             _signInManager = signInManager;
             _logger = logger;
             _context = context;
+            _userManager = userManager;
         }
 
         // ERROR
@@ -82,6 +84,29 @@ namespace HealthApp.MVC.Controllers
 
             _logger.LogInformation($"Appointment created at {date}, with patient {patientId} and doctor {doctorId}");
             return RedirectToAction("appointments", "care");
+        }
+
+        public async Task<IActionResult> appointments()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            ViewBag.User = user;
+            ViewBag.IsDoctor = await _userManager.IsInRoleAsync(user, "doctor");
+            ViewBag.IsPatient = await _userManager.IsInRoleAsync(user, "patient");
+            ViewBag.IsAdmin = await _userManager.IsInRoleAsync(user, "administrator");
+
+            var appointments = await _context.Appointments
+                .Where(a => a.PatientId == user.Id.ToString())
+                .OrderBy(a => a.Date)
+                .ThenBy(a => a.Time)
+                .ToListAsync();
+
+            ViewBag.Appointments = appointments;
+
+            return View();
         }
     }
 }
