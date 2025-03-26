@@ -111,16 +111,13 @@ namespace HealthApp.MVC.Controllers
         }
 
         // LOGIN
-        public async Task<IActionResult> login(string returnUrl = null)
+        public async Task<IActionResult> login()
         {
-            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> login(LoginInputModel model, string returnUrl = null)
+        public async Task<IActionResult> login(LoginInputModel model)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(
@@ -128,32 +125,31 @@ namespace HealthApp.MVC.Controllers
                     model.Password,
                     model.RememberMe,
                     lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation($"{model.Email} logged in.");
                     return RedirectToAction("edit", "account");
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid credentials.");
+                    TempData["ErrorMessage"] = "Wrong credentials.\n";
                     return View(model);
                 }
             }
 
+            TempData["ErrorMessage"] = "Wrong credentials.\n";
             return View(model);
         }
 
         // REGISTER
-        public async Task<IActionResult> register(string returnUrl = null)
+        public async Task<IActionResult> register()
         {
-            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
-        [HttpPost]
-        public async Task<IActionResult> register(RegisterInputModel model, string returnUrl = null)
-        {
-            ViewData["ReturnUrl"] = returnUrl;
 
+        [HttpPost]
+        public async Task<IActionResult> register(RegisterInputModel model)
+        {
             if (ModelState.IsValid)
             {
                 var user = new User
@@ -173,21 +169,19 @@ namespace HealthApp.MVC.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: true);
-                    _logger.LogInformation($"User {user.Email} signed in after registration.");
                     await _userManager.AddToRoleAsync(user, roleName);
-
-                    _logger.LogInformation($"\n*****************************\n{model.FirstName} {model.LastName} created a new account with the Email address {model.Email}.\n*****************************\n");
-
                     return RedirectToAction("edit", "account");
                 }
                 else
                 {
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        TempData["ErrorMessage"] = $"{error.Description}\n";
+                        return View(model);
                     }
                 }
             }
+            TempData["ErrorMessage"] = "Registration failed.\n";
             return View(model);
         }
 
@@ -206,7 +200,7 @@ namespace HealthApp.MVC.Controllers
 
             if (user == null)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("login", "account");
             }
 
             ViewBag.UserFirstName = user.FirstName;
@@ -248,10 +242,8 @@ namespace HealthApp.MVC.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> change_info(ChangeInfoInputModel model, string returnUrl = null)
+        public async Task<IActionResult> change_info(ChangeInfoInputModel model)
         {
-            ViewData["ReturnUrl"] = returnUrl;
-
             var user = await _userManager.GetUserAsync(User);
             if (ModelState.IsValid)
             {
@@ -263,17 +255,17 @@ namespace HealthApp.MVC.Controllers
 
             if (result.Succeeded)
             {
-                TempData["SuccessMessage"] = "Your information has been updated successfully.";
-                return RedirectToAction("my_profile");
+                TempData["SuccessMessage"] = "Your information has been updated.\n";
+                return RedirectToAction("my_profile", "account");
             }
             else
             {
                 foreach (var error in result.Errors)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    TempData["ErrorMessage"] = $"{error.Description}\n";
                 }
             }
-            return RedirectToAction("my_profile");
+            return RedirectToAction("my_profile", "account");
         }
 
         [HttpGet]
@@ -317,26 +309,26 @@ namespace HealthApp.MVC.Controllers
 
             if (model.CurrentEmail == null || model.NewEmail == null || model.ConfirmNewEmail == null)
             {
-                TempData["FailMessage"] = "All fields are required.";
-                return RedirectToAction("edit");
+                TempData["ErrorMessage"] = "All fields are required.\n";
+                return RedirectToAction("edit", "account");
             }
 
             if (model.CurrentEmail != User.Identity.Name)
             {
-                TempData["FailMessage"] = "The current Email does not match your account Email.";
-                return RedirectToAction("edit");
+                TempData["ErrorMessage"] = "The current Email does not match your account Email.\n";
+                return RedirectToAction("edit", "account");
             }
 
             if (model.NewEmail == model.CurrentEmail || model.ConfirmNewEmail == model.CurrentEmail)
             {
-                TempData["FailMessage"] = "The new Email must be different from the current Email.";
-                return RedirectToAction("edit");
+                TempData["ErrorMessage"] = "The new Email must be different from the current Email.\n";
+                return RedirectToAction("edit", "account");
             }
 
             if (model.NewEmail != model.ConfirmNewEmail)
             {
-                TempData["FailMessage"] = "The Emails do not match.";
-                return RedirectToAction("edit");
+                TempData["ErrorMessage"] = "The Emails do not match.\n";
+                return RedirectToAction("edit", "account");
             }
 
             if (ModelState.IsValid)
@@ -345,8 +337,8 @@ namespace HealthApp.MVC.Controllers
 
                 if (existingUser != null && existingUser.Id != user.Id)
                 {
-                    TempData["FailMessage"] = "This Email is already in use.";
-                    return RedirectToAction("edit");
+                    TempData["ErrorMessage"] = "This Email is already in use.\n";
+                    return RedirectToAction("edit", "account");
                 }
 
                 user.Email = model.NewEmail;
@@ -360,28 +352,25 @@ namespace HealthApp.MVC.Controllers
                 {
                     foreach (var error in emailResult.Errors)
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                        _logger.LogError($"Email change error: {error.Description}");
+                        TempData["ErrorMessage"] = $"{error.Description}\n";
                     }
-                    return RedirectToAction("edit");
+                    return RedirectToAction("edit", "account");
                 }
 
                 await _userManager.UpdateAsync(user);
                 await _signInManager.RefreshSignInAsync(user);
-                TempData["SuccessMessage"] = "Your Email has been updated successfully.";
-                return RedirectToAction("edit");
+                TempData["SuccessMessage"] = "Your Email has been updated.\n";
+                return RedirectToAction("edit", "account");
             }
 
-            //TempData["FailMessage"] = "The Email change failed.";
-            return RedirectToAction("edit");
+            TempData["ErrorMessage"] = "An error occurred while updating your Email.\n";
+            return RedirectToAction("edit", "account");
         }
 
-        // CHANGE PASSWORD : NEED FIXES 
+        // CHANGE PASSWORD
         [HttpPost]
         public async Task<IActionResult> change_password(ChangePasswordInputModel model)
         {
-            //_logger.LogInformation("*******************************************************************************************************\n************************************ Change Password attempt ******************************************\n*******************************************************************************************************");
-
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
@@ -389,92 +378,48 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
-            //_logger.LogInformation("*******************************************************************************************************\n************************************ Change Password tests ********************************************\n*******************************************************************************************************");
-
             if (model.CurrentPassword == null || model.NewPassword == null || model.ConfirmNewPassword == null)
             {
-                //_logger.LogInformation("*******************************************************************************************************\n************************************ All fields required ********************************************\n*******************************************************************************************************");
-                TempData["FailMessage"] = "All fields are required.";
-                return RedirectToAction("edit");
+                TempData["ErrorMessage"] = "All fields are required.\n";
+                return RedirectToAction("edit", "account");
             }
 
             var passwordCheck = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
 
             if (!passwordCheck)
             {
-                TempData["FailMessage"] = "The current Password does not match your account Password.";
-                return RedirectToAction("edit");
+                TempData["ErrorMessage"] = "The current Password does not match your account Password.\n";
+                return RedirectToAction("edit", "account");
             }
 
             if (model.NewPassword == model.CurrentPassword || model.ConfirmNewPassword == model.CurrentPassword)
             {
-                TempData["FailMessage"] = "The new Password must be different from the current Password.";
-                return RedirectToAction("edit");
+                TempData["ErrorMessage"] = "The new Password must be different from the current Password.\n";
+                return RedirectToAction("edit", "account");
             }
 
             if (model.NewPassword != model.ConfirmNewPassword)
             {
-                TempData["FailMessage"] = "The Passwords do not match.";
-                return RedirectToAction("edit");
+                TempData["ErrorMessage"] = "The Passwords do not match.\n";
+                return RedirectToAction("edit", "account");
             }
 
-            //_logger.LogInformation("*******************************************************************************************************\n********************************* Change Password is on its way ***************************************\n*******************************************************************************************************");
-
             user.Password = model.NewPassword;
-
             var passwordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
 
             if (!passwordResult.Succeeded)
             {
                 foreach (var error in passwordResult.Errors)
                 {
-                    ModelState.AddModelError("ChangePassword." + error.Code, error.Description);
-                    _logger.LogError($"Password change error: {error.Description}");
+                    TempData["ErrorMessage"] = $"{error.Description}\n";
                 }
-                return RedirectToAction("edit");
+                return RedirectToAction("edit", "account");
             }
-
-            //_logger.LogInformation("*******************************************************************************************************\n************************************** Change Password done *******************************************\n*******************************************************************************************************");
 
             await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
-            TempData["SuccessMessage"] = "Your Password has been updated successfully.";
-            return RedirectToAction("edit");
-        }
-
-        // DELETE ACCOUNT BY KEEPING INFORMATIONS FOR MEDICAL HISTORY
-        [HttpPost]
-        public async Task<IActionResult> delete()
-        {
-            var user = await _userManager.GetUserAsync(User);
-
-            if (user != null)
-            {
-                user.Phone = "deleted";
-                user.Address = "deleted";
-
-                var newPassword = Guid.NewGuid().ToString();
-                
-                await _userManager.RemovePasswordAsync(user);
-                await _userManager.AddPasswordAsync(user, newPassword);
-
-                var result = await _userManager.UpdateAsync(user);
-
-                if (result.Succeeded)
-                {
-                    await _signInManager.SignOutAsync();
-                    return RedirectToAction("index", "home");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                    return View("edit");
-                }
-            }
-            return RedirectToAction("index", "home");
+            TempData["SuccessMessage"] = "Your Password has been updated.\n";
+            return RedirectToAction("edit", "account");
         }
 
         // DELETE ACCOUNT BY DELETING ALL INFORMATIONS
@@ -497,9 +442,9 @@ namespace HealthApp.MVC.Controllers
                     {
                         foreach (var error in result.Errors)
                         {
-                            ModelState.AddModelError(string.Empty, error.Description);
+                            TempData["ErrorMessage"] = $"{error.Description}\n";
                         }
-                        return View("edit");
+                        return View("edit", "account");
                     }
                 }
             }
