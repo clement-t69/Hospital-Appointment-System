@@ -7,7 +7,7 @@ namespace HealthApp.Domain.Models
         public int Id { get; set; }
 
         [ForeignKey("DoctorId")]
-        public int DoctorId { get; set; }
+        public string DoctorId { get; set; }
         public Doctor Doctor { get; set; }
 
         public TimeSpan StartTime { get; set; }

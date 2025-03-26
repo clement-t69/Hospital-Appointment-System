@@ -1,19 +1,56 @@
 ﻿@{
-    ViewData["Title"] = "Appointments";
+    ViewData["Title"] = "Administration";
 }
 
-<div class="container d-flex justify-content-center" style="min-height: 50vh;">
-    <div class="row justify-content-center">
-        <div>
-            <div style="color: white; user-select: none;">
-                <a>_________________________________________________________________________________________</a>
-            </div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div class="text-center" style="flex-grow: 1;">
-                    <h2>Administration</h2>
+@if (ViewBag.IsLogged == true && ViewBag.IsAdmin == true)
+{
+    <div class="container d-flex justify-content-center" style="min-height: 50vh;">
+        <div class="row justify-content-center">
+            <div>
+                <div style="color: white; user-select: none;">
+                    <a>_________________________________________________________________________________________</a>
                 </div>
-                <div style="width: 100px;"></div>
+                <div style="display: flex; justify-content: center; align-items: center;">
+                    <div class="text-center" style="flex-grow: 1;">
+                        <h1 style="font-weight: 700">Administration</h1>
+                    </div>
+                </div>
+                <section>
+                    <hr />
+                    <a class="big-white-button w-100 mb-1" asp-controller="admin" asp-action="users" style="text-decoration: none; box-shadow:none">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>👤 Users</div>
+                        </div>
+                    </a>
+                    <a class="big-white-button w-100 mb-1" asp-controller="admin" asp-action="appointments" style="text-decoration: none; box-shadow:none">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>📅 Appointments</div>
+                        </div>
+                    </a>
+                    <a class="big-white-button w-100 mb-1" asp-controller="admin" asp-action="messages" style="text-decoration: none; box-shadow:none">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>💬 Messages</div>
+                        </div>
+                    </a>
+                    <a class="big-white-button w-100 mb-1" asp-controller="admin" asp-action="logs" style="text-decoration: none; box-shadow:none">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>📜 Logs</div>
+                        </div>
+                    </a>
+                </section>
             </div>
         </div>
     </div>
-</div>
+}
+else
+{
+    @section scripts {
+    <script>
+        window.location.href = '@Url.Action("error", "home")';
+    </script>
+    }
+}

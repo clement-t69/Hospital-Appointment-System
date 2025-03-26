@@ -30,15 +30,16 @@ namespace HealthApp.Domain.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
-                    FirstName = table.Column<string>(type: "TEXT", nullable: false),
-                    LastName = table.Column<string>(type: "TEXT", nullable: false),
-                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: false),
-                    Password = table.Column<string>(type: "TEXT", nullable: false),
-                    Address = table.Column<string>(type: "TEXT", nullable: false),
-                    Phone = table.Column<string>(type: "TEXT", nullable: false),
-                    Role = table.Column<int>(type: "INTEGER", nullable: false),
+                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 13, nullable: false),
+                    FirstName = table.Column<string>(type: "TEXT", nullable: true),
+                    LastName = table.Column<string>(type: "TEXT", nullable: true),
+                    Password = table.Column<string>(type: "TEXT", nullable: true),
+                    Address = table.Column<string>(type: "TEXT", nullable: true),
+                    Phone = table.Column<string>(type: "TEXT", nullable: true),
+                    Role = table.Column<int>(type: "INTEGER", nullable: true),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
                     PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
@@ -94,13 +95,11 @@ namespace HealthApp.Domain.Migrations
                 name: "Administrators",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Administrators", x => x.Id);
+                    table.PrimaryKey("PK_Administrators", x => x.UserId);
                     table.ForeignKey(
                         name: "FK_Administrators_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -134,8 +133,8 @@ namespace HealthApp.Domain.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
+                    ProviderKey = table.Column<string>(type: "TEXT", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "TEXT", nullable: true),
                     UserId = table.Column<string>(type: "TEXT", nullable: false)
                 },
@@ -179,8 +178,8 @@ namespace HealthApp.Domain.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
-                    LoginProvider = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
                     Value = table.Column<string>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
@@ -198,13 +197,11 @@ namespace HealthApp.Domain.Migrations
                 name: "Patients",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Patients", x => x.Id);
+                    table.PrimaryKey("PK_Patients", x => x.UserId);
                     table.ForeignKey(
                         name: "FK_Patients_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -217,15 +214,13 @@ namespace HealthApp.Domain.Migrations
                 name: "Doctors",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     SpecializationId = table.Column<int>(type: "INTEGER", nullable: false),
                     Location = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Doctors", x => x.Id);
+                    table.PrimaryKey("PK_Doctors", x => x.UserId);
                     table.ForeignKey(
                         name: "FK_Doctors_AspNetUsers_UserId",
                         column: x => x.UserId,
@@ -248,8 +243,8 @@ namespace HealthApp.Domain.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Time = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    DoctorId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PatientId = table.Column<int>(type: "INTEGER", nullable: false)
+                    DoctorId = table.Column<string>(type: "TEXT", nullable: false),
+                    PatientId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -258,13 +253,13 @@ namespace HealthApp.Domain.Migrations
                         name: "FK_Appointments_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Appointments_Patients_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patients",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -274,7 +269,7 @@ namespace HealthApp.Domain.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    DoctorId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DoctorId = table.Column<string>(type: "TEXT", nullable: false),
                     StartTime = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     EndTime = table.Column<TimeSpan>(type: "TEXT", nullable: false)
                 },
@@ -285,7 +280,7 @@ namespace HealthApp.Domain.Migrations
                         name: "FK_DoctorAvailabilities_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -299,8 +294,8 @@ namespace HealthApp.Domain.Migrations
                     Title = table.Column<string>(type: "TEXT", nullable: false),
                     Diagnosis = table.Column<string>(type: "TEXT", nullable: false),
                     Treatment = table.Column<string>(type: "TEXT", nullable: false),
-                    DoctorId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PatientId = table.Column<int>(type: "INTEGER", nullable: false)
+                    DoctorId = table.Column<string>(type: "TEXT", nullable: false),
+                    PatientId = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -309,13 +304,13 @@ namespace HealthApp.Domain.Migrations
                         name: "FK_MedicalHistories_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_MedicalHistories_Patients_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patients",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -325,8 +320,8 @@ namespace HealthApp.Domain.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    DoctorId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PatientId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DoctorId = table.Column<string>(type: "TEXT", nullable: false),
+                    PatientId = table.Column<string>(type: "TEXT", nullable: false),
                     Message = table.Column<string>(type: "TEXT", nullable: false),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
@@ -337,13 +332,13 @@ namespace HealthApp.Domain.Migrations
                         name: "FK_Notifications_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Notifications_Patients_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patients",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -353,8 +348,8 @@ namespace HealthApp.Domain.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    DoctorId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PatientId = table.Column<int>(type: "INTEGER", nullable: false),
+                    DoctorId = table.Column<string>(type: "TEXT", nullable: false),
+                    PatientId = table.Column<string>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Dosage = table.Column<string>(type: "TEXT", nullable: false),
                     Frequency = table.Column<string>(type: "TEXT", nullable: false),
@@ -369,20 +364,15 @@ namespace HealthApp.Domain.Migrations
                         name: "FK_Prescriptions_Doctors_DoctorId",
                         column: x => x.DoctorId,
                         principalTable: "Doctors",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Prescriptions_Patients_PatientId",
                         column: x => x.PatientId,
                         principalTable: "Patients",
-                        principalColumn: "Id",
+                        principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Administrators_UserId",
-                table: "Administrators",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Appointments_DoctorId",
@@ -443,11 +433,6 @@ namespace HealthApp.Domain.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Doctors_UserId",
-                table: "Doctors",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MedicalHistories_DoctorId",
                 table: "MedicalHistories",
                 column: "DoctorId");
@@ -466,11 +451,6 @@ namespace HealthApp.Domain.Migrations
                 name: "IX_Notifications_PatientId",
                 table: "Notifications",
                 column: "PatientId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Patients_UserId",
-                table: "Patients",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Prescriptions_DoctorId",

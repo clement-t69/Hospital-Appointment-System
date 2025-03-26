@@ -35,6 +35,7 @@ footer {
     transition: background-color 0.3s ease, color 0.3s ease;
     cursor: pointer;
     user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
 .little-white-button:hover {
@@ -59,9 +60,10 @@ footer {
     transition: background-color 0.3s ease, color 0.3s ease;
     cursor: pointer;
     user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
-    .little-blue-button:hover {
+.little-blue-button:hover {
         background-color: #0e43ad;
         color: white;
     }
@@ -74,7 +76,7 @@ footer {
     color: inherit;
 }
 
-    .little-blue-button .text-content {
+.little-blue-button .text-content {
         flex-grow: 1;
     }
 
@@ -91,14 +93,15 @@ footer {
     transition: background-color 0.3s ease, color 0.3s ease;
     cursor: pointer;
     user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
-    .little-red-button:hover {
+.little-red-button:hover {
         background-color: darkred;
         color: white;
     }
 
-    .little-red-button::after {
+.little-red-button::after {
         content: '>';
         position: absolute;
         right: 25px;
@@ -106,7 +109,7 @@ footer {
         color: inherit;
     }
 
-    .little-red-button .text-content {
+.little-red-button .text-content {
         flex-grow: 1;
     }
 
@@ -123,6 +126,7 @@ footer {
     transition: background-color 0.3s ease, color 0.3s ease;
     cursor: pointer;
     user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
 .big-blue-button:hover {
@@ -156,6 +160,7 @@ footer {
     transition: background-color 0.3s ease, color 0.3s ease;
     cursor: pointer;
     user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
     .big-white-button:hover {
@@ -187,6 +192,7 @@ footer {
     transition: background-color 0.3s ease, color 0.3s ease;
     cursor: pointer;
     user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
     .big-white-button-red:hover {
@@ -209,6 +215,7 @@ footer {
 .rounded_fields .form-control {
     border-radius: 64px;
     height: 3rem;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
 .rounded-checkbox .form-check-input {
@@ -222,6 +229,8 @@ footer {
     outline: none;
     margin-right: 0.3rem;
     margin-top: 0.05rem;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
 }
 
 .rounded-checkbox .form-check-input:checked {
