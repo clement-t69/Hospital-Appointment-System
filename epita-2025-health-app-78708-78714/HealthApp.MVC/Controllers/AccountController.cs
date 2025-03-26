@@ -45,6 +45,7 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
+            _logger.LogError($"******************************\nUser {user.Email} has encountered an error. (redirected to error page)\n******************************\n");
             return View();
         }
 
@@ -93,6 +94,9 @@ namespace HealthApp.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> logout()
         {
+            User user = await _userManager.GetUserAsync(User);
+            _logger.LogInformation($"******************************\nUser {user.Email} has logged out.\n******************************\n");
+
             await _signInManager.SignOutAsync();
             return RedirectToAction("index", "home");
         }
@@ -128,15 +132,18 @@ namespace HealthApp.MVC.Controllers
 
                 if (result.Succeeded)
                 {
+                    _logger.LogInformation($"******************************\nUser {model.Email} has logged in.\n******************************\n");
                     return RedirectToAction("edit", "account");
                 }
                 else
                 {
+                    _logger.LogError($"******************************\nUser {model.Email} has failed to log in.\n******************************\n");
                     TempData["ErrorMessage"] = "Wrong credentials.\n";
                     return View(model);
                 }
             }
 
+            _logger.LogError($"******************************\nUser {model.Email} has failed to log in.\n******************************\n");
             TempData["ErrorMessage"] = "Wrong credentials.\n";
             return View(model);
         }
@@ -168,6 +175,8 @@ namespace HealthApp.MVC.Controllers
 
                 if (result.Succeeded)
                 {
+                    _logger.LogInformation($"******************************\nUser {model.Email} has registered.\n******************************\n");
+                    
                     await _signInManager.SignInAsync(user, isPersistent: true);
                     await _userManager.AddToRoleAsync(user, roleName);
                     return RedirectToAction("edit", "account");
@@ -176,11 +185,13 @@ namespace HealthApp.MVC.Controllers
                 {
                     foreach (var error in result.Errors)
                     {
+                        _logger.LogError($"******************************\nUser {model.Email} has failed to register.\n******************************\n");
                         TempData["ErrorMessage"] = $"{error.Description}\n";
                         return View(model);
                     }
                 }
             }
+            _logger.LogError($"******************************\nUser {model.Email} has failed to register.\n******************************\n");
             TempData["ErrorMessage"] = "Registration failed.\n";
             return View(model);
         }
@@ -255,6 +266,7 @@ namespace HealthApp.MVC.Controllers
 
             if (result.Succeeded)
             {
+                _logger.LogInformation($"******************************\nUser {user.Email} has updated their information.\n******************************\n");
                 TempData["SuccessMessage"] = "Your information has been updated.\n";
                 return RedirectToAction("my_profile", "account");
             }
@@ -262,6 +274,7 @@ namespace HealthApp.MVC.Controllers
             {
                 foreach (var error in result.Errors)
                 {
+                    _logger.LogError($"******************************\nUser {user.Email} has failed to update their information.\n******************************\n");
                     TempData["ErrorMessage"] = $"{error.Description}\n";
                 }
             }
@@ -309,24 +322,28 @@ namespace HealthApp.MVC.Controllers
 
             if (model.CurrentEmail == null || model.NewEmail == null || model.ConfirmNewEmail == null)
             {
+                _logger.LogError($"******************************\nUser {user.Email} has failed to update their Email: All fields are required.\n******************************\n");
                 TempData["ErrorMessage"] = "All fields are required.\n";
                 return RedirectToAction("edit", "account");
             }
 
             if (model.CurrentEmail != User.Identity.Name)
             {
+                _logger.LogError($"******************************\nUser {user.Email} has failed to update their Email: The current Email does not match their account Email.\n******************************\n");
                 TempData["ErrorMessage"] = "The current Email does not match your account Email.\n";
                 return RedirectToAction("edit", "account");
             }
 
             if (model.NewEmail == model.CurrentEmail || model.ConfirmNewEmail == model.CurrentEmail)
             {
+                _logger.LogError($"******************************\nUser {user.Email} has failed to update their Email: The new Email must be different from the current Email.\n******************************\n");
                 TempData["ErrorMessage"] = "The new Email must be different from the current Email.\n";
                 return RedirectToAction("edit", "account");
             }
 
             if (model.NewEmail != model.ConfirmNewEmail)
             {
+                _logger.LogError($"******************************\nUser {user.Email} has failed to update their Email: The Emails do not match.\n******************************\n");
                 TempData["ErrorMessage"] = "The Emails do not match.\n";
                 return RedirectToAction("edit", "account");
             }
@@ -337,6 +354,7 @@ namespace HealthApp.MVC.Controllers
 
                 if (existingUser != null && existingUser.Id != user.Id)
                 {
+                    _logger.LogError($"******************************\nUser {user.Email} has failed to update their Email: This Email is already in use.\n******************************\n");
                     TempData["ErrorMessage"] = "This Email is already in use.\n";
                     return RedirectToAction("edit", "account");
                 }
@@ -350,12 +368,17 @@ namespace HealthApp.MVC.Controllers
 
                 if (!emailResult.Succeeded)
                 {
+                    _logger.LogError($"******************************\n");
                     foreach (var error in emailResult.Errors)
                     {
+                        _logger.LogError($"User {user.Email} has failed to update their Email: {error.Description}\n");
                         TempData["ErrorMessage"] = $"{error.Description}\n";
                     }
+                    _logger.LogError($"******************************\n");
                     return RedirectToAction("edit", "account");
                 }
+
+                _logger.LogInformation($"******************************\nUser {user.Email} has updated their Email to {model.NewEmail}.\n******************************\n");
 
                 await _userManager.UpdateAsync(user);
                 await _signInManager.RefreshSignInAsync(user);
@@ -363,6 +386,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("edit", "account");
             }
 
+            _logger.LogError($"******************************\nUser {user.Email} has failed to update their Email.\n******************************\n");
             TempData["ErrorMessage"] = "An error occurred while updating your Email.\n";
             return RedirectToAction("edit", "account");
         }
@@ -380,6 +404,7 @@ namespace HealthApp.MVC.Controllers
 
             if (model.CurrentPassword == null || model.NewPassword == null || model.ConfirmNewPassword == null)
             {
+                _logger.LogError($"******************************\nUser {user.Email} has failed to update their Password: All fields are required.\n******************************\n");
                 TempData["ErrorMessage"] = "All fields are required.\n";
                 return RedirectToAction("edit", "account");
             }
@@ -388,18 +413,21 @@ namespace HealthApp.MVC.Controllers
 
             if (!passwordCheck)
             {
+                _logger.LogError($"******************************\nUser {user.Email} has failed to update their Password: The current Password does not match their account Password.\n******************************\n");
                 TempData["ErrorMessage"] = "The current Password does not match your account Password.\n";
                 return RedirectToAction("edit", "account");
             }
 
             if (model.NewPassword == model.CurrentPassword || model.ConfirmNewPassword == model.CurrentPassword)
             {
+                _logger.LogError($"******************************\nUser {user.Email} has failed to update their Password: The new Password must be different from the current Password.\n******************************\n");
                 TempData["ErrorMessage"] = "The new Password must be different from the current Password.\n";
                 return RedirectToAction("edit", "account");
             }
 
             if (model.NewPassword != model.ConfirmNewPassword)
             {
+                _logger.LogError($"******************************\nUser {user.Email} has failed to update their Password: The Passwords do not match.\n******************************\n");
                 TempData["ErrorMessage"] = "The Passwords do not match.\n";
                 return RedirectToAction("edit", "account");
             }
@@ -409,12 +437,17 @@ namespace HealthApp.MVC.Controllers
 
             if (!passwordResult.Succeeded)
             {
+                _logger.LogError($"******************************\n");
                 foreach (var error in passwordResult.Errors)
                 {
+                    _logger.LogError($"User {user.Email} has failed to update their Password: {error.Description}\n");
                     TempData["ErrorMessage"] = $"{error.Description}\n";
                 }
+                _logger.LogError($"******************************\n");
                 return RedirectToAction("edit", "account");
             }
+
+            _logger.LogInformation($"******************************\nUser {user.Email} has updated their Password.\n******************************\n");
 
             await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
@@ -432,18 +465,24 @@ namespace HealthApp.MVC.Controllers
 
                 if (user != null)
                 {
+                    var userEmail = user.Email;
                     var result = await _userManager.DeleteAsync(user);
                     if (result.Succeeded)
                     {
+                        _logger.LogInformation($"******************************\nUser {userEmail} has deleted their account.\n******************************\n");
+
                         await _signInManager.SignOutAsync();
                         return RedirectToAction("index", "home");
                     }
                     else
                     {
+                        _logger.LogError($"******************************\n");
                         foreach (var error in result.Errors)
                         {
+                            _logger.LogError($"User {userEmail} has failed to delete their account: {error.Description}\n");
                             TempData["ErrorMessage"] = $"{error.Description}\n";
                         }
+                        _logger.LogError($"******************************\n");
                         return View("edit", "account");
                     }
                 }

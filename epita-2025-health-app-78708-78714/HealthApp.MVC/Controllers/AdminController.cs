@@ -38,6 +38,8 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            _logger.LogError($"******************************\nUser {user.Email} has encountered an error. (redirected to error page)\n******************************\n");
             return View();
         }
 
@@ -88,8 +90,8 @@ namespace HealthApp.MVC.Controllers
 
             // USERS
             var users = _context.Users.OfType<User>().ToList();
-
             var roles = new Dictionary<string, IList<string>>();
+
             foreach (var u in users)
             {
                 var r = await _userManager.GetRolesAsync(u);
@@ -114,6 +116,7 @@ namespace HealthApp.MVC.Controllers
                     var filteredIds = roles.Where(r => r.Value.Any(role => role.ToLower().Contains(searchInput))).Select(r => r.Key).ToList();
                     users = users.Where(u => filteredIds.Contains(u.Id)).ToList();
                 }
+                _logger.LogInformation($"******************************\nAdmin {user.Email} has searched for users with {searchField} containing {searchInput}.\n******************************\n");
             }
             else
             {
@@ -142,6 +145,7 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
+
         public IActionResult logs()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -154,6 +158,8 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            _logger.LogInformation($"******************************\nAdmin {user.Email} has accessed the logs page.\n******************************\n");
             return View();
         }
 
@@ -177,6 +183,8 @@ namespace HealthApp.MVC.Controllers
 
                 if (result.Succeeded)
                 { 
+                    _logger.LogInformation($"******************************\nNew user with Email {model.Email} and role {roleName} has been created.\n******************************\n");
+
                     await _userManager.AddToRoleAsync(user, roleName);
 
                     TempData["SuccessMessage"] = $"New user with Email {model.Email} and role {roleName} has been created.\n";
@@ -185,19 +193,25 @@ namespace HealthApp.MVC.Controllers
                 }
                 else
                 {
+                    _logger.LogError($"******************************\n");
                     foreach (var error in result.Errors)
                     {
+                        _logger.LogError($"Error when creating user: {error.Description}\n");
                         TempData["ErrorMessage"] = $"{error.Description}\n";
                     }
+                    _logger.LogError($"******************************\n");
                     return RedirectToAction("users", "admin");
                 }
             }
             else
             {
+                _logger.LogError($"******************************\n");
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
+                    _logger.LogError($"Error when creating user: {error.ErrorMessage}\n");
                     TempData["ErrorMessage"] = $"{error.ErrorMessage}\n";
                 }
+                _logger.LogError($"******************************\n");
                 return RedirectToAction("users", "admin");
             }
         }
@@ -225,27 +239,38 @@ namespace HealthApp.MVC.Controllers
 
                     if (result.Succeeded)
                     {
+                        _logger.LogInformation($"******************************\nUser {user.Email} has been updated.\n******************************\n");
                         TempData["SuccessMessage"] = $"User {user.Email} has been updated.\n";
                         return RedirectToAction("users", "admin");
                     }
                     else
                     {
+                        _logger.LogError($"******************************\n");
                         foreach (var error in result.Errors)
                         {
+                            _logger.LogError($"Error when updating user: {error.Description}\n");
                             TempData["ErrorMessage"] = $"{error.Description}\n";
                         }
+                        _logger.LogError($"******************************\n");
                         return RedirectToAction("users", "admin");
                     }
                 }
                 else
                 {
+                    _logger.LogError($"******************************\nUser with Id {userId} not found.\n******************************\n");
                     TempData["ErrorMessage"] = $"User with Id {userId} not found.\n";
                     return RedirectToAction("users", "admin");
                 }
             }
             else
             {
-                TempData["ErrorMessage"] = "All fields are required.\n";
+                _logger.LogError($"******************************\n");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError($"Error when updating user: {error.ErrorMessage}\n");
+                    TempData["ErrorMessage"] = $"{error.ErrorMessage}\n";
+                }
+                _logger.LogError($"******************************\n");
                 return RedirectToAction("users", "admin");
             }
         }
@@ -254,6 +279,8 @@ namespace HealthApp.MVC.Controllers
         {
             if (ModelState.IsValid)
             {
+                var currentUser = await _signInManager.UserManager.GetUserAsync(User);
+
                 var user = await _userManager.FindByIdAsync(userId);
 
                 if (user != null)
@@ -261,34 +288,47 @@ namespace HealthApp.MVC.Controllers
                     var admin = user.UserName == "admin@test.fr";
                     if (admin)
                     {
+                        _logger.LogError($"******************************\nAdmin {currentUser.Email} tried to delete the admin@test.fr user.\n******************************\n");
                         TempData["ErrorMessage"] = $"You cannot delete this admin user.\n";
                         return RedirectToAction("users", "admin");
                     }
 
+                    var userEmail = user.Email;
                     var result = await _userManager.DeleteAsync(user);
                     if (result.Succeeded)
                     {
+                        _logger.LogInformation($"******************************\nUser {userEmail} has been deleted.\n******************************\n");
                         TempData["SuccessMessage"] = $"User has been deleted.\n";
                         return RedirectToAction("users", "admin");
                     }
                     else
                     {
+                        _logger.LogError($"******************************\n");
                         foreach (var error in result.Errors)
                         {
+                            _logger.LogError($"Error when deleting user: {error.Description}\n");
                             TempData["ErrorMessage"] = $"{error.Description}\n";
                         }
+                        _logger.LogError($"******************************\n");
                         return RedirectToAction("users", "admin");
                     }
                 }
                 else
                 {
+                    _logger.LogError($"******************************\nUser with Id {userId} not found.\n******************************\n");
                     TempData["ErrorMessage"] = $"User with Id {userId} not found.\n";
                     return RedirectToAction("users", "admin");
                 }
             }
             else
             {
-                TempData["ErrorMessage"] = "All fields are required.\n";
+                _logger.LogError($"******************************\n");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError($"Error when deleting user: {error.ErrorMessage}\n");
+                    TempData["ErrorMessage"] = $"{error.ErrorMessage}\n";
+                }
+                _logger.LogError($"******************************\n");
                 return RedirectToAction("users", "admin");
             }
         }

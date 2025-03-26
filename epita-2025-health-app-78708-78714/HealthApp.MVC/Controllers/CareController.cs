@@ -35,21 +35,8 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
-            return View();
-        }
 
-        public IActionResult center()
-        {
-            var user = _signInManager.UserManager.GetUserAsync(User).Result;
-            if (user == null)
-            {
-                return View();
-            }
-            var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
-            ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("doctor");
-            ViewBag.IsPatient = userRoles.Contains("patient");
-            ViewBag.IsAdmin = userRoles.Contains("administrator");
+            _logger.LogError($"******************************\nUser {user.Email} has encountered an error. (redirected to error page)\n******************************\n");
             return View();
         }
 
@@ -69,7 +56,7 @@ namespace HealthApp.MVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> appointmentCreation (DateTime date, TimeSpan time, string doctorId, string patientId)
+        public async Task<IActionResult> create_appointment (DateTime date, TimeSpan time, string doctorId, string patientId)
         {
             var appointment = new Appointment
             {
@@ -80,6 +67,11 @@ namespace HealthApp.MVC.Controllers
             };
 
             _context.Appointments.Add(appointment);
+
+            var doctor = await _userManager.FindByIdAsync(doctorId);
+            var patient = await _userManager.FindByIdAsync(patientId);
+
+            _logger.LogInformation($"******************************\nAppointment created for patient {patient.Email} with doctor {doctor.Email} on {date} at {time}.\n******************************\n");
             await _context.SaveChangesAsync();
             return RedirectToAction("appointments", "care");
         }

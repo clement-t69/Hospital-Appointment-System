@@ -22,10 +22,31 @@
                 </div>
                 <section>
                     <hr />
+                    <div id="logConsole" style="width: 1280px; height: 640px; overflow-y: scroll; background-color: black; color: white; padding: 10px; margin: 0 auto;"></div>
                 </section>
             </div>
         </div>
     </div>
+
+    @section scripts {
+        <script>
+            const socket = new WebSocket("wss://localhost:44368/ws");
+            const logConsole = document.getElementById("logConsole");
+
+            socket.onmessage = function (event) {
+                logConsole.innerHTML += event.data + "<br>";
+                logConsole.scrollTop = logConsole.scrollHeight;
+            };
+
+            socket.onopen = function (event) {
+                console.log("WebSocket connection established.");
+            };
+
+            socket.onclose = function (event) {
+                console.log("WebSocket connection closed.");
+            };
+        </script>
+    }
 }
 else
 {
