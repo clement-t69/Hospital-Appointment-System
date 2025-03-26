@@ -81,8 +81,6 @@ namespace HealthApp.MVC.Controllers
 
             _context.Appointments.Add(appointment);
             await _context.SaveChangesAsync();
-
-            _logger.LogInformation($"Appointment created at {date}, with patient {patientId} and doctor {doctorId}");
             return RedirectToAction("appointments", "care");
         }
 
@@ -93,18 +91,21 @@ namespace HealthApp.MVC.Controllers
             {
                 return RedirectToAction("Login", "Account");
             }
-            ViewBag.User = user;
+            ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = await _userManager.IsInRoleAsync(user, "doctor");
             ViewBag.IsPatient = await _userManager.IsInRoleAsync(user, "patient");
             ViewBag.IsAdmin = await _userManager.IsInRoleAsync(user, "administrator");
 
             var appointments = await _context.Appointments
                 .Where(a => a.PatientId == user.Id.ToString())
-                .OrderBy(a => a.Date)
-                .ThenBy(a => a.Time)
                 .ToListAsync();
 
-            ViewBag.Appointments = appointments;
+            var sortedAppointments = appointments
+                .OrderBy(a => a.Date)
+                .ThenBy(a => a.Time)
+                .ToList();
+
+            ViewBag.Appointments = sortedAppointments;
 
             return View();
         }

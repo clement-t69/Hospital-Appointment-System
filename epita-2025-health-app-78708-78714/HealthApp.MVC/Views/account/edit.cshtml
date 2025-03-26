@@ -23,9 +23,9 @@
                     {
                         <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
                     }
-                    @if (TempData["FailMessage"] != null)
+                    @if (TempData["ErrorMessage"] != null)
                     {
-                        <div class="alert alert-danger mt-4">@TempData["FailMessage"]</div>
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
                     }
 
                     @if (ViewBag.IsDoctor == true)
@@ -38,13 +38,19 @@
                             <span class="icon"></span>
                             <div class="text-content px-3" style="display: flex; align-items: center;">
                                 <div>👤 My Profile</div>
-                                <div class="mx-3" style="font-size: 0.9em; color: gray;">@ViewBag.UserFirstName @ViewBag.UserLastName</div>
+                                <div class="mx-3" style="font-size: 0.9em; color: gray;">@ViewBag.UserFirstName @ViewBag.UserLastName.ToUpper()</div>
                             </div>
                         </a>
                         <a class="big-white-button w-100 mb-1" asp-controller="account" asp-action="my_appointments" style="text-decoration: none; box-shadow:none">
                             <span class="icon"></span>
                             <div class="text-content px-3">
                                 <div>📅 My Appointments</div>
+                            </div>
+                        </a>
+                        <a class="big-white-button w-100 mb-1" asp-controller="care" asp-action="patients" style="text-decoration: none; box-shadow:none">
+                            <span class="icon"></span>
+                            <div class="text-content px-3">
+                                <div>🏥 Care Center</div>
                             </div>
                         </a>
                         <a class="big-white-button w-100 mb-1" asp-controller="account" asp-action="my_messages" style="text-decoration: none; box-shadow:none">
@@ -75,11 +81,6 @@
                                         <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close" style="margin-right: 6px"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div asp-validation-summary="All" class="text-danger"></div>
-                                        @if (TempData["ErrorMessage"] != null)
-                                        {
-                                            <div class="text-danger">@TempData["ErrorMessage"]</div>
-                                        }
                                         <form id="changeEmailForm" asp-controller="account" asp-action="change_email" method="post">
                                             <div class="rounded_fields form-label mb-3">
                                                 <input asp-for="ChangeEmail.CurrentEmail" type="email" class="form-control" id="CurrentEmail" name="CurrentEmail" aria-required="true" placeholder="Current Email" style="width: 100%;" />
@@ -133,11 +134,6 @@
                                         <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close" style="margin-right: 6px"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div asp-validation-summary="All" class="text-danger"></div>
-                                        @if (TempData["ErrorMessage"] != null)
-                                        {
-                                            <div class="text-danger">@TempData["ErrorMessage"]</div>
-                                        }
                                         <form id="changePasswordForm" asp-controller="account" asp-action="change_password" method="post">
                                             <div class="rounded_fields form-label mb-3">
                                                 <input asp-for="ChangePassword.CurrentPassword" type="password" class="form-control" id="CurrentPassword" name="CurrentPassword" aria-required="true" placeholder="Current Password" style="width: 100%;" />
@@ -206,7 +202,7 @@
                             <span class="icon"></span>
                             <div class="text-content px-3" style="display: flex; align-items: center;">
                                 <div>👤 My Profile</div>
-                                <div class="mx-3" style="font-size: 0.9em; color: gray;">@ViewBag.UserFirstName @ViewBag.UserLastName</div>
+                                <div class="mx-3" style="font-size: 0.9em; color: gray;">@ViewBag.UserFirstName @ViewBag.UserLastName.ToUpper()</div>
                             </div>
                         </a>
                         <a class="big-white-button w-100 mb-1" asp-controller="account" asp-action="my_medical_history" style="text-decoration: none; box-shadow:none">
@@ -255,11 +251,6 @@
                                         <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close" style="margin-right: 6px"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div asp-validation-summary="All" class="text-danger"></div>
-                                        @if (TempData["ErrorMessage"] != null)
-                                        {
-                                            <div class="text-danger">@TempData["ErrorMessage"]</div>
-                                        }
                                         <form id="changeEmailForm" asp-controller="account" asp-action="change_email" method="post">
                                             <div class="rounded_fields form-label mb-3">
                                                 <input asp-for="ChangeEmail.CurrentEmail" type="email" class="form-control" id="CurrentEmail" name="CurrentEmail" aria-required="true" placeholder="Current Email" style="width: 100%;" />
@@ -313,11 +304,6 @@
                                         <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close" style="margin-right: 6px"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div asp-validation-summary="All" class="text-danger"></div>
-                                        @if (TempData["ErrorMessage"] != null)
-                                        {
-                                            <div class="text-danger">@TempData["ErrorMessage"]</div>
-                                        }
                                         <form id="changePasswordForm" asp-controller="account" asp-action="change_password" method="post">
                                             <div class="rounded_fields form-label mb-3">
                                                 <input asp-for="ChangePassword.CurrentPassword" type="password" class="form-control" id="CurrentPassword" name="CurrentPassword" aria-required="true" placeholder="Current Password" style="width: 100%;" />
@@ -386,7 +372,7 @@
                             <span class="icon"></span>
                             <div class="text-content px-3" style="display: flex; align-items: center;">
                                 <div>👤 My Profile</div>
-                                <div class="mx-3" style="font-size: 0.9em; color: gray;">@ViewBag.UserFirstName @ViewBag.UserLastName</div>
+                                <div class="mx-3" style="font-size: 0.9em; color: gray;">@ViewBag.UserFirstName @ViewBag.UserLastName.ToUpper()</div>
                             </div>
                         </a>
 
@@ -418,11 +404,6 @@
                                         <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close" style="margin-right: 6px"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div asp-validation-summary="All" class="text-danger"></div>
-                                        @if (TempData["ErrorMessage"] != null)
-                                        {
-                                            <div class="text-danger">@TempData["ErrorMessage"]</div>
-                                        }
                                         <form id="changeEmailForm" asp-controller="account" asp-action="change_email" method="post">
                                             <div class="rounded_fields form-label mb-3">
                                                 <input asp-for="ChangeEmail.CurrentEmail" type="email" class="form-control" id="CurrentEmail" name="CurrentEmail" aria-required="true" placeholder="Current Email" style="width: 100%;" />
@@ -476,11 +457,6 @@
                                         <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("edit", "account")'" aria-label="Close" style="margin-right: 6px"></button>
                                     </div>
                                     <div class="modal-body">
-                                        <div asp-validation-summary="All" class="text-danger"></div>
-                                        @if (TempData["ErrorMessage"] != null)
-                                        {
-                                            <div class="text-danger">@TempData["ErrorMessage"]</div>
-                                        }
                                         <form id="changePasswordForm" asp-controller="account" asp-action="change_password" method="post">
                                             <div class="rounded_fields form-label mb-3">
                                                 <input asp-for="ChangePassword.CurrentPassword" type="password" class="form-control" id="CurrentPassword" name="CurrentPassword" aria-required="true" placeholder="Current Password" style="width: 100%;" />
