@@ -14,15 +14,10 @@ namespace HealthApp.MVC.Models
         [Display(Name = "Address")]
         public string? Address { get; set; }
 
-
-
-        
-
         public ChangeInfoInputModel(string phone, string address)
         {
             Phone = phone;
             Address = address;
-
         }
 
         public ChangeInfoInputModel() { }

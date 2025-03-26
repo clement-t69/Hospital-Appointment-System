@@ -29,6 +29,8 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            _logger.LogError($"******************************\nUser {user.Email} has encountered an error. (redirected to error page)\n******************************\n");
             return View();
         }
 
@@ -69,6 +71,7 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
+        
         public IActionResult my_appointments()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -84,6 +87,7 @@ namespace HealthApp.MVC.Controllers
 
             return RedirectToAction("appointments", "care");
         }
+        
         public IActionResult edit()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -98,9 +102,13 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
+        
         [HttpPost]
         public async Task<IActionResult> logout()
         {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            _logger.LogInformation($"******************************\nUser {user.Email} has logged out.\n******************************\n");
+
             await _signInManager.SignOutAsync();
             return RedirectToAction("index", "home");
         }

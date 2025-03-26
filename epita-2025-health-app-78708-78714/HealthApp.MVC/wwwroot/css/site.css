@@ -63,7 +63,7 @@ footer {
     box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
-    .little-blue-button:hover {
+.little-blue-button:hover {
         background-color: #0e43ad;
         color: white;
     }
@@ -76,7 +76,7 @@ footer {
     color: inherit;
 }
 
-    .little-blue-button .text-content {
+.little-blue-button .text-content {
         flex-grow: 1;
     }
 
@@ -96,12 +96,12 @@ footer {
     box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
 }
 
-    .little-red-button:hover {
+.little-red-button:hover {
         background-color: darkred;
         color: white;
     }
 
-    .little-red-button::after {
+.little-red-button::after {
         content: '>';
         position: absolute;
         right: 25px;
@@ -109,7 +109,7 @@ footer {
         color: inherit;
     }
 
-    .little-red-button .text-content {
+.little-red-button .text-content {
         flex-grow: 1;
     }
 

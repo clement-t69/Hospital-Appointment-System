@@ -1,4 +1,6 @@
-﻿@{
+﻿@model HealthApp.MVC.Models.CreateUserInputModel
+
+@{
     ViewData["Title"] = "Users";
 }
 
@@ -8,7 +10,7 @@
         <div class="row justify-content-center">
             <div>
                 <div style="color: white; user-select: none;">
-                    <a>_________________________________________________________________________________________</a>
+                    <a>_________________________________________________________________________________________________</a>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
                     <a class="little-white-button" asp-controller="admin" asp-action="panel" style="text-decoration: none; width: 90px; box-shadow:none">
@@ -22,16 +24,290 @@
                 </div>
                 <section>
                     <hr />
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+
+                    <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                        <input type="text" id="searchInput" name="searchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                        <select id="searchField" name="searchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                            <option value="Name">Name</option>
+                            <option value="Email">Email</option>
+                            <option value="Role">Role</option>
+                        </select>
+                        <button class="btn little-white-button" id="searchButton" onclick="location.href='@Url.Action("users", "admin")?searchInput=' + document.getElementById('searchInput').value + '&searchField=' + document.getElementById('searchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍 Search</button>
+                    </section>
+
+                    <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#createUserModal" style="margin-left:608px; text-decoration: none; box-shadow:none; width: 224px;">
+                        <span class="icon"></span>
+                        <div class="text-content px-3" style="display: flex; align-items: center;">
+                            <div>👤 Create a new User</div>
+                        </div>
+                    </a>
+
+                    <!-- Create User Modal -->
+                    <div class="modal fade @(ViewData.ModelState.ErrorCount > 0 && ViewData.ModelState.ContainsKey("CreateUser") ? "show d-block" : "")" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="createUserModalLabel" style="margin-left: 8px">Create a new User</h5>
+                                    <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("users", "admin")'" aria-label="Close" style="margin-right: 6px"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="createUserForm" asp-controller="admin" asp-action="create_user" method="post">
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="FirstName" class="form-control" id="FirstName" name="FirstName" aria-required="true" placeholder="First Name" style="width:100%;">
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="LastName" class="form-control" id="LastName" name="LastName" aria-required="true" placeholder="Last Name" style="width:100%;">
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="Email" type="email" class="form-control" id="Email" name="Email" aria-required="true" placeholder="Email" style="width:100%;">
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="Phone" class="form-control" id="Phone" name="Phone" aria-required="true" placeholder="Phone" style="width:100%;">
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="Address" class="form-control" id="Address" name="Address" aria-required="true" placeholder="Address" style="width:100%;">
+                                        </div>
+                                        <div class="rounded_fields form-label mb-3">
+                                            <input asp-for="Password" type="password" class="form-control" id="Password" name="Password" aria-required="true" placeholder="Password" style="width:100%;">
+                                        </div>
+                                        <div class="mb-3">
+                                            <select class="form-select" style="border-radius: 64px; height: 3rem;" id="Role" name="Role" required>
+                                                <option value="Patient">Patient</option>
+                                                <option value="Doctor">Doctor</option>
+                                                <option value="Administrator">Administrator</option>
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <a class="little-blue-button" href="#" onclick="document.getElementById('createUserForm').submit(); return false;" style="text-decoration: none;">
+                                        <div class="text-content fs-6 px-2 fw-bold">
+                                            <div>👤 Create a new User</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (ViewData.ModelState.ErrorCount > 0 || TempData["ErrorMessage"] != null)
+                    {
+                        <script>
+                            document.body.classList.add('modal-open');
+                        </script>
+                    }
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Phone</th>
+                                <th>Address</th>
+                                <th>Role</th>
+                                <th style="padding-left:40px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.Users != null)
+                            {
+                                @foreach (var user in ViewBag.Users)
+                                {
+                                    <tr>
+                                        <td style="vertical-align: middle;">@user.UserName</td>
+                                        <td style="vertical-align: middle;">@user.FirstName</td>
+                                        <td style="vertical-align: middle;">@user.LastName</td>
+                                        <td style="vertical-align: middle;">@user.Phone</td>
+                                        <td style="vertical-align: middle;">@user.Address</td>
+                                        @if (ViewBag.UserRoles != null && ViewBag.UserRoles.ContainsKey(user.Id.ToString()))
+                                        {
+                                            for (int i = 0; i < ViewBag.UserRoles[user.Id.ToString()].Count; i++)
+                                            {
+                                                var role = ViewBag.UserRoles[user.Id.ToString()][i];
+
+                                                if (role == "administrator")
+                                                {
+                                                    <td style="color: red; vertical-align: middle;">Administrator</td>
+                                                }
+                                                else if (role == "doctor")
+                                                {
+                                                    <td style="color:dodgerblue; vertical-align: middle;">Doctor</td>
+                                                }
+                                                else if (role == "patient")
+                                                {
+                                                    <td style="vertical-align: middle;">Patient</td>
+                                                }
+                                                else
+                                                {
+                                                    <td style="vertical-align: middle;">Fail</td>
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <td style="vertical-align: middle;">Unknown</td>
+                                        }
+                                        <td style="vertical-align: middle;">
+                                            <div style="display: flex;">
+
+                                                <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#editUserModal-@user.Id" style="text-decoration: none; box-shadow:none; width: 96px; margin-left: 32px; margin-right: 8px">
+                                                    <span class="icon"></span>
+                                                    <div class="text-content px-3" style="display: flex; align-items: center; justify-content: flex-start;">
+                                                        <div>Edit</div>
+                                                    </div>
+                                                </a>
+
+                                                <!-- Edit User Modal -->
+                                                <div class="modal fade @(ViewData.ModelState.ErrorCount > 0 && ViewData.ModelState.ContainsKey("EditUser") ? "show d-block" : "")" id="editUserModal-@user.Id" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="editUserModalLabel" style="margin-left: 8px">Edit a User</h5>
+                                                                <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("users", "admin")'" aria-label="Close" style="margin-right: 6px"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form id="editUserForm" asp-controller="admin" asp-action="edit_user" method="post">
+                                                                    <input type="hidden" name="UserId" value="@user.Id" />
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <input asp-for="FirstName" class="form-control" id="FirstName" name="FirstName" aria-required="true" placeholder="First Name" style="width:100%;" value="@ViewBag.FirstName_@user.FirstName">
+                                                                    </div>
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <input asp-for="LastName" class="form-control" id="LastName" name="LastName" aria-required="true" placeholder="Last Name" style="width:100%;" value="@ViewBag.LastName_@user.LastName">
+                                                                    </div>
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <input asp-for="Email" type="email" class="form-control" id="Email" name="Email" aria-required="true" placeholder="Email" style="width:100%;" value="@ViewBag.Email_@user.UserName">
+                                                                    </div>
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <input asp-for="Phone" class="form-control" id="Phone" name="Phone" aria-required="true" placeholder="Phone" style="width:100%;" value="@ViewBag.Phone_@user.Phone">
+                                                                    </div>
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <input asp-for="Address" class="form-control" id="Address" name="Address" aria-required="true" placeholder="Address" style="width:100%;" value="@ViewBag.Address_@user.Address">
+                                                                    </div>
+                                                                    <div class="mb-3">
+                                                                        <select class="form-select" style="border-radius: 64px; height: 3rem;" id="Role" name="Role" required>
+                                                                            @{
+                                                                                for (int i = 0; i < ViewBag.UserRoles[user.Id.ToString()].Count; i++)
+                                                                                {
+                                                                                    var role = ViewBag.UserRoles[user.Id.ToString()][i];
+                                                                                    if (role == "patient")
+                                                                                    {
+                                                                                        <option value="Patient" selected>Patient</option>
+                                                                                        <option value="Doctor">Doctor</option>
+                                                                                        <option value="Administrator">Administrator</option>
+                                                                                    }
+                                                                                    else if (role == "doctor")
+                                                                                    {
+                                                                                        <option value="Patient">Patient</option>
+                                                                                        <option value="Doctor" selected>Doctor</option>
+                                                                                        <option value="Administrator">Administrator</option>
+                                                                                    }
+                                                                                    else if (role == "administrator")
+                                                                                    {
+                                                                                        <option value="Patient">Patient</option>
+                                                                                        <option value="Doctor">Doctor</option>
+                                                                                        <option value="Administrator" selected>Administrator</option>
+                                                                                    }
+                                                                                    else
+                                                                                    {
+                                                                                        <option value="Patient">Patient</option>
+                                                                                        <option value="Doctor">Doctor</option>
+                                                                                        <option value="Administrator">Administrator</option>
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        </select>
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <a class="little-blue-button" href="#" onclick="document.getElementById('editUserForm').submit(); return false;" style="text-decoration: none;">
+                                                                    <div class="text-content fs-6 px-2 fw-bold">
+                                                                        <div>👤 Edit the User</div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <a class="little-red-button mb-1" data-bs-toggle="modal" data-bs-target="#confirmDeleteUserModal-@user.Id" style="text-decoration: none; box-shadow:none; width: 112px;">
+                                                    <span class="icon"></span>
+                                                    <div class="text-content px-3" style="display: flex; align-items: center; justify-content: flex-start;">
+                                                        <div>Delete</div>
+                                                    </div>
+                                                </a>
+
+                                                <div class="modal fade" id="confirmDeleteUserModal-@user.Id" tabindex="-1" aria-labelledby="confirmDeleteUserModalLabel-@user.Id" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.2)">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="confirmDeleteUserModalLabel-@user.Id">Delete an User</h5>
+                                                                <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("users", "admin")'" aria-label="Close"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                Are you sure you want to delete this user?
+                                                            </div>
+                                                            <form id="deleteUserForm-@user.Id" asp-controller="admin" asp-action="delete_user" method="post" style="display: none;">
+                                                                <input type="hidden" name="userId" value="@user.Id" />
+                                                            </form>
+                                                            <div class="modal-footer">
+                                                                <a class="little-red-button" href="#" onclick="document.getElementById('deleteUserForm-@user.Id').submit(); return false;" style="text-decoration: none;">
+                                                                    <div class="text-content fs-6 px-2 fw-bold">
+                                                                        <div>🗑️ Confirm Delete</div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
                 </section>
             </div>
         </div>
     </div>
+    @section scripts 
+    {
+        <script>
+            function searchUsers()
+            {
+                var searchInput = document.getElementById('searchInput').value;
+                var searchField = document.getElementById('searchField').value;
+
+                if (searchInput == "" || searchField == "") 
+                {
+				    searchField = "";
+			        searchInput = "";
+                } 
+                else 
+                {
+                    location.href = '@Url.Action("users", "admin")?search=' + searchInput + '-in=' + searchField;
+                }
+            }
+        </script>
+    }
 }
 else
 {
-@section scripts {
-    <script>
-        window.location.href = '@Url.Action("error", "home")';
-    </script>
+    @section scripts 
+    {
+        <script>
+            window.location.href = '@Url.Action("error", "home")';
+        </script>
     }
 }
