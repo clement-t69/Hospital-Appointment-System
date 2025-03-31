@@ -3,6 +3,7 @@ using System;
 using HealthApp.Domain.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331211311_Clean_Database")]
+    partial class Clean_Database
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
@@ -110,6 +113,10 @@ namespace HealthApp.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Specialization")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -444,100 +451,104 @@ namespace HealthApp.Domain.Migrations
 
             modelBuilder.Entity("HealthApp.Domain.Models.Appointment", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
+                    b.HasOne("HealthApp.Domain.Models.Doctor", null)
                         .WithMany("Appointments")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthApp.Domain.Models.Patient", "Patient")
+                    b.HasOne("HealthApp.Domain.Models.Patient", null)
                         .WithMany("Appointments")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Doctor", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.User", "User")
+                    b.HasOne("HealthApp.Domain.Models.User", null)
                         .WithOne()
                         .HasForeignKey("HealthApp.Domain.Models.Doctor", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.MedicalHistory", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
+                    b.HasOne("HealthApp.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthApp.Domain.Models.Patient", "Patient")
+                    b.HasOne("HealthApp.Domain.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthApp.Domain.Models.Patient", null)
                         .WithMany("MedicalHistories")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Notification", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
-                        .WithMany("Notifications")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthApp.Domain.Models.Patient", "Patient")
-                        .WithMany("Notifications")
-                        .HasForeignKey("PatientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Patient");
-                });
-
-            modelBuilder.Entity("HealthApp.Domain.Models.Patient", b =>
-                {
-                    b.HasOne("HealthApp.Domain.Models.User", "User")
-                        .WithOne()
-                        .HasForeignKey("HealthApp.Domain.Models.Patient", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("HealthApp.Domain.Models.Prescription", b =>
-                {
-                    b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
+                    b.HasOne("HealthApp.Domain.Models.User", null)
                         .WithMany()
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthApp.Domain.Models.Patient", "Patient")
-                        .WithMany("Prescriptions")
+                    b.HasOne("HealthApp.Domain.Models.Doctor", null)
+                        .WithMany("Notifications")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthApp.Domain.Models.User", null)
+                        .WithMany()
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Doctor");
+                    b.HasOne("HealthApp.Domain.Models.Patient", null)
+                        .WithMany("Notifications")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
 
-                    b.Navigation("Patient");
+            modelBuilder.Entity("HealthApp.Domain.Models.Patient", b =>
+                {
+                    b.HasOne("HealthApp.Domain.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("HealthApp.Domain.Models.Patient", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HealthApp.Domain.Models.Prescription", b =>
+                {
+                    b.HasOne("HealthApp.Domain.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthApp.Domain.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthApp.Domain.Models.Patient", null)
+                        .WithMany("Prescriptions")
+                        .HasForeignKey("PatientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

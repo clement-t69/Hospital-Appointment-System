@@ -3,6 +3,7 @@ using System;
 using HealthApp.Domain.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,12 +11,24 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250331150538_User_New")]
+    partial class User_New
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
+
+            modelBuilder.Entity("HealthApp.Domain.Models.Administrator", b =>
+                {
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("Administrators");
+                });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Appointment", b =>
                 {
@@ -30,19 +43,7 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DoctorLastName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("PatientId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PatientLastName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -67,13 +68,53 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Specialization")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("SpecializationId")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("SpecializationId")
+                        .IsUnique();
+
                     b.ToTable("Doctors");
+                });
+
+            modelBuilder.Entity("HealthApp.Domain.Models.DoctorAvailability", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("DoctorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("DoctorAvailabilities");
+                });
+
+            modelBuilder.Entity("HealthApp.Domain.Models.DoctorSpecialization", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DoctorSpecializations");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.MedicalHistory", b =>
@@ -93,23 +134,15 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DoctorLastName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Location")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("PatientId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PatientLastName")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Specialization")
+                    b.Property<string>("Treatment")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -167,9 +200,6 @@ namespace HealthApp.Domain.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("TEXT");
 
                     b.Property<string>("DoctorId")
                         .IsRequired()
@@ -442,34 +472,56 @@ namespace HealthApp.Domain.Migrations
                     b.HasDiscriminator().HasValue("User");
                 });
 
+            modelBuilder.Entity("HealthApp.Domain.Models.Administrator", b =>
+                {
+                    b.HasOne("HealthApp.Domain.Models.User", null)
+                        .WithOne()
+                        .HasForeignKey("HealthApp.Domain.Models.Administrator", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("HealthApp.Domain.Models.Appointment", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
+                    b.HasOne("HealthApp.Domain.Models.Doctor", null)
                         .WithMany("Appointments")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthApp.Domain.Models.Patient", "Patient")
+                    b.HasOne("HealthApp.Domain.Models.Patient", null)
                         .WithMany("Appointments")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Doctor");
-
-                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Doctor", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.User", "User")
+                    b.HasOne("HealthApp.Domain.Models.DoctorSpecialization", "Specialization")
+                        .WithOne()
+                        .HasForeignKey("HealthApp.Domain.Models.Doctor", "SpecializationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("HealthApp.Domain.Models.User", null)
                         .WithOne()
                         .HasForeignKey("HealthApp.Domain.Models.Doctor", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("Specialization");
+                });
+
+            modelBuilder.Entity("HealthApp.Domain.Models.DoctorAvailability", b =>
+                {
+                    b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
+                        .WithMany("DoctorAvailabilities")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.MedicalHistory", b =>
@@ -512,13 +564,11 @@ namespace HealthApp.Domain.Migrations
 
             modelBuilder.Entity("HealthApp.Domain.Models.Patient", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.User", "User")
+                    b.HasOne("HealthApp.Domain.Models.User", null)
                         .WithOne()
                         .HasForeignKey("HealthApp.Domain.Models.Patient", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Prescription", b =>
@@ -594,6 +644,8 @@ namespace HealthApp.Domain.Migrations
             modelBuilder.Entity("HealthApp.Domain.Models.Doctor", b =>
                 {
                     b.Navigation("Appointments");
+
+                    b.Navigation("DoctorAvailabilities");
 
                     b.Navigation("Notifications");
                 });

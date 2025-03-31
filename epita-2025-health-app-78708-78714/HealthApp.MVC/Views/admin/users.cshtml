@@ -43,12 +43,14 @@
                         <button class="btn little-white-button" id="searchButton" onclick="location.href='@Url.Action("users", "admin")?searchInput=' + document.getElementById('searchInput').value + '&searchField=' + document.getElementById('searchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍 Search</button>
                     </section>
 
-                    <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#createUserModal" style="margin-left:608px; text-decoration: none; box-shadow:none; width: 224px;">
-                        <span class="icon"></span>
-                        <div class="text-content px-3" style="display: flex; align-items: center;">
-                            <div>👤 Create a new User</div>
-                        </div>
-                    </a>
+                    <div style="display: flex; justify-content: flex-end;">
+                        <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#createUserModal" style="margin-right:0px; text-decoration: none; box-shadow:none; width: 224px;">
+                            <span class="icon"></span>
+                            <div class="text-content px-3" style="display: flex; align-items: center;">
+                                <div>👤 Create a new User</div>
+                            </div>
+                        </a>
+                    </div>
 
                     <!-- Create User Modal -->
                     <div class="modal fade @(ViewData.ModelState.ErrorCount > 0 && ViewData.ModelState.ContainsKey("CreateUser") ? "show d-block" : "")" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
@@ -167,16 +169,16 @@
                                                 </a>
 
                                                 <!-- Edit User Modal -->
-                                                <div class="modal fade @(ViewData.ModelState.ErrorCount > 0 && ViewData.ModelState.ContainsKey("EditUser") ? "show d-block" : "")" id="editUserModal-@user.Id" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+                                                <div class="modal fade" id="editUserModal-@user.Id" tabindex="-1" aria-labelledby="editUserModalLabel-@user.Id" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="editUserModalLabel" style="margin-left: 8px">Edit a User</h5>
+                                                                <h5 class="modal-title" id="editUserModalLabel-@user.Id" style="margin-left: 8px">Edit a User</h5>
                                                                 <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("users", "admin")'" aria-label="Close" style="margin-right: 6px"></button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <form id="editUserForm" asp-controller="admin" asp-action="edit_user" method="post">
-                                                                    <input type="hidden" name="UserId" value="@user.Id" />
+                                                                <form id="editUserForm-@user.Id" asp-controller="admin" asp-action="edit_user" method="post">
+                                                                    <input type="hidden" name="userId" value="@user.Id" />
                                                                     <div class="rounded_fields form-label mb-3">
                                                                         <input asp-for="FirstName" class="form-control" id="FirstName" name="FirstName" aria-required="true" placeholder="First Name" style="width:100%;" value="@ViewBag.FirstName_@user.FirstName">
                                                                     </div>
@@ -230,7 +232,7 @@
                                                             </div>
 
                                                             <div class="modal-footer">
-                                                                <a class="little-blue-button" href="#" onclick="document.getElementById('editUserForm').submit(); return false;" style="text-decoration: none;">
+                                                                <a class="little-blue-button" href="#" onclick="document.getElementById('editUserForm-@user.Id').submit(); return false;" style="text-decoration: none;">
                                                                     <div class="text-content fs-6 px-2 fw-bold">
                                                                         <div>👤 Edit the User</div>
                                                                     </div>
@@ -247,6 +249,7 @@
                                                     </div>
                                                 </a>
 
+                                                <!-- Delete User Modal -->
                                                 <div class="modal fade" id="confirmDeleteUserModal-@user.Id" tabindex="-1" aria-labelledby="confirmDeleteUserModalLabel-@user.Id" aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.2)">
@@ -296,7 +299,7 @@
                 } 
                 else 
                 {
-                    location.href = '@Url.Action("users", "admin")?search=' + searchInput + '-in=' + searchField;
+                    location.href = '@Url.Action("users", "admin")?searchInput=' + searchInput + '&searchField=' + searchField;
                 }
             }
         </script>

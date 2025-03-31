@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Policy;
 
 namespace HealthApp.Domain.Models
 {
@@ -15,6 +16,7 @@ namespace HealthApp.Domain.Models
         public Patient Patient { get; set; }
 
         public string Name { get; set; }
+        public DateTime Date { get; set; }
         public string Dosage { get; set; }
         public string Frequency { get; set; }
         public string Duration { get; set; }

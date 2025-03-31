@@ -8,17 +8,21 @@ namespace HealthApp.Domain.Models
         public DateTime Date { get; set; }
         public TimeSpan Time { get; set; }
 
+        public Doctor Doctor { get; set; }
         public string DoctorId { get; set; }
+        public string DoctorLastName { get; set; }
 
+        public Patient Patient { get; set; }
         public string PatientId { get; set; }
+        public string PatientLastName { get; set; }
 
-        public enum Status
-        {
+        public string Status { get; set; }
+        /*
             Pending,
             Approved,
             Rejected,
             Completed,
             Cancelled
-        }
+        */
     }
 }

@@ -5,13 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HealthApp.MVC.Models;
 using Microsoft.AspNetCore.Authorization;
-using System.Runtime.InteropServices;
-using System.Data.Entity.Validation;
-using System.Data.Entity;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using System.Net;
 using HealthApp.Domain.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.Sqlite;
-using System.Globalization;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -21,18 +17,25 @@ namespace HealthApp.MVC.Controllers
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly SendEmailModel _sendEmailModel;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ApplicationDbContext _context;
 
         private ChangeEmailInputModel changeEmailModel = new ChangeEmailInputModel();
         private ChangePasswordInputModel changePasswordModel = new ChangePasswordInputModel();
 
         public AccountController(SignInManager<User> signInManager,
             UserManager<User> userManager, RoleManager<IdentityRole> roleManager,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger, SendEmailModel sendEmailModel, IHttpContextAccessor httpContextAccessor
+            , ApplicationDbContext context)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _roleManager = roleManager;
             _logger = logger;
+            _sendEmailModel = sendEmailModel;
+            _httpContextAccessor = httpContextAccessor;
+            _context = context;
         }
 
         // ERROR
@@ -68,6 +71,7 @@ namespace HealthApp.MVC.Controllers
 
             return View();
         }
+        
         public IActionResult my_appointments()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -80,6 +84,7 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("appointments", "care");
 
         }
+        
         public IActionResult edit()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -91,6 +96,7 @@ namespace HealthApp.MVC.Controllers
 
             return View();
         }
+        
         [HttpPost]
         public async Task<IActionResult> logout()
         {
@@ -115,10 +121,11 @@ namespace HealthApp.MVC.Controllers
         }
 
         // LOGIN
-        public async Task<IActionResult> login()
+        public IActionResult login()
         {
             return View();
         }
+        
         [HttpPost]
         public async Task<IActionResult> login(LoginInputModel model)
         {
@@ -149,7 +156,7 @@ namespace HealthApp.MVC.Controllers
         }
 
         // REGISTER
-        public async Task<IActionResult> register()
+        public IActionResult register()
         {
             return View();
         }
@@ -171,14 +178,36 @@ namespace HealthApp.MVC.Controllers
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
-                var roleName = "patient";
+                var roleName = "Patient";
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation($"******************************\nUser {model.Email} has registered.\n******************************\n");
-                    
+
+                    _sendEmailModel.SendCreateConfirmation(model.FirstName, model.LastName, model.Email, "user");
+
                     await _signInManager.SignInAsync(user, isPersistent: true);
                     await _userManager.AddToRoleAsync(user, roleName);
+
+                    try
+                    {
+                        var patient = new Patient
+                        {
+                            UserId = user.Id
+                        };
+                        patient.Appointments = new List<Appointment>();
+                        patient.MedicalHistories = new List<MedicalHistory>();
+                        patient.Notifications = new List<Notification>();
+                        patient.Prescriptions = new List<Prescription>();
+
+                        _context.Patients.Add(patient);
+                        _context.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"******************************\n{ex.Message}\n******************************\n");
+                    }
+
                     return RedirectToAction("edit", "account");
                 }
                 else
@@ -196,8 +225,130 @@ namespace HealthApp.MVC.Controllers
             return View(model);
         }
 
-        // FORGOT PASSWORD : TODO
+        // FORGOT PASSWORD
         public IActionResult forgot_password()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> forgot_password(ForgotPasswordInputModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                string emailToLower = model.Email.ToLower();
+
+                var user = await _userManager.FindByEmailAsync(emailToLower);
+                if (user == null)
+                {
+                    _logger.LogError($"******************************\nUser {model.Email} has failed to reset their Password: Email not found.\n******************************\n");
+                    TempData["ErrorMessage"] = "Email not found.\n";
+                    return View(model);
+                }
+
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var existingToken = _context.UserTokens.FirstOrDefault(t => t.UserId == user.Id && t.LoginProvider == "Default" && t.Name == "PasswordReset");
+
+                if (existingToken == null)
+                {
+                    //_logger.LogError($"******************************\nToken {token} has been generated for User {model.Email}.\n******************************\n");
+                    try
+                    {
+                        _context.UserTokens.Add(new IdentityUserToken<string>
+                        {
+                            UserId = user.Id,
+                            LoginProvider = "Default",
+                            Name = "PasswordReset",
+                            Value = token
+                        });
+
+                        //_logger.LogInformation($"******************************\nToken {token} has been inserted manually for User {model.Email}.\n******************************\n");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"******************************\n{ex.Message}\n******************************\n");
+                    }
+                }
+                else
+                    existingToken.Value = token;
+
+                await _context.SaveChangesAsync();
+
+                var callbackUrl = Url.Action(
+                    "reset_password",
+                    "account",
+                    new { token = WebUtility.UrlEncode(token), email = user.UserName },
+                    //new { token, email = user.UserName },
+                    Request.Scheme
+                );
+
+
+                _sendEmailModel.SendForgotPassword(user.FirstName, user.LastName, model.Email, token, callbackUrl);
+
+                _logger.LogInformation($"******************************\nUser {model.Email} has requested a Password reset.\n******************************\n");
+                TempData["SuccessMessage"] = "An Email has been sent to reset your Password.\n";
+                
+                return RedirectToAction("login", "account");
+            }
+            
+            _logger.LogError($"******************************\nUser {model.Email} has failed to reset their Password.\n******************************\n");
+            TempData["ErrorMessage"] = "An error occurred while resetting your Password.\n";
+            return View(model);
+        }
+
+        public IActionResult reset_password(string token, string email)
+        {
+            ViewBag.token = WebUtility.UrlDecode(token);
+            ViewBag.email = email;
+
+            //_logger.LogInformation($"Recevied Email (GET) : {email}");
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> reset_password(ResetPasswordInputModel model)
+        {
+            //_logger.LogInformation($"Received Email (POST) : {model.Email}");
+
+            if (ModelState.IsValid)
+            {
+                var decodedToken = WebUtility.UrlDecode(model.Token);
+                //var decodedToken = model.Token;
+
+                _logger.LogInformation($"******************************\nEmail: {model.Email}\n******************************\n");
+
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user == null)
+                {
+                    _logger.LogError($"******************************\nUser {model.Email} has failed to reset their Password: Email not found.\n******************************\n");
+                    TempData["ErrorMessage"] = "Email not found.\n";
+                    return RedirectToAction("forgot_password", "account");
+                }
+
+                _logger.LogInformation($"******************************\nEmail: {user.UserName}\nPassword: {model.NewPassword}\n******************************\n");
+                
+                var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation($"******************************\nUser {model.Email} has reset their Password.\n******************************\n");
+                    TempData["SuccessMessage"] = "Your Password has been reset.\n";
+
+                    _context.UserTokens.RemoveRange(_context.UserTokens.Where(t => t.UserId == user.Id));
+                    await _context.SaveChangesAsync();
+
+                    return RedirectToAction("password_changed", "account");
+                }
+
+                foreach (var error in result.Errors)
+                {
+                    _logger.LogError($"******************************\nUser {model.Email} has failed to reset their Password: {error.Description}\n******************************\n");
+                    TempData["ErrorMessage"] = $"{error.Description}\n";
+                }
+            }
+            return View(model);
+        }
+
+        public IActionResult password_changed()
         {
             return View();
         }
@@ -216,7 +367,7 @@ namespace HealthApp.MVC.Controllers
 
             ViewBag.UserFirstName = user.FirstName;
             ViewBag.UserLastName = user.LastName;
-            ViewBag.UserEmail = user.Email;
+            ViewBag.UserEmail = user.UserName;
             ViewBag.UserPasswordLength = user.Password.Length;
 
             var userRoles = await _userManager.GetRolesAsync(user);
@@ -266,6 +417,8 @@ namespace HealthApp.MVC.Controllers
 
             if (result.Succeeded)
             {
+                _sendEmailModel.SendEditConfirmation(user.FirstName, user.LastName, user.UserName, "user", "information");
+
                 _logger.LogInformation($"******************************\nUser {user.Email} has updated their information.\n******************************\n");
                 TempData["SuccessMessage"] = "Your information has been updated.\n";
                 return RedirectToAction("my_profile", "account");
@@ -292,6 +445,13 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
+            var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
+            if (patient != null)
+            {
+                var medicalHistories = _context.MedicalHistories.Where(mh => mh.PatientId == patient.UserId).ToList();
+                ViewBag.MedicalHistories = medicalHistories;
+            }
+
             return View();
         }
 
@@ -305,6 +465,13 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
+            if (patient != null)
+            {
+                var prescriptions = _context.Prescriptions.Where(p => p.PatientId == patient.UserId).ToList();
+                ViewBag.Prescriptions = prescriptions;
+            }
 
             return View();
         }
@@ -380,6 +547,8 @@ namespace HealthApp.MVC.Controllers
 
                 _logger.LogInformation($"******************************\nUser {user.Email} has updated their Email to {model.NewEmail}.\n******************************\n");
 
+                _sendEmailModel.SendEditConfirmation(user.FirstName, user.LastName, model.CurrentEmail, "user", "email");
+
                 await _userManager.UpdateAsync(user);
                 await _signInManager.RefreshSignInAsync(user);
                 TempData["SuccessMessage"] = "Your Email has been updated.\n";
@@ -449,6 +618,8 @@ namespace HealthApp.MVC.Controllers
 
             _logger.LogInformation($"******************************\nUser {user.Email} has updated their Password.\n******************************\n");
 
+            _sendEmailModel.SendEditConfirmation(user.FirstName, user.LastName, user.UserName, "user", "password");
+
             await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
             TempData["SuccessMessage"] = "Your Password has been updated.\n";
@@ -462,14 +633,54 @@ namespace HealthApp.MVC.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.GetUserAsync(User);
+                var userRoles = await _userManager.GetRolesAsync(user);
 
                 if (user != null)
                 {
-                    var userEmail = user.Email;
+                    var userEmail = user.UserName;
+                    var userFirstName = user.FirstName;
+                    var userLastName = user.LastName;
+
+                    if (userEmail == "admin@test.fr")
+                    {
+                        _logger.LogError($"******************************\nUser {userEmail} has failed to delete their account: Admin account cannot be deleted.\n******************************\n");
+                        TempData["ErrorMessage"] = "Admin account cannot be deleted.\n";
+                        return RedirectToAction("edit", "account");
+                    }
+
                     var result = await _userManager.DeleteAsync(user);
                     if (result.Succeeded)
                     {
-                        _logger.LogInformation($"******************************\nUser {userEmail} has deleted their account.\n******************************\n");
+                        try
+                        {
+                            if (userRoles.Contains("patient"))
+                            {
+                                var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
+                                if (patient != null)
+                                {
+                                    _context.Patients.Remove(patient);
+                                    _context.SaveChanges();
+                                }
+
+                                _logger.LogInformation($"******************************\nUser {userEmail} has deleted their account.\n******************************\n");
+                            }
+                            else if (userRoles.Contains("doctor"))
+                            {
+                                var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
+                                if (doctor != null)
+                                {
+                                    _context.Doctors.Remove(doctor);
+                                    _context.SaveChanges();
+                                }
+                                _logger.LogInformation($"******************************\nUser {userEmail} has deleted their account.\n******************************\n");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError($"******************************\n{ex.Message}\n******************************\n");
+                        }
+
+                        _sendEmailModel.SendDeleteConfirmation(userFirstName, userLastName, userEmail, "user");
 
                         await _signInManager.SignOutAsync();
                         return RedirectToAction("index", "home");

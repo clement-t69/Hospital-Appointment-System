@@ -10,26 +10,92 @@
                 <div style="color: white; user-select: none;">
                     <a>_________________________________________________________________________________________</a>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <a class="little-white-button" asp-controller="account" asp-action="edit" style="text-decoration: none; width: 90px; box-shadow:none">
-                        <div class="text-content fs-6 px-2 fw-bold text-center">
-                            <div>&lt; Back</div>
-                        </div>
-                    </a>
-                </div>
                 <div class="text-center" style="flex-grow: 1;">
                     <h1 style="font-weight: 700">Patients</h1>
                 </div>
                 <section>
                     <hr />
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+
+                    <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                        <input type="text" id="searchInput" name="searchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                        <select id="searchField" name="searchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                            <option value="Name">Name</option>
+                            <option value="Email">Email</option>S
+                        </select>
+                        <button class="btn little-white-button" id="searchButton" onclick="location.href='@Url.Action("patients", "care")?searchInput=' + document.getElementById('searchInput').value + '&searchField=' + document.getElementById('searchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍 Search</button>
+                    </section>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Email</th>
+                                <th style="padding-left:24px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.Patients != null)
+                            {
+                                @foreach (var patient in ViewBag.Patients)
+                                {
+                                    <tr>
+                                        <td style="vertical-align: middle;">@patient.FirstName</td>
+                                        <td style="vertical-align: middle;">@patient.LastName</td>
+                                        <td style="vertical-align: middle;">@patient.UserName</td>
+                                        <td style="vertical-align: middle;">
+                                            <div style="display: flex;">
+                                                <a class="little-blue-button" asp-controller="care" asp-action="patient" asp-route-id="@patient.Id" style="text-decoration: none; width: 96px">
+                                                    <div class="text-content fs-6 px-2 fw-bold">
+                                                        <div>Edit</div>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
                 </section>
             </div>
         </div>
     </div>
+
+        @section scripts 
+    {
+        <script>
+            function searchPatients()
+            {
+                var searchInput = document.getElementById('searchInput').value;
+                var searchField = document.getElementById('searchField').value;
+
+                if (searchInput == "" || searchField == "") 
+                {
+				    searchField = "";
+			        searchInput = "";
+                } 
+                else 
+                {
+                    location.href = '@Url.Action("care", "patients")?searchInput=' + searchInput + '&searchField=' + searchField;
+                }
+            }
+        </script>
+    }
 }
 else
 {
-    @section scripts {
+    @section scripts 
+    {
         <script>
             window.location.href = '@Url.Action("error", "home")';
         </script>

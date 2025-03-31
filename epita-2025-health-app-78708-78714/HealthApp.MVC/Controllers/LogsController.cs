@@ -15,6 +15,12 @@ namespace HealthApp.MVC.Controllers
         private readonly SignInManager<User> _signInManager;
         private readonly ILogger<AccountController> _logger;
 
+        public LogsController(SignInManager<User> signInManager, ILogger<AccountController> logger)
+        {
+            _signInManager = signInManager;
+            _logger = logger;
+        }
+
         public IActionResult error()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;

@@ -1,3 +1,5 @@
+#nullable disable
+
 using HealthApp.Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
@@ -6,23 +8,26 @@ using HealthApp.Domain.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Entity;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HealthApp.MVC.Controllers
 {
     public class AdminController : Controller
     {
         private readonly SignInManager<User> _signInManager;
-        private readonly ILogger<AccountController> _logger;
+        private readonly ILogger<AdminController> _logger;
         private readonly UserManager<User> _userManager;
         private readonly ApplicationDbContext _context;
+        private readonly SendEmailModel _sendEmailModel;
 
         public AdminController(SignInManager<User> signInManager,
-            ILogger<AccountController> logger, UserManager<User> userManager, ApplicationDbContext context)
+            ILogger<AdminController> logger, UserManager<User> userManager, ApplicationDbContext context, SendEmailModel sendEmailModel)
         {
             _signInManager = signInManager;
             _logger = logger;
             _userManager = userManager;
             _context = context;
+            _sendEmailModel = sendEmailModel;
         }
 
         // ERROR
@@ -183,11 +188,53 @@ namespace HealthApp.MVC.Controllers
 
                 if (result.Succeeded)
                 { 
-                    _logger.LogInformation($"******************************\nNew user with Email {model.Email} and role {roleName} has been created.\n******************************\n");
+                    //_logger.LogInformation($"******************************\nNew user with Email {model.Email} and role {roleName} has been created.\n******************************\n");
 
                     await _userManager.AddToRoleAsync(user, roleName);
 
+                    _sendEmailModel.SendCreateConfirmation(model.FirstName, model.LastName, model.Email, "admin");
+
                     TempData["SuccessMessage"] = $"New user with Email {model.Email} and role {roleName} has been created.\n";
+
+                    try
+                    {
+                        if (roleName == "Doctor")
+                        {
+                            var doctor = new Doctor
+                            {
+                                UserId = user.Id
+                            };
+                            doctor.Notifications = new List<Notification>();
+                            doctor.Appointments = new List<Appointment>();
+                            doctor.Specialization = "";
+                            doctor.Location = "";
+
+                            _context.Doctors.Add(doctor);
+                            _context.SaveChanges();
+                            _logger.LogInformation($"******************************\nUser {user.UserName} has been added to the database.\n******************************\n");
+                        }
+                        else if (roleName == "Patient")
+                        {
+                            var patient = new Patient
+                            {
+                                UserId = user.Id
+                            };
+                            patient.Notifications = new List<Notification>();
+                            patient.MedicalHistories = new List<MedicalHistory>();
+                            patient.Appointments = new List<Appointment>();
+                            patient.Prescriptions = new List<Prescription>();
+
+                            _context.Patients.Add(patient);
+                            _context.SaveChanges();
+                            _logger.LogInformation($"******************************\nUser {user.UserName} has been added to the database.\n******************************\n");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError($"******************************\nError when creating user: {e.Message}\n******************************\n");
+                        TempData["ErrorMessage"] = $"{e.Message}\n";
+                        return RedirectToAction("users", "admin");
+                    }
 
                     return RedirectToAction("users", "admin");
                 }
@@ -221,14 +268,46 @@ namespace HealthApp.MVC.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByIdAsync(userId);
+                var userRole = await _userManager.GetRolesAsync(user);
 
                 if (user != null)
                 {
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
+                    user.UserName = model.Email;
                     user.Email = model.Email;
                     user.Phone = model.Phone;
                     user.Address = model.Address;
+
+                    try
+                    {
+                        if (userRole.Contains("doctor"))
+                        {
+                            var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
+                            if (doctor != null)
+                            {
+                                _context.Doctors.Remove(doctor);
+                                _context.SaveChanges();
+                                _logger.LogInformation($"******************************\nDoctor {user.UserName} has been removed from the Doctor table.\n******************************\n");
+                            }
+                        }
+                        else if (userRole.Contains("patient"))
+                        {
+                            var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
+                            if (patient != null)
+                            {
+                                _context.Patients.Remove(patient);
+                                _context.SaveChanges();
+                                _logger.LogInformation($"******************************\nPatient {user.UserName} has been removed from the Patient table.\n******************************\n");
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError($"******************************\nError when updating user: {e.Message}\n******************************\n");
+                        TempData["ErrorMessage"] = $"1 {e.Message}\n";
+                        return RedirectToAction("users", "admin");
+                    }
 
                     var roleName = model.Role.ToString();
 
@@ -239,8 +318,47 @@ namespace HealthApp.MVC.Controllers
 
                     if (result.Succeeded)
                     {
-                        _logger.LogInformation($"******************************\nUser {user.Email} has been updated.\n******************************\n");
-                        TempData["SuccessMessage"] = $"User {user.Email} has been updated.\n";
+                        _sendEmailModel.SendEditConfirmation(user.FirstName, user.LastName, user.UserName, "admin", "information");
+
+                        try
+                        {
+                            if (roleName == "Doctor")
+                            {
+                                var doctor = new Doctor
+                                {
+                                    UserId = user.Id
+                                };
+                                doctor.Notifications = new List<Notification>();
+                                doctor.Appointments = new List<Appointment>();
+                                doctor.Specialization = "";
+                                doctor.Location = "";
+
+                                _context.Doctors.Add(doctor);
+                                _context.SaveChanges();
+                            }
+                            else if (roleName == "Patient")
+                            {
+                                var patient = new Patient
+                                {
+                                    UserId = user.Id
+                                };
+                                patient.Notifications = new List<Notification>();
+                                patient.MedicalHistories = new List<MedicalHistory>();
+                                patient.Appointments = new List<Appointment>();
+                                patient.Prescriptions = new List<Prescription>();
+                                _context.Patients.Add(patient);
+                                _context.SaveChanges();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError($"******************************\nError when updating user: {e.Message}\n******************************\n");
+                            TempData["ErrorMessage"] = $"2 {e.Message}\n";
+                            return RedirectToAction("users", "admin");
+                        }
+
+                        _logger.LogInformation($"******************************\nUser {user.UserName} has been updated.\n******************************\n");
+                        TempData["SuccessMessage"] = $"User {user.UserName} has been updated.\n";
                         return RedirectToAction("users", "admin");
                     }
                     else
@@ -293,12 +411,38 @@ namespace HealthApp.MVC.Controllers
                         return RedirectToAction("users", "admin");
                     }
 
-                    var userEmail = user.Email;
+                    var userEmail = user.UserName;
+                    var userFirstName = user.FirstName;
+                    var userLastName = user.LastName;
+                    var userRole = await _userManager.GetRolesAsync(user);
+
                     var result = await _userManager.DeleteAsync(user);
+
                     if (result.Succeeded)
                     {
+                        _sendEmailModel.SendDeleteConfirmation(userFirstName, userLastName, userEmail, "admin");
+
+                        if (userRole.Contains("doctor"))
+                        {
+                            var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
+                            if (doctor != null)
+                            {
+                                _context.Doctors.Remove(doctor);
+                                _context.SaveChanges();
+                            }
+                        }
+                        else if (userRole.Contains("patient"))
+                        {
+                            var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
+                            if (patient != null)
+                            {
+                                _context.Patients.Remove(patient);
+                                _context.SaveChanges();
+                            }
+                        }
+
                         _logger.LogInformation($"******************************\nUser {userEmail} has been deleted.\n******************************\n");
-                        TempData["SuccessMessage"] = $"User has been deleted.\n";
+                        TempData["SuccessMessage"] = $"User {userEmail} has been deleted.\n";
                         return RedirectToAction("users", "admin");
                     }
                     else
