@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Messages";
 }
 
@@ -11,7 +11,7 @@
                     <a>_________________________________________________________________________________________</a>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <a class="little-white-button" asp-controller="account" asp-action="edit" style="text-decoration: none; width: 90px; box-shadow:none">
+                    <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
                         <div class="text-content fs-6 px-2 fw-bold text-center">
                             <div>&lt; Back</div>
                         </div>
@@ -34,7 +34,7 @@
                 </div>
 
                 <div style="display: flex; justify-content: center; width: 100%;">
-                    <div style="border-right: 1px solid #dee2e6; border-left: 1px solid #dee2e6; width: 400px;">
+                    <div>
                         <table class="table">
                             <tbody>
                                 @if (ViewBag.Messages == null || ViewBag.Messages.Count == 0)
@@ -67,6 +67,15 @@
             </div>
         </div>
     </div>
+
+    @section scripts {
+        <script>
+            function goBack()
+            {
+                window.history.go(-1);
+            }
+        </script>
+    }
 }
 else
 {

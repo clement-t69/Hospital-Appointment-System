@@ -14,7 +14,9 @@ namespace HealthApp.Domain.Models
         public string PatientId { get; set; }
         public Patient Patient { get; set; }
 
+        public string Object { get; set; }
         public string Message { get; set; }
-        public DateTime Date { get; set; }
+
+        public string Date { get; set; }
     }
 }

@@ -199,6 +199,8 @@ namespace HealthApp.MVC.Controllers
                         patient.MedicalHistories = new List<MedicalHistory>();
                         patient.Notifications = new List<Notification>();
                         patient.Prescriptions = new List<Prescription>();
+                        patient.FirstName = user.FirstName;
+                        patient.LastName = user.LastName;
 
                         _context.Patients.Add(patient);
                         _context.SaveChanges();
@@ -386,18 +388,31 @@ namespace HealthApp.MVC.Controllers
         // ACCESS TO PROFILE, MEDICAL HISTORY, PRESCRIPTIONS
         [HttpGet]
         [Authorize]
-        public IActionResult my_profile()
+        public async Task<IActionResult> my_profile()
         {
-            var user = _userManager.GetUserAsync(User).Result;
-            var userRoles = _userManager.GetRolesAsync(user).Result;
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
+
             ViewBag.UserFirstName = user.FirstName;
             ViewBag.UserLastName = user.LastName;
-            ViewBag.UserPhone = user.Phone;
-            ViewBag.UserAddress = user.Address;
+            ViewBag.Phone = user.Phone;
+            ViewBag.Address = user.Address;
+
+            if ((await _userManager.GetRolesAsync(user)).Contains("doctor") || (await _userManager.GetRolesAsync(user)).Contains("Doctor"))
+            {
+                var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
+
+                if (doctor != null)
+                {
+                    ViewBag.DoctorSpecialization = doctor.Specialization;
+                    ViewBag.DoctorLocation = doctor.Location;
+                }
+            }
 
             return View();
         }
@@ -407,16 +422,35 @@ namespace HealthApp.MVC.Controllers
         public async Task<IActionResult> change_info(ChangeInfoInputModel model)
         {
             var user = await _userManager.GetUserAsync(User);
-            if (ModelState.IsValid)
+
+            var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
+            var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
+
+            if (patient != null)
             {
                 user.Phone = model.Phone;
                 user.Address = model.Address;
             }
+            else if (doctor != null)
+            {
+                user.Phone = model.Phone;
+                user.Address = model.Address;
+
+                if (string.IsNullOrEmpty(model.Location) || string.IsNullOrEmpty(model.Specialization))
+                {
+                    TempData["ErrorMessage"] = "Location and Specialization cannot be empty.";
+                    return RedirectToAction("my_profile", "account");
+                }
+
+                doctor.Specialization = model.Specialization;
+                doctor.Location = model.Location;
+            }         
 
             var result = await _userManager.UpdateAsync(user);
 
             if (result.Succeeded)
             {
+                _context.SaveChanges();
                 _sendEmailModel.SendEditConfirmation(user.FirstName, user.LastName, user.UserName, "user", "information");
 
                 _logger.LogInformation($"******************************\nUser {user.Email} has updated their information.\n******************************\n");

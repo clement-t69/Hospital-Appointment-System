@@ -1,8 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Logs";
+    ViewData["Title"] = "Send Message";
 }
 
-@if (ViewBag.IsLogged == true && ViewBag.IsAdmin == true)
+@if (ViewBag.IsLogged == true)
 {
     <div class="container d-flex justify-content-center" style="min-height: 50vh;">
         <div class="row justify-content-center">
@@ -18,11 +18,10 @@
                     </a>
                 </div>
                 <div class="text-center" style="flex-grow: 1;">
-                    <h1 style="font-weight: 700">Logs</h1>
+                    <h1 style="font-weight: 700">Send a Messages</h1>
                 </div>
                 <section>
                     <hr />
-                    <div id="logConsole" style="width: 1280px; height: 640px; overflow-y: scroll; background-color: black; color: white; padding: 10px; margin: 0 auto;"></div>
                 </section>
             </div>
         </div>
@@ -30,26 +29,10 @@
 
     @section scripts {
         <script>
-            const socket = new WebSocket("wss://localhost:44368/ws");
-            const logConsole = document.getElementById("logConsole");
-
-            socket.onmessage = function (event) {
-                logConsole.innerHTML += event.data + "<br>";
-                logConsole.scrollTop = logConsole.scrollHeight;
-            };
-
-            socket.onopen = function (event) {
-                console.log("WebSocket connection established.");
-            };
-
-            socket.onclose = function (event) {
-                console.log("WebSocket connection closed.");
-            };
-
-			function goBack() 
+            function goBack()
             {
-				window.history.go(-1);
-			}
+                window.history.go(-1);
+            }
         </script>
     }
 }
@@ -57,7 +40,7 @@ else
 {
     @section scripts {
     <script>
-        window.location.href = '@Url.Action("error", "home")';
+        window.location.href = '@Url.Action("login_or_register", "account")';
     </script>
     }
 }

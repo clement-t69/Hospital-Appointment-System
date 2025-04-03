@@ -246,3 +246,22 @@ footer {
 .rounded-checkbox .form-check-label {
     align-items: center;
 }
+
+.big-white-button-table:hover {
+    background-color: #0e43ad;
+    color: white;
+    border-radius: 64px;
+}
+
+.calendar-slot 
+{
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+    .calendar-slot:hover 
+    {
+        background-color: #0e43ad;
+        cursor: pointer;
+    }
