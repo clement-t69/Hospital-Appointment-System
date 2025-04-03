@@ -71,7 +71,21 @@ namespace HealthApp.MVC.Controllers
 
             return View();
         }
-        
+
+
+        public IActionResult send_message()
+        {
+            var user = _userManager.GetUserAsync(User).Result;
+            var userRoles = _userManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+            var doctors = _context.Doctors.ToList();
+            ViewBag.Doctors = doctors;
+            return View();
+        }
+
         public IActionResult my_appointments()
         {
             var user = _userManager.GetUserAsync(User).Result;
