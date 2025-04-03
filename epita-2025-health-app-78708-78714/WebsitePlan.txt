@@ -2,9 +2,9 @@
 ⏯️: WIP
 ❌: TODO
 
-//////////////////////// Views/home ////////////////////////
+//////////////////////// Views/home //////////////////////// ⏯️: NEED TO IMPLEMENT CONTACT
 
-[⏯️]	Views/home/index.cshtml: NEED TO IMPLEMENT THE SEARCH BAR LOGIC (SEARCH IN THE DATABASE AMONG DOCTORS AND SPECIALTIES)
+[✅]	Views/home/index.cshtml:
 		Search bar (field to enter a keyword, a select to choose a category, a button to Search)
 		This search will bring to care/doctors.cshtml and perform a search in the database (filering with the search keyword and category)
 
@@ -17,7 +17,7 @@
 		Form with Name, Email, Subject, Message, Send button
 		This will be sent to all administrators, who can see it in the my_messages page
 
-//////////////////////// Views/Shared ////////////////////////
+//////////////////////// Views/Shared //////////////////////// ✅
 
 [✅]	Views/Shared/_layout.cshtml: 
 		When not logged:
@@ -32,7 +32,7 @@
 		Bottom of the page:
 		Cancellation Policy (hyperlink to Cancellation Policy)
 
-//////////////////////// Views/account ////////////////////////
+//////////////////////// Views/account //////////////////////// ✅
 
 [✅]	Views/account/login_or_register.cshtml:
 		Title: Register or Log in
@@ -78,7 +78,7 @@
 		Title: My profile
 		Card with First name, Last name, Address, Phone number with Edit button (opens a form to edit the information)
 
-[⏯️]	Views/account/my_profile.cshtml (as a doctor): NEED TO IMPLEMENT THE SPECIALTY AND LOCATION
+[✅]	Views/account/my_profile.cshtml (as a doctor):
 		Title: My profile
 		Card with First name, Last name, Address, Phone number, Specialty, Location with Edit button (opens a form to edit the information)
 
@@ -129,21 +129,19 @@
 		--> Button to send a message to the patient (opens a form with Title, Content, Send button)
 		Send a message when a prescription is issued, updated, or cancelled
 
-[❌]	Views/care/doctors.cshtml (only as a patient, if not the case redirect to Error page):
-		List of doctors (can be filtered by name, specialty, location)
-		For each doctor, button to view profile, send a message, book an appointment
+[⏯️]	Views/care/doctors.cshtml (only as a patient, if not the case redirect to Error page): TODO: SEND MESSAGE (just copy the doctor email to the message form)
+		✅List of doctors (can be filtered by name, specialty, location)
+		⏯️For each doctor, button to view profile, send a message, book an appointment (form)
 
-[⏯️]	Views/care/appointments.cshtml (as a patient): NEED TO FIX THE APPOINTMENT FORM LOGIC
-		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
+[⏯️]	Views/care/appointments.cshtml (as a patient):
+		✅List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
 		Clicking on an appointment opens a form to reschedule or cancel the appointment
-		If a patient wants to cancel an appointment --> Pop-up with a form to enter the reason
 		If a patient wants to cancel an appointment in the 48 hours before the appointment --> Pop-up with a warning explaining that the cancellation is not possible, with a link to cancellation policy
 		If the appointment is virtual --> Pop-up with link to join the virtual consultation
 
-		Calendar by month on the right with appointments
-		The calendar can be filtered by doctor name, status
+		✅Calendar by week on the right with appointments
 		When an appointment is booked --> Send Message to Patient (can be viewed in Account/Messages)
-		Monday to friday between 9am and 5pm only (15 minutes slots) but not between 12pm and 1pm
+		✅Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
 
 [⏯️]	Views/care/appointments.cshtml (as a doctor): NEED TO FIX THE APPOINTMENT FORM LOGIC
 		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)

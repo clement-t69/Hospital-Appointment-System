@@ -49,6 +49,12 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> index([FromQuery] string searchInput, [FromQuery] string searchField)
+        {
+            return RedirectToAction("doctors", "care", new { searchInput = searchInput, searchField = searchField });
+        }
+
         // HEADER
         // IF NOT LOGGED IN
         public IActionResult login_or_register()

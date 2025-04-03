@@ -7,6 +7,8 @@ using HealthApp.Domain.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using HealthApp.MVC.Models;
+using System.Data.Entity;
+using System.Numerics;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -44,6 +46,7 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        // care/patients.cshtml
         public async Task<IActionResult> patients([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
@@ -84,6 +87,7 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        // care/patient.cshtml
         public async Task<IActionResult> patient(string id, 
             [FromQuery] string appointmentsSearchInput, [FromQuery] string appointmentsSearchField,
             [FromQuery] string prescriptionsSearchInput, [FromQuery] string prescriptionsSearchField,
@@ -295,7 +299,10 @@ namespace HealthApp.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> create_medical_history(string patientId, MedicalHistoryInputModel model)
         {
-            var patient = await _userManager.FindByIdAsync(patientId);
+            var patient = _context.Patients.Find(patientId);
+            var p = await _userManager.FindByIdAsync(patientId);
+            var d = await _userManager.FindByIdAsync(model.DoctorId);
+
             if (ModelState.IsValid)
             {
                 var medicalHistory = new MedicalHistory
@@ -308,73 +315,207 @@ namespace HealthApp.MVC.Controllers
                     Location = model.Location
                 };
 
-                var doctor = await _userManager.FindByIdAsync(model.DoctorId);
+                var doctor = _context.Doctors.Find(model.DoctorId);
+
                 medicalHistory.DoctorLastName = doctor.LastName;
                 medicalHistory.PatientLastName = patient.LastName;
 
                 _context.MedicalHistories.Add(medicalHistory);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation($"******************************\nMedical history created for patient {patient.Email} by doctor {model.DoctorId}.\n******************************\n");
+                _logger.LogInformation($"******************************\nMedical history created for patient {p.Email} by doctor {model.DoctorId}.\n******************************\n");
             }
 
             return RedirectToAction("patient", "care");
         }
 
-
-
-
-
-
-
-
-
-
-
-        [HttpPost]
-        public async Task<IActionResult> create_appointment (DateTime date, TimeSpan time, string doctorId, string patientId)
-        {
-            var appointment = new Appointment
-            {
-                Date = date,
-                Time = time,
-                DoctorId = doctorId,
-                PatientId = patientId
-            };
-
-            _context.Appointments.Add(appointment);
-
-            var doctor = await _userManager.FindByIdAsync(doctorId);
-            var patient = await _userManager.FindByIdAsync(patientId);
-
-            _logger.LogInformation($"******************************\nAppointment created for patient {patient.Email} with doctor {doctor.Email} on {date} at {time}.\n******************************\n");
-            await _context.SaveChangesAsync();
-            return RedirectToAction("appointments", "care");
-        }
-
-        public async Task<IActionResult> appointments()
+        // care/doctors.cshtml
+        public async Task<IActionResult> doctors([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("login", "account");
             }
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = await _userManager.IsInRoleAsync(user, "doctor");
             ViewBag.IsPatient = await _userManager.IsInRoleAsync(user, "patient");
             ViewBag.IsAdmin = await _userManager.IsInRoleAsync(user, "administrator");
 
-            var appointments = await _context.Appointments
-                .Where(a => a.PatientId == user.Id.ToString())
-                .ToListAsync();
+            if (searchInput == null || searchField == null)
+            {
+                searchInput = "";
+                searchField = "";
+            }
 
-            var sortedAppointments = appointments
-                .OrderBy(a => a.Date)
-                .ThenBy(a => a.Time)
-                .ToList();
+            var doctors = searchDoctors(searchInput, searchField);
+            var doctorUsers = new Dictionary<string, User>();
 
-            ViewBag.Appointments = sortedAppointments;
+            foreach (var doctor in doctors)
+            {
+                var u = await _userManager.FindByIdAsync(doctor.UserId);
+                if (u != null)
+                {
+                    doctorUsers[doctor.UserId] = u;
+                }
+            }
+
+            if (searchInput != "" && searchField != "" && doctors.Count == 0)
+            {
+                TempData["ErrorMessage"] = "No doctors found.";
+                _logger.LogError($"******************************\nNo doctors found while searching for doctors with {searchField} containing {searchInput}.\n******************************\n");
+            }
+
+            _logger.BeginScope($"******************************\nUser {user.UserName} has searched for doctors with {searchField} containing {searchInput}.\n******************************\n");
+
+            ViewBag.Doctors = doctors;
+            ViewBag.DoctorUsers = doctorUsers;
 
             return View();
+        }
+
+        public List<Doctor> searchDoctors(string searchInput, string searchField)
+        {
+            var doctors = _context.Doctors.ToList();
+
+            if (searchField == "Name")
+            {
+                doctors = doctors.Where(d => d.FirstName.ToLower().Contains(searchInput) || d.LastName.ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Location")
+            {
+                doctors = doctors.Where(doctors => doctors.Location.ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Specialization")
+            {
+                doctors = doctors.Where(doctors => doctors.Specialization.ToLower().Contains(searchInput)).ToList();
+            }
+            else
+            {
+                searchInput = "";
+                searchField = "";
+            }
+
+            return doctors;
+        }
+
+        // care/appointments.cshtml
+        public async Task<IActionResult> appointments(DateTime? sunday, string searchInput, string doctorId)
+        {
+            //////////////////
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("login_or_register", "account");
+            }
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = await _userManager.IsInRoleAsync(user, "doctor");
+            ViewBag.IsPatient = await _userManager.IsInRoleAsync(user, "patient");
+            ViewBag.IsAdmin = await _userManager.IsInRoleAsync(user, "administrator");
+            //////////////////
+
+            // List of appointments for the logged-in user
+            var appointments = _context.Appointments
+        .Where(a => a.PatientId == user.Id.ToString())
+        .ToList();
+
+            var sortedAppointments = appointments
+                .OrderByDescending(a => a.Date)
+                .ThenBy(a => a.Time)
+                .ToList();
+            ViewBag.Appointments = sortedAppointments;
+
+            // Dates
+            if (sunday == null)
+            {
+                sunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+            }
+            var saturday = ((DateTime)sunday).AddDays(6);
+
+            // Récupérer les rendez-vous du patient et filtrer en mémoire
+            List<Appointment> existingAppointments = _context.Appointments
+                .Where(a => a.PatientId == user.Id.ToString())
+                .ToList()
+                .Where(a => DateTime.ParseExact(a.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) >= (DateTime)sunday &&
+                            DateTime.ParseExact(a.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) <= saturday)
+                .ToList();
+
+            ViewBag.ExistingAppointments = existingAppointments;
+
+            // Patient's information
+            ViewBag.PatientId = user.Id;
+            ViewBag.PatientLastName = user.LastName;
+            ViewBag.PatientFirstName = user.FirstName;
+
+            // List of doctors
+            var doctors = _context.Doctors.ToList();
+            ViewBag.Doctors = doctors;
+            ViewBag.DoctorId = doctorId;
+
+            ViewBag.Sunday = sunday;
+
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> create_appointment(AppointmentInputModel model)
+        {
+            var id = _context.Appointments.Max(a => a.Id) + 1;
+
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return RedirectToAction("login_or_register", "Account");
+            }
+
+            var doctor = await _userManager.FindByIdAsync(model.DoctorId);
+
+            Doctor doctor1 = _context.Doctors.Find(model.DoctorId);
+
+            if (model.appointmentDate == null || model.appointmentHour == null || model.DoctorId == null)
+            {
+                TempData["ErrorMessage"] = "Please fill in all fields.";
+                return RedirectToAction("appointments", "care");
+            }
+
+            _logger.LogInformation($"******************************\n");
+            _logger.LogInformation($"Id = {id}\n");
+            _logger.LogInformation($"Date = {model.appointmentDate}\n");
+            _logger.LogInformation($"Time = {model.appointmentHour}\n");
+            _logger.LogInformation($"DoctorId = {model.DoctorId}\n");
+            _logger.LogInformation($"PatientId = {user.Id}\n");
+            _logger.LogInformation($"Specialization = {doctor1.Specialization}\n");
+            _logger.LogInformation($"Location = {doctor1.Location}\n");
+            _logger.LogInformation($"Status = Pending\n");
+            _logger.LogInformation($"DoctorLastName = {doctor.LastName}\n");
+            _logger.LogInformation($"DoctorFirstName = {doctor.FirstName}\n");
+            _logger.LogInformation($"PatientLastName = {user.LastName}\n");
+            _logger.LogInformation($"PatientFirstName = {user.FirstName}\n");
+            _logger.LogInformation($"******************************\n");
+
+            var appointment = new Appointment
+            {
+                Id = id,
+                Date = model.appointmentDate,
+                Time = model.appointmentHour,
+                DoctorId = model.DoctorId,
+                PatientId = user.Id,
+                Specialization = doctor1.Specialization,
+                Location = doctor1.Location,
+                Status = "Pending",
+                DoctorLastName = doctor.LastName,
+                DoctorFirstName = doctor.FirstName,
+                PatientLastName = user.LastName,
+                PatientFirstName = user.FirstName
+            };
+
+            _context.Appointments.Add(appointment);
+
+            _logger.LogInformation($"******************************\nAppointment created for patient {user.UserName} with doctor {doctor.UserName} on {model.appointmentDate} at {model.appointmentHour}.\n******************************\n");
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Appointment booked successfully.";
+            return RedirectToAction("appointments", "care");
         }
     }
 }

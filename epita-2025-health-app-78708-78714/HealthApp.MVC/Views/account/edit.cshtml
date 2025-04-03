@@ -12,6 +12,13 @@
                 <div style="color: white; user-select: none;">
                     <a>_________________________________________________________________________________________</a>
                 </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
+                    <div class="text-content fs-6 px-2 fw-bold text-center">
+                        <div>&lt; Back</div>
+                    </div>
+                </a>
+                </div>
                 <div style="display: flex; justify-content: center; align-items: center;">
                     <div class="text-center" style="flex-grow: 1;">
                         <h1 style="font-weight: 700">My Account</h1>
@@ -519,6 +526,14 @@
             </div>
         </div>
     </div>
+    @section scripts {
+        <script>
+            function goBack()
+            {
+                window.history.go(-1);
+            }
+		</script>
+    }
 }
 else
 {

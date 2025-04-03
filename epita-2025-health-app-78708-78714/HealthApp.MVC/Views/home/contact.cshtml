@@ -9,7 +9,7 @@
                 <a>_________________________________________________________________________________________</a>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <a class="little-white-button" asp-controller="home" asp-action="index" style="text-decoration: none; width: 90px; box-shadow:none;">
+                <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none;">
                     <div class="text-content fs-6 px-2 fw-bold text-center">
                         <div>&lt; Back</div>
                     </div>
@@ -24,3 +24,12 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+	<script>
+		function goBack() 
+        {
+			window.history.go(-1);
+		}
+	</script>
+}

@@ -11,6 +11,8 @@ namespace HealthApp.Domain.Models
         public string UserId { get; set; }
 
         public User User { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
         public List<MedicalHistory> MedicalHistories { get; set; } = new List<MedicalHistory>();
         public List<Prescription> Prescriptions { get; set; } = new List<Prescription>();

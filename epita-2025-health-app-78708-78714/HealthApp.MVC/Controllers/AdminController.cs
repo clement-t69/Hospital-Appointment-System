@@ -206,8 +206,10 @@ namespace HealthApp.MVC.Controllers
                             };
                             doctor.Notifications = new List<Notification>();
                             doctor.Appointments = new List<Appointment>();
-                            doctor.Specialization = "";
-                            doctor.Location = "";
+                            doctor.Specialization = "General Practician";
+                            doctor.Location = "Unknown";
+                            doctor.FirstName = user.FirstName;
+                            doctor.LastName = user.LastName;
 
                             _context.Doctors.Add(doctor);
                             _context.SaveChanges();
@@ -223,6 +225,8 @@ namespace HealthApp.MVC.Controllers
                             patient.MedicalHistories = new List<MedicalHistory>();
                             patient.Appointments = new List<Appointment>();
                             patient.Prescriptions = new List<Prescription>();
+                            patient.FirstName = user.FirstName;
+                            patient.LastName = user.LastName;
 
                             _context.Patients.Add(patient);
                             _context.SaveChanges();
@@ -330,8 +334,10 @@ namespace HealthApp.MVC.Controllers
                                 };
                                 doctor.Notifications = new List<Notification>();
                                 doctor.Appointments = new List<Appointment>();
-                                doctor.Specialization = "";
-                                doctor.Location = "";
+                                doctor.Specialization = "General Practician";
+                                doctor.Location = "Unknown";
+                                doctor.FirstName = user.FirstName;
+                                doctor.LastName = user.LastName;
 
                                 _context.Doctors.Add(doctor);
                                 _context.SaveChanges();
@@ -346,6 +352,8 @@ namespace HealthApp.MVC.Controllers
                                 patient.MedicalHistories = new List<MedicalHistory>();
                                 patient.Appointments = new List<Appointment>();
                                 patient.Prescriptions = new List<Prescription>();
+                                patient.FirstName = user.FirstName;
+                                patient.LastName = user.LastName;
                                 _context.Patients.Add(patient);
                                 _context.SaveChanges();
                             }

@@ -13,7 +13,7 @@
                     <a>_________________________________________________________________________________________</a>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <a class="little-white-button" asp-controller="account" asp-action="edit" style="text-decoration: none; width: 90px; box-shadow:none">
+                    <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
                         <div class="text-content fs-6 px-2 fw-bold text-center">
                             <div>&lt; Back</div>
                         </div>
@@ -68,19 +68,19 @@
                                                     </div>
 
                                                     <div class="rounded_fields form-label mb-3">
-                                                        <input asp-for="Phone" type="phone" class="form-control" id="Phone" name="Phone" aria-required="true" placeholder="Phone Number" style="width: 100%;" value="@ViewBag.UserPhone">
+                                                        <input asp-for="Phone" type="phone" class="form-control" id="Phone" name="Phone" aria-required="true" placeholder="Phone Number" style="width: 100%;" value="@ViewBag.Phone">
                                                     </div>
 
                                                     <div class="rounded_fields form-label mb-3">
-                                                        <input asp-for="Address" type="text" class="form-control" id="Address" name="Address" aria-required="true" placeholder="Address" style="width: 100%;" value="@ViewBag.UserAddress">
+                                                        <input asp-for="Address" type="text" class="form-control" id="Address" name="Address" aria-required="true" placeholder="Address" style="width: 100%;" value="@ViewBag.Address">
                                                     </div>
 
                                                     <div class="rounded_fields form-label mb-3">
-                                                        <!--<input asp-for="Specialization" type="text" class="form-control" id="Specialization" name="Specialization" aria-required="true" placeholder="Specialization" style="width: 100%;">-->
+                                                        <input asp-for="Specialization" type="text" class="form-control" id="Specialization" name="Specialization" aria-required="true" placeholder="Specialization" style="width: 100%;" value="@ViewBag.DoctorSpecialization">
                                                     </div>
 
                                                     <div class="rounded_fields form-label mb-3">
-                                                        <!--<input asp-for="Location" type="text" class="form-control" id="Location" name="Location" aria-required="true" placeholder="Location" style="width: 100%;">-->
+                                                        <input asp-for="Location" type="text" class="form-control" id="Location" name="Location" aria-required="true" placeholder="Location" style="width: 100%;" value="@ViewBag.DoctorLocation">
                                                     </div>
 
                                                 </form>
@@ -113,19 +113,19 @@
                                                 <form id="changeInfoForm" asp-controller="account" asp-action="change_info" method="post">
 
                                                     <div class="rounded_fields form-label mb-3">
-                                                        <input type="text" class="form-control" placeholder="@ViewBag.UserFirstName" style="width: 100%; color: black;" readonly />
+                                                        <input type="text" class="form-control" value="@ViewBag.UserFirstName" style="width: 100%; color: black;" readonly />
                                                     </div>
 
                                                     <div class="rounded_fields form-label mb-3">
-                                                        <input type="text" class="form-control" placeholder="@ViewBag.UserLastName" style="width: 100%; color: black;" readonly />
+                                                        <input type="text" class="form-control" value="@ViewBag.UserLastName" style="width: 100%; color: black;" readonly />
                                                     </div>
 
                                                     <div class="rounded_fields form-label mb-3">
-                                                        <input asp-for="Phone" type="phone" class="form-control" id="Phone" name="Phone" aria-required="true" placeholder="Phone Number" style="width: 100%;" value="@ViewBag.UserPhone">
+                                                        <input asp-for="Phone" type="phone" class="form-control" id="Phone" name="Phone" aria-required="true" placeholder="Phone Number" style="width: 100%;" value="@ViewBag.Phone">
                                                     </div>
 
                                                     <div class="rounded_fields form-label mb-3">
-                                                        <input asp-for="Address" type="text" class="form-control" id="Address" name="Address" aria-required="true" placeholder="Address" style="width: 100%;" value="@ViewBag.UserAddress">
+                                                        <input asp-for="Address" type="text" class="form-control" id="Address" name="Address" aria-required="true" placeholder="Address" style="width: 100%;" value="@ViewBag.Address">
                                                     </div>
 
                                                 </form>
@@ -145,12 +145,12 @@
 
                         <div style="margin-left: 24px">
 							<p><strong>@ViewBag.UserFirstName @ViewBag.UserLastName.ToUpper()</strong></p>
-							<p>Phone:   @ViewBag.UserPhone</p>
-							<p>Addres:  @ViewBag.UserAddress</p>
+							<p>Phone:   @ViewBag.Phone</p>
+							<p>Addres:  @ViewBag.Address</p>
 							@if (ViewBag.IsDoctor == true)
 							{
-								<p>Specialization: </p>
-								<p>Location: </p>
+								<p>Specialization: @ViewBag.DoctorSpecialization</p>
+								<p>Location: @ViewBag.DoctorLocation</p>
 							}
                         </div>
                     </div>
@@ -158,6 +158,15 @@
             </div>
         </div>
     </div>
+
+    @section scripts {
+        <script>
+            function goBack()
+            {
+                window.history.go(-1);
+            }
+        </script>
+    }
 }
 else
 {
