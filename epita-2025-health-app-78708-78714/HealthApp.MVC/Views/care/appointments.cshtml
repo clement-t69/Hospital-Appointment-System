@@ -92,7 +92,7 @@
                                             </div>
                                             <div class="modal-body">
                                                 <form id="editAppointmentForm-@a.Id" asp-controller="care" asp-action="edit_appointment" method="post">
-													<input type="hidden" name="Id" value="@a.Id" />
+                                                    <input type="hidden" name="Id" value="@a.Id" />
                                                     <div class="rounded_fields form-label mb-3">
                                                         <input type="date" class="form-control" id="editAppointmentDate-@a.Id" name="Date" aria-required="true" style="width:100%;" value="@a.Date">
                                                     </div>
@@ -222,7 +222,7 @@
                     </div>
                 </row>
 
-				<!-- CALENDAR TABLE -->
+                <!-- CALENDAR TABLE -->
                 <table class="table table-bordered" style="border-color: black; width: 100%; table-layout: fixed;">
                     <thead>
                         <tr>
@@ -260,6 +260,56 @@
                                         cellStyle = "background-color: lightgray; cursor: not-allowed";
                                         buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
                                         buttonDisabled = "disabled";
+                                    }
+                                    else
+                                    {
+                                        bool isAvailable = true;
+                                        string cellColor = "";
+
+                                        if ((ViewBag.Appointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.Appointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else
+                                                    {
+                                                        isAvailable = false;
+                                                        if (a.Status == "Pending")
+                                                        {
+                                                            cellColor = "background-color: orange;";
+                                                        }
+                                                        else if (a.Status == "Approved")
+                                                        {
+                                                            cellColor = "background-color: lightgreen;";
+                                                        }
+                                                        else if (a.Status == "Completed")
+                                                        {
+                                                            cellColor = "background-color: green;";
+                                                        }
+                                                        else if (a.Status == "Rejected")
+                                                        {
+                                                            cellColor = "background-color: red;";
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (!isAvailable)
+                                        {
+                                            cellStyle = cellColor + " cursor: not-allowed";
+                                            buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                            buttonDisabled = "disabled";
+                                        }
                                     }
 
                                     <td style="height: 48px; @cellStyle" class="calendar-slot">
@@ -303,6 +353,56 @@
                                         cellStyle = "background-color: lightgray; cursor: not-allowed";
                                         buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
                                         buttonDisabled = "disabled";
+                                    }
+                                    else
+                                    {
+                                        bool isAvailable = true;
+                                        string cellColor = "";
+
+                                        if ((ViewBag.Appointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.Appointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else
+                                                    {
+                                                        isAvailable = false;
+                                                        if (a.Status == "Pending")
+                                                        {
+                                                            cellColor = "background-color: orange;";
+                                                        }
+                                                        else if (a.Status == "Approved")
+                                                        {
+                                                            cellColor = "background-color: lightgreen;";
+                                                        }
+                                                        else if (a.Status == "Completed")
+                                                        {
+                                                            cellColor = "background-color: green;";
+                                                        }
+                                                        else if (a.Status == "Rejected")
+                                                        {
+                                                            cellColor = "background-color: red;";
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (!isAvailable)
+                                        {
+                                            cellStyle = cellColor + " cursor: not-allowed";
+                                            buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                            buttonDisabled = "disabled";
+                                        }
                                     }
 
                                     <td style="height: 48px; @cellStyle" class="calendar-slot">

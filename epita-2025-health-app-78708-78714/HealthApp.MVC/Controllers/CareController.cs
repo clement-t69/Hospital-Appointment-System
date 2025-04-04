@@ -453,11 +453,11 @@ namespace HealthApp.MVC.Controllers
             var id = _context.Appointments.Max(a => a.Id) + 1;
             var doctor = await _userManager.FindByIdAsync(model.DoctorId);
 
-            /*if (doctor == null)
+            if (doctor == null)
             {
                 TempData["ErrorMessage"] = "Doctor not found.";
                 return RedirectToAction("appointments", "care");
-            }*/
+            }
 
             if (model.appointmentDate == null || model.appointmentHour == null || model.DoctorId == null)
             {
@@ -511,6 +511,12 @@ namespace HealthApp.MVC.Controllers
             if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
             {
                 TempData["ErrorMessage"] = "Cannot edit past appointments.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
+            }
+
+            if (appointment.Status == "Cancelled")
+            {
+                TempData["ErrorMessage"] = "Cannot edit cancelled appointments.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
             }
 
@@ -599,7 +605,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care");
             }
 
-            _context.Appointments.Remove(appointment);
+            appointment.Status = "Cancelled";
             _logger.LogInformation($"******************************\nAppointment with id {id} cancelled.\n******************************\n");
             await _context.SaveChangesAsync();
             TempData["SuccessMessage"] = "Appointment cancelled successfully.";
