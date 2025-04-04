@@ -135,9 +135,8 @@
 
 [⏯️]	Views/care/appointments.cshtml (as a patient):
 		✅List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
-		Clicking on an appointment opens a form to reschedule or cancel the appointment
-		If a patient wants to cancel an appointment in the 48 hours before the appointment --> Pop-up with a warning explaining that the cancellation is not possible, with a link to cancellation policy
-		If the appointment is virtual --> Pop-up with link to join the virtual consultation
+		✅Clicking on an appointment opens a form to reschedule or cancel the appointment
+		✅If a patient wants to cancel an appointment in the 48 hours before the appointment --> Pop-up with a warning explaining that the cancellation is not possible, with a link to cancellation policy
 
 		✅Calendar by week on the right with appointments
 		When an appointment is booked --> Send Message to Patient (can be viewed in Account/Messages)

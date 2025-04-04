@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Send Message";
 }
 
@@ -52,17 +52,20 @@
         </div>
     </div>
 
-    @section scripts {
-    <script>
-        function goBack() {
-            window.history.go(-1);
-        }
-    </script>
+    @section scripts 
+    {
+        <script>
+            function goBack() 
+            {
+                window.history.go(-1);
+            }
+        </script>
     }
 }
 else
 {
-    @section scripts {
+    @section scripts 
+    {
     <script>
         window.location.href = '@Url.Action("login_or_register", "account")';
     </script>

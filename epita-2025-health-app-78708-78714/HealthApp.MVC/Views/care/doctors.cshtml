@@ -107,7 +107,7 @@
                                                     </a>
 
                                                     <!-- BUTTON TO BOOK AN APPOINTMENT -->
-                                                    <a class="little-blue-button" href="@Url.Action("Appointments", "Care", new { doctorId = d.UserId })" style="text-decoration: none;">
+                                                    <a class="little-blue-button" href="@Url.Action("appointments", "care", new { weekOffset = 0, doctorId = d.UserId })" style="text-decoration: none;">
                                                         <div class="text-content fs-6 px-2 fw-bold">
                                                             <div>Book an Appointment</div>
                                                         </div>
