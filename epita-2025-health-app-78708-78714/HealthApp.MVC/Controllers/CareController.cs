@@ -426,6 +426,12 @@ namespace HealthApp.MVC.Controllers
                 .ToList();
             ViewBag.Appointments = sortedAppointments;
 
+            // List of appointments for all patients
+            var allAppointments = _context.Appointments
+                .Where(a => a.PatientId != user.Id.ToString())
+                .ToList();
+            ViewBag.AllAppointments = allAppointments;
+
             // Dates
             if (sunday == null)
             {
