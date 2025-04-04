@@ -483,6 +483,23 @@ namespace HealthApp.MVC.Controllers
             }
             else
             {
+                List<Appointment> doctorAppointments = _context.Appointments
+                .Where(a => a.DoctorId == model.DoctorId)
+                .ToList();
+
+                if (doctorAppointments != null)
+                {
+                    foreach (var a in doctorAppointments)
+                    {
+                        if (a.Date == model.appointmentDate && a.Time == model.appointmentHour && a.Status != "Cancelled")
+                        {
+                            TempData["ErrorMessage"] = "Doctor is not available at this time.";
+                            _logger.LogError($"******************************\nPatient {model.PatientId} tried to book an appointment with doctor {model.DoctorId} at {model.appointmentDate} {model.appointmentHour}, but the doctor is not available.\n******************************\n");
+                            return RedirectToAction("appointments", "care", new { doctorId = model.DoctorId });
+                        }
+                    }
+                }
+
                 var appointment = new Appointment
                 {
                     Id = id,
@@ -548,6 +565,23 @@ namespace HealthApp.MVC.Controllers
             {
                 TempData["ErrorMessage"] = "Appointment not found.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
+            }
+
+            List<Appointment> doctorAppointments = _context.Appointments
+                .Where(a => a.DoctorId == model.DId)
+                .ToList();
+
+            if (doctorAppointments != null)
+            {
+                foreach (var a in doctorAppointments)
+                {
+                    if (a.Date == model.Date && a.Time == model.Hour && a.Status != "Cancelled")
+                    {
+                        TempData["ErrorMessage"] = "Doctor is not available at this time.";
+                        _logger.LogError($"******************************\nPatient {model.PId} tried to book an appointment with doctor {model.DId} at {model.Date} {model.Hour}, but the doctor is not available.\n******************************\n");
+                        return RedirectToAction("appointments", "care", new { doctorId = model.DId });
+                    }
+                }
             }
 
             appointment.Date = model.Date;
