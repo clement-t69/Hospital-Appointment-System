@@ -143,19 +143,17 @@
 		✅Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
 
 [⏯️]	Views/care/appointments.cshtml (as a doctor): NEED TO FIX THE APPOINTMENT FORM LOGIC
-		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
-		Clicking on an appointment opens a form to mark the appointment as completed, reschedule, or cancel the appointment
-		If the appointment is virtual --> Pop-up with link to join the virtual consultation
-		Doctor can access patient's profile, medical history, prescriptions (redirect to Doctor/Patients)
+		✅List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
+		✅Clicking on an appointment opens a form to mark the appointment as completed, reschedule, or cancel the appointment
+		✅Doctor can access patient's profile, medical history, prescriptions (redirect to Doctor/Patient/{id})
 
-		Calendar by month on the right with appointment
-		The calendar can be filtered by patient name, status (scheduled, completed, cancelled)
+		✅Calendar by month on the right with appointment
 		When an appointment is booked by a patient --> Send Message to Doctor (can be viewed in Account/Messages)
-		Can block unavailable slots (button with a form to enter date(s), time, reason)
+		✅Can block unavailable slots (button with a form to enter date(s), time, reason)
 		Generate a report of daily or weekly appointments (button with pop-up to choose daily or weekly)
 		Export appointments data to a CSV or PDF file (button with pop-up to choose CSV or PDF)
-		Track the number of no-shows and cancellations (red icon with number per month)
-		Monday to friday between 9am and 5pm only (15 minutes slots) but not between 12pm and 1pm
+		✅Track the number of no-shows and cancellations (red icon with number per month)
+		✅Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
 
 //////////////////////// Views/admin //////////////////////// (only as an administrator, if not the case redirect to Error page)
 

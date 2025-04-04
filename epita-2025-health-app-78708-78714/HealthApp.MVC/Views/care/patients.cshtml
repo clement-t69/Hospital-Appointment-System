@@ -47,7 +47,6 @@
                                 <th>First Name</th>
                                 <th>Last Name</th>
                                 <th>Email</th>
-                                <th style="padding-left:24px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,20 +54,55 @@
                             {
                                 @foreach (var patient in ViewBag.Patients)
                                 {
-                                    <tr>
-                                        <td style="vertical-align: middle;">@patient.FirstName</td>
-                                        <td style="vertical-align: middle;">@patient.LastName</td>
-                                        <td style="vertical-align: middle;">@patient.UserName</td>
-                                        <td style="vertical-align: middle;">
-                                            <div style="display: flex;">
-                                                <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#changeInfoModal" style="text-decoration: none; box-shadow:none; margin-left: 488px; width: 96px;">
-                                                    <div class="text-content fs-6 px-2 fw-bold">
-                                                        <div>Edit</div>
-                                                    </div>
-                                                </a>
-                                            </div>
+                                    <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#viewPatientModal-@patient.UserId"
+                                        data-firstname="@patient.FirstName" data-lastname="@patient.LastName"
+                                        style="cursor: pointer;">
+                                        <td>
+                                            <div style="border-radius: 64px; padding: 8px;">@patient.FirstName</div>
+                                        </td>
+                                        <td>
+                                            <div style="border-radius: 64px; padding: 8px;">@patient.LastName</div>
+                                        </td>
+                                        <td>
+                                            <div style="border-radius: 64px; padding: 8px;">@patient.User.UserName</div>
                                         </td>
                                     </tr>
+
+                                    <div class="modal fade" id="viewPatientModal-@patient.UserId" tabindex="-1" aria-labelledby="viewPatientModalLabel-@patient.UserId" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="viewPatientModalLabel-@patient.UserId" style="margin-left: 8px">Doctor's Profile</h5>
+                                                    <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("patients", "care")'" aria-label="Close" style="margin-right: 6px"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h5 class="modal-title" style="margin-left: 8px"><strong>@patient.FirstName @patient.LastName</strong></h5>
+                                                    <div class="d-flex justify-content-between" style="margin-left: 8px; margin-top: 8px">
+                                                        <div>
+                                                            <p class="mb-2"><strong>Email:</strong> @ViewBag.PatientUsers[@patient.UserId]?.UserName</p>
+                                                            <p class="mb-2"><strong>Phone:</strong> @ViewBag.PatientUsers[@patient.UserId]?.Phone</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <!-- BUTTON TO SEND A MESSAGE -->
+                                                    <a class="little-blue-button" href="#" onclick="window.location.href='@Url.Action("send_message", "account")'; return false;" style="text-decoration: none;">
+                                                        <div class="text-content fs-6 px-2 fw-bold">
+                                                            <div>Send a Message</div>
+                                                        </div>
+                                                    </a>
+
+                                                    <!-- ACCESS TO PATIENT'S PROFILE -->
+                                                    <a class="little-blue-button" href="@Url.Action("patient", "care", new { id = patient.UserId })" style="text-decoration: none;">
+                                                        <div class="text-content fs-6 px-2 fw-bold">
+                                                            <div>Patient Details</div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 }
                             }
                             else

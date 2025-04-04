@@ -62,21 +62,49 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
-            var patients = await _userManager.GetUsersInRoleAsync("Patient");
-
-            if (!string.IsNullOrEmpty(searchInput) && !string.IsNullOrEmpty(searchField))
+            if (searchInput == null || searchField == null)
             {
-                searchInput = searchInput.ToLower();
+                searchInput = "";
+                searchField = "";
+            }
 
-                if (searchField == "Name")
+            var patients = searchPatients(searchInput, searchField);
+            var patientUsers = new Dictionary<string, User>();
+
+            foreach (var patient in patients)
+            {
+                var u = await _userManager.FindByIdAsync(patient.UserId);
+                if (u != null)
                 {
-                    patients = patients.Where(u => u.FirstName.ToLower().Contains(searchInput) || u.LastName.ToLower().Contains(searchInput)).ToList();
+                    patientUsers[patient.UserId] = u;
                 }
-                else if (searchField == "Email")
-                {
-                    patients = patients.Where(u => u.UserName.ToLower().Contains(searchInput)).ToList();
-                }
-                _logger.LogInformation($"******************************\nAdmin {user.Email} has searched for users with {searchField} containing {searchInput}.\n******************************\n");
+            }
+
+            if (searchInput != "" && searchField != "" && patients.Count == 0)
+            {
+                TempData["ErrorMessage"] = "No patients found.";
+                _logger.LogError($"******************************\nNo patients found while searching for patients with {searchField} containing {searchInput}.\n******************************\n");
+            }
+
+            _logger.BeginScope($"******************************\nUser {user.UserName} has searched for patients with {searchField} containing {searchInput}.\n******************************\n");
+
+            ViewBag.Patients = patients;
+            ViewBag.PatientUsers = patientUsers;
+
+            return View();
+        }
+
+        public List<Patient> searchPatients(string searchInput, string searchField)
+        {
+            var patients = _context.Patients.ToList();
+
+            if (searchField == "Name")
+            {
+                patients = patients.Where(p => p.FirstName.ToLower().Contains(searchInput) || p.LastName.ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Email")
+            {
+                patients = patients.Where(p => p.User.UserName.ToLower().Contains(searchInput)).ToList();
             }
             else
             {
@@ -84,12 +112,10 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
-            ViewBag.Patients = patients;
-
-            return View();
+            return patients;
         }
 
-        // care/patient.cshtml
+        // care/patient/{id}.cshtml
         public async Task<IActionResult> patient(string id,
             [FromQuery] string appointmentsSearchInput, [FromQuery] string appointmentsSearchField,
             [FromQuery] string prescriptionsSearchInput, [FromQuery] string prescriptionsSearchField,
@@ -420,11 +446,21 @@ namespace HealthApp.MVC.Controllers
                 .Where(a => a.PatientId == user.Id.ToString())
                 .ToList();
 
+            var doctorAppointments = _context.Appointments
+                .Where(a => a.DoctorId == user.Id.ToString())
+                .ToList();
+
             var sortedAppointments = appointments
                 .OrderByDescending(a => a.Date)
                 .ThenBy(a => a.Time)
                 .ToList();
             ViewBag.Appointments = sortedAppointments;
+
+            var sortedDoctorAppointments = doctorAppointments
+                .OrderByDescending(a => a.Date)
+                .ThenBy(a => a.Time)
+                .ToList();
+            ViewBag.DoctorAppointments = sortedDoctorAppointments;
 
             // List of appointments for all patients
             var allAppointments = _context.Appointments
@@ -518,6 +554,10 @@ namespace HealthApp.MVC.Controllers
 
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
+
+                // SEND MESSAGE TO PATIENT
+                // SEND MESSAGE TO DOCTOR
+
                 TempData["SuccessMessage"] = "Appointment booked successfully.";
                 _logger.LogInformation($"******************************\nAppointment booked for patient {model.PatientId} with doctor {model.DoctorId}.\n******************************\n");
                 return RedirectToAction("appointments", "care", new { doctorId = "" });
@@ -533,13 +573,13 @@ namespace HealthApp.MVC.Controllers
 
             if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
             {
-                TempData["ErrorMessage"] = "Cannot edit past appointments.";
+                TempData["ErrorMessage"] = "Cannot reschedule past appointments.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
             }
 
-            if (appointment.Status == "Cancelled")
+            if (appointment.Status != "Pending")
             {
-                TempData["ErrorMessage"] = "Cannot edit cancelled appointments.";
+                TempData["ErrorMessage"] = "Cannot reschedule this appointments.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
             }
 
@@ -596,11 +636,117 @@ namespace HealthApp.MVC.Controllers
 
             _context.Appointments.Update(appointment);
 
-            _logger.LogInformation($"******************************\nAppointment with id {Id} edited.\n******************************\n");
+            _logger.LogInformation($"******************************\nAppointment with id {Id} rescheduled.\n******************************\n");
 
             await _context.SaveChangesAsync();
-            TempData["SuccessMessage"] = "Appointment edited successfully.";
+
+            // SEND MESSAGE TO PATIENT
+            // SEND MESSAGE TO DOCTOR
+
+            TempData["SuccessMessage"] = "Appointment rescheduled successfully.";
             return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> approve_appointment(int id, string sunday)
+        {
+            var appointment = _context.Appointments.Find(id);
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("appointments", "care");
+            }
+
+            if (appointment.Status == "Approved")
+            {
+                TempData["ErrorMessage"] = "Appointment already approved.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            if (appointment.Status != "Pending" && appointment.Status != "Approved")
+            {
+                TempData["ErrorMessage"] = "Cannot approve this appointment.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            appointment.Status = "Approved";
+            _logger.LogInformation($"******************************\nAppointment with id {id} approved.\n******************************\n");
+            await _context.SaveChangesAsync();
+
+            // SEND MESSAGE TO PATIENT
+            // SEND MESSAGE TO DOCTOR
+
+            TempData["SuccessMessage"] = "Appointment approved successfully.";
+            return RedirectToAction("appointments", "care", new { sunday = sunday });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> reject_appointment(int id, string sunday)
+        {
+            var appointment = _context.Appointments.Find(id);
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("appointments", "care");
+            }
+
+            if (appointment.Status == "Approved")
+            {
+                TempData["ErrorMessage"] = "Approved appointments cannot be rejected.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            if (appointment.Status != "Pending" && appointment.Status != "Rejected")
+            {
+                TempData["ErrorMessage"] = "Cannot reject this appointment.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            appointment.Status = "Rejected";
+            _logger.LogInformation($"******************************\nAppointment with id {id} rejected.\n******************************\n");
+            await _context.SaveChangesAsync();
+
+            // SEND MESSAGE TO PATIENT
+            // SEND MESSAGE TO DOCTOR
+
+            TempData["SuccessMessage"] = "Appointment rejected successfully.";
+            return RedirectToAction("appointments", "care", new { sunday = sunday });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> complete_appointment(int id, string sunday)
+        {
+            var appointment = _context.Appointments.Find(id);
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("appointments", "care");
+            }
+
+            if (appointment.Status == "Completed")
+            {
+                TempData["ErrorMessage"] = "Appointment already completed.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            if (appointment.Status != "Approved" && appointment.Status != "Completed")
+            {
+                TempData["ErrorMessage"] = "Cannot complete this appointment.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            appointment.Status = "Completed";
+            _logger.LogInformation($"******************************\nAppointment with id {id} completed.\n******************************\n");
+            await _context.SaveChangesAsync();
+
+            // SEND MESSAGE TO PATIENT
+            // SEND MESSAGE TO DOCTOR
+
+            TempData["SuccessMessage"] = "Appointment completed successfully.";
+            return RedirectToAction("appointments", "care", new { sunday = sunday });
         }
 
         [HttpPost]
@@ -648,8 +794,119 @@ namespace HealthApp.MVC.Controllers
             appointment.Status = "Cancelled";
             _logger.LogInformation($"******************************\nAppointment with id {id} cancelled.\n******************************\n");
             await _context.SaveChangesAsync();
+
+            // SEND MESSAGE TO PATIENT
+            // SEND MESSAGE TO DOCTOR
+
             TempData["SuccessMessage"] = "Appointment cancelled successfully.";
             return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> declare_unavailability(BookAppointmentInputModel model)
+        {
+            var id = _context.Appointments.Max(a => a.Id) + 1;
+            var doctor = await _userManager.GetUserAsync(User);
+            if (doctor == null)
+            {
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            var doctorId = doctor.Id.ToString();
+
+            if (doctor == null)
+            {
+                TempData["ErrorMessage"] = "Doctor not found.";
+                return RedirectToAction("appointments", "care");
+            }
+
+            var appointments = _context.Appointments
+                .Where(a => a.DoctorId == doctorId)
+                .ToList();
+
+            if (appointments != null)
+            {
+                foreach (var a in appointments)
+                {
+                    if (a.Date == model.appointmentDate && a.Time == model.appointmentHour && a.Status == "Unavailable")
+                    {
+                        TempData["ErrorMessage"] = "Unavailability already declared for this date and time.";
+                        _logger.LogError($"******************************\nDoctor {doctorId} tried to declare unavailability for {model.appointmentDate} {model.appointmentHour}, but it is already declared.\n******************************\n");
+                        return RedirectToAction("appointments", "care");
+                    }
+                }
+            }
+
+            if (model.appointmentDate == null || model.appointmentHour == null || doctorId == null || doctorId == "")
+            {
+                _logger.LogError($"******************************\n"
+                   + $"Date: {model.appointmentDate}\n" +
+                   $"Hour: {model.appointmentHour}\n" +
+                   $"Doctor: {doctorId} ({doctor.FirstName} {doctor.LastName})\n" +
+                   $"Patient: {model.PatientId} ({model.PatientFirstName} {model.PatientLastName})\n" +
+                   $"Specialization: {model.Specialization}\n" +
+                   $"Location: {model.Location}\n" +
+                   $"Status: {model.Status}\n" +
+                   $"*******************************\n");
+
+                TempData["ErrorMessage"] = "Please fill in all fields.";
+                var sunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
+                return RedirectToAction("appointments", "care");
+            }
+            else
+            {
+                var appointment = new Appointment
+                {
+                    Id = id,
+                    Date = model.appointmentDate,
+                    Time = model.appointmentHour,
+                    DoctorId = doctorId,
+                    PatientId = model.PatientId,
+                    Specialization = model.Specialization,
+                    Location = model.Location,
+                    Status = "Unavailable",
+                    DoctorLastName = doctor.LastName,
+                    DoctorFirstName = doctor.FirstName,
+                    PatientLastName = model.PatientLastName,
+                    PatientFirstName = model.PatientFirstName
+                };
+
+                _context.Appointments.Add(appointment);
+                await _context.SaveChangesAsync();
+
+                // SEND MESSAGE TO DOCTOR
+
+                TempData["SuccessMessage"] = "Unavailability declared successfully.";
+                _logger.LogInformation($"******************************\nUnavailability declared for doctor {doctorId}.\n******************************\n");
+                return RedirectToAction("appointments", "care");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> cancel_unavailability(int id, string sunday)
+        {
+            var appointment = _context.Appointments.Find(id);
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Unavailability not found.";
+                return RedirectToAction("appointments", "care");
+            }
+
+            if (appointment.Status != "Unavailable")
+            {
+                TempData["ErrorMessage"] = "Cannot cancel this unavailability.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            _context.Appointments.Remove(appointment);
+            _logger.LogInformation($"******************************\nUnavailability with id {id} cancelled.\n******************************\n");
+            await _context.SaveChangesAsync();
+
+            // SEND MESSAGE TO DOCTOR
+
+            TempData["SuccessMessage"] = "Unavailability cancelled successfully.";
+            return RedirectToAction("appointments", "care", new { sunday = sunday });
         }
     }
 }
