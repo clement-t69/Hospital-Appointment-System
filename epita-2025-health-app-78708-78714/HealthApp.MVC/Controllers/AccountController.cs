@@ -71,8 +71,8 @@ namespace HealthApp.MVC.Controllers
 
             return View();
         }
-        
-        public IActionResult my_appointments()
+
+        public IActionResult send_message()
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
@@ -81,8 +81,9 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
-            return RedirectToAction("appointments", "care");
-
+            var doctors = _context.Doctors.ToList();
+            ViewBag.Doctors = doctors;
+            return View();
         }
         
         public IActionResult edit()

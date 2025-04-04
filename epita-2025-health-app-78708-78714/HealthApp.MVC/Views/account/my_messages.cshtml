@@ -22,53 +22,52 @@
                 </div>
                 <section>
                     <hr />
-                </section>
+                    <div style="display: flex;">
+                        <a class="little-blue-button mb-1" onclick="window.location.href='@Url.Action("send_message", "account")'" style="margin-right:0px; text-decoration: none; box-shadow:none; width: 100%;">
+                            <span class="icon"></span>
+                            <div class="text-content fs-6 px-2 fw-bold">
+                                <div> 📩 Send a Message</div>
+                            </div>
+                        </a>
+                    </div>
 
-                <div style="display: flex;">
-                    <a class="little-blue-button mb-1" onclick="window.location.href='@Url.Action("send_message", "account")'" style="margin-right:0px; text-decoration: none; box-shadow:none; width: 100%;">
-                        <span class="icon"></span>
-                        <div class="text-content fs-6 px-2 fw-bold">
-                            <div> 📩 Send a Message</div>
-                        </div>
-                    </a>
-                </div>
-
-                <div style="display: flex; justify-content: center; width: 100%;">
-                    <div>
-                        <table class="table">
-                            <tbody>
-                                @if (ViewBag.Messages == null || ViewBag.Messages.Count == 0)
-                                {
-                                    <tr>
-                                        <td colspan="4" style="text-align: center">No messages found.</td>
-                                    </tr>
-                                }
-                                else
-                                {
-                                    @foreach (var message in ViewBag.Messages)
+                    <div style="display: flex; justify-content: center; width: 100%;">
+                        <div>
+                            <table class="table">
+                                <tbody>
+                                    @if (ViewBag.Messages == null || ViewBag.Messages.Count == 0)
                                     {
                                         <tr>
-                                            <td>
-                                                <div style="display: flex; justify-content: space-between; align-items: baseline;">
-                                                    <p class="mb-1"><strong>@message.Title</strong></p>
-                                                    <p class="mb-1">@message.Date</p>
-                                                </div>
-                                                <p class="mb-1">@message.Content</p>
-                                                <hr />
-                                            </td>
+                                            <td colspan="4" style="text-align: center">No messages found.</td>
                                         </tr>
                                     }
-                                }
-                            </tbody>
-                        </table>
+                                    else
+                                    {
+                                        @foreach (var message in ViewBag.Messages)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div style="display: flex; justify-content: space-between; align-items: baseline;">
+                                                        <p class="mb-1"><strong>@message.Title</strong></p>
+                                                        <p class="mb-1">@message.Date</p>
+                                                    </div>
+                                                    <p class="mb-1">@message.Content</p>
+                                                    <hr />
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
-                </div>
-
+                </section>
             </div>
         </div>
     </div>
 
-    @section scripts {
+    @section scripts 
+    {
         <script>
             function goBack()
             {
@@ -79,7 +78,8 @@
 }
 else
 {
-    @section scripts {
+    @section scripts 
+    {
     <script>
         window.location.href = '@Url.Action("login_or_register", "account")';
     </script>
