@@ -216,9 +216,9 @@
                         <h3 style="font-weight: 700">@sunday.ToString("dd MMM") - @saturday.ToString("dd MMM yyyy")</h3>
                     </div>
                     <div class="text-content mb-3" style="display: flex; table-layout: fixed; justify-content: flex-end; border-radius: 64px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
-                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="prevButton" onclick="location.href='@Url.Action("appointments", new { sunday = ((DateTime)ViewBag.Sunday).AddDays(-7)})';" style="width: 64px; height: 40px; border-radius: 64px 0px 0px 64px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">&lt;</button>
-                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="todayButton" onclick="location.href='@Url.Action("appointments")';" style="width: 96px; height: 40px; border-radius: 0px 0px 0px 0px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">Today</button>
-                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="nextButton" onclick="location.href='@Url.Action("appointments", new { sunday = ((DateTime)ViewBag.Sunday).AddDays(7)})';" style="width: 64px; height: 40px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">&gt;</button>
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="prevButton" onclick="location.href='@Url.Action("appointments", new { sunday = ((DateTime)ViewBag.Sunday).AddDays(-7), doctorId = ViewBag.DoctorId })';" style="width: 64px; height: 40px; border-radius: 64px 0px 0px 64px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">&lt;</button>
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="todayButton" onclick="location.href='@Url.Action("appointments", new { doctorId = ViewBag.DoctorId })';" style="width: 96px; height: 40px; border-radius: 0px 0px 0px 0px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">Today</button>
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="nextButton" onclick="location.href='@Url.Action("appointments", new { sunday = ((DateTime)ViewBag.Sunday).AddDays(7), doctorId = ViewBag.DoctorId })';" style="width: 64px; height: 40px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">&gt;</button>
                     </div>
                 </row>
 
@@ -266,6 +266,7 @@
                                         bool isAvailable = true;
                                         string cellColor = "";
 
+                                        // Logic for logged user
                                         if ((ViewBag.Appointments).Count != 0)
                                         {
                                             foreach (var a in ViewBag.Appointments)
@@ -298,8 +299,31 @@
                                                         {
                                                             cellColor = "background-color: red;";
                                                         }
-                                                        break;
                                                     }
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        // Logic for other users appointments
+                                        if ((ViewBag.AllAppointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.AllAppointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+													if (a.Status == "Cancelled")
+													{
+														isAvailable = true;
+														cellColor = "";
+														buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+														buttonDisabled = "";
+													}
+													else if (ViewBag.DoctorId == a.DoctorId)
+													{
+														isAvailable = false;
+														cellColor = "background-color: lightgray; cursor: not-allowed";
+													}
                                                 }
                                             }
                                         }
@@ -359,6 +383,7 @@
                                         bool isAvailable = true;
                                         string cellColor = "";
 
+                                        // Logic for logged user
                                         if ((ViewBag.Appointments).Count != 0)
                                         {
                                             foreach (var a in ViewBag.Appointments)
@@ -391,7 +416,30 @@
                                                         {
                                                             cellColor = "background-color: red;";
                                                         }
-                                                        break;
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        // Logic for other users appointments
+                                        if ((ViewBag.AllAppointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.AllAppointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else if (ViewBag.DoctorId == a.DoctorId)
+                                                    {
+                                                        isAvailable = false;
+                                                        cellColor = "background-color: lightgray; cursor: not-allowed";
                                                     }
                                                 }
                                             }
