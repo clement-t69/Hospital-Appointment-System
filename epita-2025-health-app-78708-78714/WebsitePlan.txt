@@ -85,20 +85,20 @@
 
 
 [✅]	Views/account/my_notifications.cshtml:
-		✅Notification : Title, Date, Content
-		✅Button to mark all notifications as read
-		✅Button to delete a notification
+		Notification : Title, Date, Content
+		Button to mark all notifications as read
+		Button to delete a notification
 
 
 [✅]	Views/account/my_messages.cshtml (as a patient): FIX SEARCH
 		List of messages (can be filtered by content, date, sender)
-		✅Message : Title, Content, Date, Sender
-		✅Button to write a message (form with Title, Content, Sender, Send button)
+		Message : Title, Content, Date, Sender
+		Button to write a message (form with Title, Content, Sender, Send button)
 
 [✅]	Views/account/my_messages.cshtml (as a doctor): FIX SEARCH
 		List of messages (can be filtered by content, date, sender)
-		✅Message : Title, Content, Date, Sender
-		✅Button to write a message (form with Title, Content, Sender, Send button)
+		Message : Title, Content, Date, Sender
+		Button to write a message (form with Title, Content, Sender, Send button)
 
 
 
@@ -119,7 +119,7 @@
 		List of patients (can be filtered by name, email)
 		Button to edit a patient, redirect to care/patient/{id}
 
-[⏯️]	Views/care/patient/{id}.cshtml : NEED TO IMPLEMENT BUTTONS TO CREATE MEDICAL HISTORY AND PRESCRIPTIONS, AND OTHER FEATURES
+[⏯️]	Views/care/patient/{id}.cshtml : NEED TO IMPLEMENT BUTTONS TO CREATE PRESCRIPTIONS, AND OTHER FEATURES
 		✅Patient's profile (First name, Last name)
 		✅3 fields: Appointments, Medical history, Prescriptions
 		✅Appointments: List of appointments (can be filtered by date, doctor name, status)
@@ -132,30 +132,28 @@
 		✅Send a message when a prescription is issued, updated, or cancelled
 
 [✅]	Views/care/doctors.cshtml (only as a patient, if not the case redirect to Error page): TODO: SEND MESSAGE (just copy the doctor email to the message form)
-		✅List of doctors (can be filtered by name, specialty, location)
-		⏯️For each doctor, button to view profile, send a message, book an appointment (form)
+		List of doctors (can be filtered by name, specialty, location)
+		For each doctor, button to view profile, send a message, book an appointment (form)
 
 [✅]	Views/care/appointments.cshtml (as a patient):
-		✅List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
-		✅Clicking on an appointment opens a form to reschedule or cancel the appointment
-		✅If a patient wants to cancel an appointment in the 48 hours before the appointment --> Pop-up with a warning explaining that the cancellation is not possible, with a link to cancellation policy
+		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
+		Clicking on an appointment opens a form to reschedule or cancel the appointment
+		If a patient wants to cancel an appointment in the 48 hours before the appointment --> Pop-up with a warning explaining that the cancellation is not possible, with a link to cancellation policy
 
-		✅Calendar by week on the right with appointments
-		✅When an appointment is booked --> Send Message to Patient (can be viewed in Account/Messages)
-		✅Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
+		Calendar by week on the right with appointments
+		When an appointment is booked --> Send Message to Patient (can be viewed in Account/Messages)
+		Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
 
 [✅]	Views/care/appointments.cshtml (as a doctor):
-		✅List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
-		✅Clicking on an appointment opens a form to mark the appointment as completed, reschedule, or cancel the appointment
-		✅Doctor can access patient's profile, medical history, prescriptions (redirect to Doctor/Patient/{id})
+		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
+		Clicking on an appointment opens a form to mark the appointment as completed, reschedule, or cancel the appointment
+		Doctor can access patient's profile, medical history, prescriptions (redirect to Doctor/Patient/{id})
 
-		✅Calendar by month on the right with appointment
-		✅When an appointment is booked by a patient --> Send Message to Doctor (can be viewed in Account/Messages)
-		✅Can block unavailable slots (button with a form to enter date(s), time, reason)
-		Generate a report of daily or weekly appointments (button with pop-up to choose daily or weekly)
-		Export appointments data to a CSV or PDF file (button with pop-up to choose CSV or PDF)
-		✅Track the number of no-shows and cancellations (red icon with number per month)
-		✅Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
+		Calendar by month on the right with appointment
+		When an appointment is booked by a patient --> Send Message to Doctor (can be viewed in Account/Messages)
+		Can block unavailable slots (button with a form to enter date(s), time, reason)
+		Track the number of no-shows and cancellations (red icon with number per month)
+		Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
 
 //////////////////////// Views/admin //////////////////////// (only as an administrator, if not the case redirect to Error page)
 
@@ -169,10 +167,6 @@
 		Deactivate/reactivate users (button with a pop-up to confirm)
 		Prevent duplicate email addresses (FailMessage)
 		✅Receive a notification after successful changes (SuccessMessage)
-		When a user is a doctor:
-			- Button to view and edit schedules
-			- Button to generate reports (can be filtered by date, doctor name, patient name)
-			- Button to export reports to a CSV or PDF file
 
 [❌]	Views/admin/appointments.cshtml
 		List of appointments (can be filtered by date, patient name, doctor name, status)
