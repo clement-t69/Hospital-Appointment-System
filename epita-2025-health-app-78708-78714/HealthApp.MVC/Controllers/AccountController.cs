@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Net;
 using HealthApp.Domain.Data;
+using System.Net.NetworkInformation;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -38,7 +40,7 @@ namespace HealthApp.MVC.Controllers
             _context = context;
         }
 
-        // ERROR
+        // home/error.cshtml
         public IActionResult error()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -52,7 +54,8 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        // HEADER
+
+        // Shared/_Layout.cshtml
         // IF NOT LOGGED IN
         public IActionResult login_or_register()
         {
@@ -60,7 +63,7 @@ namespace HealthApp.MVC.Controllers
         }
 
         // IF LOGGED IN
-        public IActionResult my_messages()
+        public IActionResult my_notifications()
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
@@ -68,24 +71,501 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            ViewBag.userId = user.Id;
+
+            var notifications = _context.Notifications
+                .Where(n => n.ReceiverId == user.Id)
+                .OrderByDescending(n => n.Date)
+                .ToList();
+
+            ViewBag.Notifications = notifications;
 
             return View();
         }
 
-        public IActionResult send_message()
+        public IActionResult mark_as_read(string userId)
+        {
+            var notifications = _context.Notifications
+                .Where(n => n.ReceiverId == userId && n.IsRead == false)
+                .OrderByDescending(n => n.Date)
+                .ToList();
+
+            if (notifications.Count == 0)
+            {
+                TempData["ErrorMessage"] = "No unread notifications found.";
+                return RedirectToAction("my_notifications", "account");
+            }
+            else
+            {
+                foreach (var notification in notifications)
+                {
+                    notification.IsRead = true;
+                }
+            }
+
+            _context.SaveChanges();
+            return RedirectToAction("my_notifications", "account");
+        }
+
+        public IActionResult delete_notification(int id)
+        {
+            var notification = _context.Notifications.FirstOrDefault(n => n.Id == id);
+
+            if (notification == null)
+            {
+                TempData["ErrorMessage"] = "Notification not found.";
+                return RedirectToAction("my_notifications", "account");
+            }
+            else if (notification.Id == 0)
+            {
+                TempData["ErrorMessage"] = "You cannot delete this notification.";
+                return RedirectToAction("my_notifications", "account");
+            }
+            else
+            {
+                _context.Notifications.Remove(notification);
+                _context.SaveChanges();
+            }
+
+            return RedirectToAction("my_notifications", "account");
+        }
+
+        public IActionResult my_messages([FromQuery] string messagesSearchInput, 
+            [FromQuery] string messagesSearchField, 
+            [FromQuery] string sentMessagesSearchInput, 
+            [FromQuery] string sentMessagesSearchField)
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
-            var doctors = _context.Doctors.ToList();
-            ViewBag.Doctors = doctors;
+            List<Message> messages = _context.Messages
+                .Where(m => m.ReceiverId == user.Id)
+                .OrderByDescending(m => m.Date)
+                .ToList();
+
+            List<Message> sentMessages = _context.Messages
+                .Where(m => m.SenderId == user.Id)
+                .OrderByDescending(m => m.Date)
+                .ToList();
+
+            if (messagesSearchInput == null || messagesSearchField == null)
+            {
+                messagesSearchInput = "";
+                messagesSearchField = "";
+            }
+            if (sentMessagesSearchInput == null || sentMessagesSearchField == null)
+            {
+                sentMessagesSearchInput = "";
+                sentMessagesSearchField = "";
+            }
+
+            if (messagesSearchInput != null || messagesSearchField != null)
+            {
+                messages = searchMessages(messagesSearchInput, messagesSearchField, user.Id);
+            }
+
+            if (sentMessagesSearchInput != null || sentMessagesSearchField != null)
+            {
+                sentMessages = searchSentMessages(sentMessagesSearchInput, sentMessagesSearchField, user.Id);
+            }
+
+            ViewBag.Messages = messages;
+            ViewBag.SentMessages = sentMessages;
+
+            return View();
+        }
+
+        public List<Message> searchMessages(string searchInput, string searchField, string receiverId)
+        {
+            var messages = _context.Messages.ToList().Where(m => m.ReceiverId == receiverId).ToList();
+
+            if (searchField == "Date")
+            {
+                messages = messages.Where(m => m.Date.ToLower().Contains(searchInput) && m.ReceiverId == receiverId).ToList();
+            }
+            else if (searchField == "Sender")
+            {
+                messages = messages.Where(m => m.SenderFirstName.ToLower().Contains(searchInput) || m.SenderLastName.ToLower().Contains(searchInput) && m.ReceiverId == receiverId).ToList();
+            }
+            else if (searchField == "Object")
+            {
+                messages = messages.Where(m => m.Object.ToLower().Contains(searchInput) && m.ReceiverId == receiverId).ToList();
+            }
+            else
+            {
+                searchInput = "";
+                searchField = "";
+            }
+
+            return messages;
+        }
+
+        public List<Message> searchSentMessages(string searchInput, string searchField, string senderId)
+        {
+            var messages = _context.Messages.ToList().Where(m => m.SenderId == senderId).ToList();
+
+            if (searchField == "Date")
+            {
+                messages = messages.Where(m => m.Date.ToLower().Contains(searchInput) && m.SenderId == senderId).ToList();
+            }
+            else if (searchField == "Receiver")
+            {
+                messages = messages.Where(m => m.ReceiverFirstName.ToLower().Contains(searchInput) || m.ReceiverLastName.ToLower().Contains(searchInput) && m.SenderId == senderId).ToList();
+            }
+            else if (searchField == "Object")
+            {
+                messages = messages.Where(m => m.Object.ToLower().Contains(searchInput) && m.SenderId == senderId).ToList();
+            }
+            else
+            {
+                searchInput = "";
+                searchField = "";
+            }
+
+            return messages;
+        }
+
+        public async Task<IActionResult> message(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+            ViewBag.UserId = user.Id;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            var message = _context.Messages.FirstOrDefault(m => m.Id == id);
+
+            if (message == null)
+            {
+                TempData["ErrorMessage"] = "Message not found.";
+                return RedirectToAction("my_messages", "account");
+            }
+
+            if (message.IsRead == false && message.ReceiverId == user.Id)
+            {
+                message.IsRead = true;
+                _context.SaveChanges();
+            }
+
+            ViewBag.Message = message;
+
+            return View(message);
+        }
+
+        public async Task<IActionResult> send_message()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            ViewBag.User = user;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login", "account");
+            }
+
+            ViewBag.Doctors = _context.Doctors.ToList();
+            ViewBag.Patients = _context.Patients.ToList();
+
+            if (userRoles.Contains("doctor"))
+            {
+                ViewBag.Receiver = _userManager.GetUsersInRoleAsync("patient").Result;
+            }
+            else if (userRoles.Contains("patient"))
+            {
+                ViewBag.Receiver = _userManager.GetUsersInRoleAsync("doctor").Result;
+            }
+
             return View();
         }
         
+        public async Task<IActionResult> new_message(NewMessageInputModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login", "account");
+            }
+
+            ViewBag.SenderId = user.Id;
+
+            _logger.LogInformation($"******************************\nSenderId: {model.SenderId}\nReceiverId: {model.ReceiverId}\nObject: {model.Object}\nMessage: {model.Message}\n******************************\n");
+
+            var sender = await _userManager.FindByIdAsync(model.SenderId);
+            var receiver = await _userManager.FindByIdAsync(model.ReceiverId);
+
+            if (sender == null || receiver == null)
+            {
+                TempData["ErrorMessage"] = "Sender or receiver not found.";
+                return RedirectToAction("send_message", "account");
+            }
+
+            var id = _context.Messages.Max(m => m.Id) + 1;
+
+            if (ModelState.IsValid)
+            {
+                if (userRoles.Contains("doctor"))
+                {
+                    var doctorId = user.Id;
+                    var patientId = model.ReceiverId;
+
+                    var message = new Message
+                    {
+                        Id = id,
+                        DoctorId = doctorId,
+                        PatientId = patientId,
+                        SenderId = model.SenderId,
+                        SenderFirstName = user.FirstName,
+                        SenderLastName = user.LastName,
+                        ReceiverId = model.ReceiverId,
+                        ReceiverFirstName = receiver.FirstName,
+                        ReceiverLastName = receiver.LastName,
+                        Object = model.Object,
+                        Content = model.Message,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        Type = "New",
+                        IsRead = false
+                    };
+
+                    var notification = new Notification
+                    {
+                        Id = _context.Notifications.Max(n => n.Id) + 1,
+                        SenderId = user.Id,
+                        ReceiverId = model.ReceiverId,
+                        Content = "You have received a new message from " + user.FirstName + " " + user.LastName,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        IsRead = false
+                    };
+
+                    try
+                    {
+                        _context.Messages.Add(message);
+                        _context.Notifications.Add(notification);
+                        _context.SaveChanges();
+                        TempData["SuccessMessage"] = "Message sent successfully.";
+                        _logger.LogInformation($"******************************\nDoctor {user.UserName} has sent a message to {receiver.UserName}.\n******************************\n");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"******************************\n{ex.Message}\n******************************\n");
+                        TempData["ErrorMessage"] = "An error occurred while sending the message.";
+                    }
+                }
+                else if (userRoles.Contains("patient"))
+                {
+                    var doctorId = model.ReceiverId;
+                    var patientId = user.Id;
+
+                    var message = new Message
+                    {
+                        Id = id,
+                        DoctorId = doctorId,
+                        PatientId = patientId,
+                        SenderId = model.SenderId,
+                        SenderFirstName = user.FirstName,
+                        SenderLastName = user.LastName,
+                        ReceiverId = model.ReceiverId,
+                        ReceiverFirstName = receiver.FirstName,
+                        ReceiverLastName = receiver.LastName,
+                        Object = model.Object,
+                        Content = model.Message,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        Type = "New",
+                        IsRead = false
+                    };
+
+                    var notification = new Notification
+                    {
+                        Id = _context.Notifications.Max(n => n.Id) + 1,
+                        SenderId = user.Id,
+                        ReceiverId = model.ReceiverId,
+                        Content = "You have received a new message from " + user.FirstName + " " + user.LastName,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        IsRead = false
+                    };
+
+                    try
+                    {
+                        _context.Messages.Add(message);
+                        _context.Notifications.Add(notification);
+                        _context.SaveChanges();
+                        TempData["SuccessMessage"] = "Message sent successfully.";
+                        _logger.LogInformation($"******************************\nPatient {user.UserName} has sent a message to {receiver.UserName}.\n******************************\n");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"******************************\n{ex.Message}\n******************************\n");
+                        TempData["ErrorMessage"] = "An error occurred while sending the message.";
+                    }
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Invalid input.";
+            }
+            return RedirectToAction("my_messages", "account");
+        }
+
+        public async Task<IActionResult> reply_message(ReplyMessageInputModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login", "account");
+            }
+
+            ViewBag.SenderId = user.Id;
+
+            var sender = await _userManager.FindByIdAsync(model.replySenderId);
+            var receiver = await _userManager.FindByIdAsync(model.replyReceiverId);
+
+            if (sender == null || receiver == null)
+            {
+                TempData["ErrorMessage"] = "Sender or receiver not found.";
+                return RedirectToAction("my_messages", "account");
+            }
+
+            if (model.replyMessage == null || model.replyObject == null || model.replyReceiverId == null || model.replySenderId == null)
+            {
+                TempData["ErrorMessage"] = "Your message cannot be empty.";
+                return RedirectToAction("message", "account", new { Id = model.Id });
+            }
+
+            var id = _context.Messages.Max(m => m.Id) + 1;
+
+            if (ModelState.IsValid)
+            {
+                if (userRoles.Contains("doctor"))
+                {
+                    var doctorId = user.Id;
+                    var patientId = model.replyReceiverId;
+
+                    var message = new Message
+                    {
+                        Id = id,
+                        DoctorId = doctorId,
+                        PatientId = patientId,
+                        SenderId = model.replySenderId,
+                        SenderFirstName = user.FirstName,
+                        SenderLastName = user.LastName,
+                        ReceiverId = model.replyReceiverId,
+                        ReceiverFirstName = receiver.FirstName,
+                        ReceiverLastName = receiver.LastName,
+                        Object = "RE: " + model.replyObject,
+                        Content = model.replyMessage,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        Type = "Reply",
+                        IsRead = false
+                    };
+
+                    var notification = new Notification
+                    {
+                        Id = _context.Notifications.Max(n => n.Id) + 1,
+                        SenderId = user.Id,
+                        ReceiverId = model.replyReceiverId,
+                        Content = "You have received a new message from " + user.FirstName + " " + user.LastName,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        IsRead = false
+                    };
+
+                    try
+                    {
+                        _context.Messages.Add(message);
+                        _context.Notifications.Add(notification);
+                        _context.SaveChanges();
+                        TempData["SuccessMessage"] = "Message sent successfully.";
+                        _logger.LogInformation($"******************************\nDoctor {user.UserName} has sent a message to {receiver.UserName}.\n******************************\n");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"******************************\n{ex.Message}\n******************************\n");
+                        TempData["ErrorMessage"] = "An error occurred while sending the message.";
+                    }
+                }
+                else if (userRoles.Contains("patient"))
+                {
+                    var doctorId = model.replyReceiverId;
+                    var patientId = user.Id;
+
+                    var message = new Message
+                    {
+                        Id = id,
+                        DoctorId = doctorId,
+                        PatientId = patientId,
+                        SenderId = model.replySenderId,
+                        SenderFirstName = user.FirstName,
+                        SenderLastName = user.LastName,
+                        ReceiverId = model.replyReceiverId,
+                        ReceiverFirstName = receiver.FirstName,
+                        ReceiverLastName = receiver.LastName,
+                        Object = "RE: " + model.replyObject,
+                        Content = model.replyMessage,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        Type = "Reply",
+                        IsRead = false
+                    };
+
+                    var notification = new Notification
+                    {
+                        Id = _context.Notifications.Max(n => n.Id) + 1,
+                        SenderId = user.Id,
+                        ReceiverId = model.replyReceiverId,
+                        Content = "You have received a new message from " + user.FirstName + " " + user.LastName,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        IsRead = false
+                    };
+
+                    try
+                    {
+                        _context.Messages.Add(message);
+                        _context.Notifications.Add(notification);
+                        _context.SaveChanges();
+                        TempData["SuccessMessage"] = "Message sent successfully.";
+                        _logger.LogInformation($"******************************\nPatient {user.UserName} has sent a message to {receiver.UserName}.\n******************************\n");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError($"******************************\n{ex.Message}\n******************************\n");
+                        TempData["ErrorMessage"] = "An error occurred while sending the message.";
+                    }
+                }
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Invalid input.";
+            }
+            return RedirectToAction("message", "account", new {Id = id});
+        }
+
         public IActionResult edit()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -121,7 +601,8 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        // LOGIN
+
+        // account/login.cshtml
         public IActionResult login()
         {
             return View();
@@ -156,7 +637,8 @@ namespace HealthApp.MVC.Controllers
             return View(model);
         }
 
-        // REGISTER
+
+        // account/register.cshtml
         public IActionResult register()
         {
             return View();
@@ -198,7 +680,7 @@ namespace HealthApp.MVC.Controllers
                         };
                         patient.Appointments = new List<Appointment>();
                         patient.MedicalHistories = new List<MedicalHistory>();
-                        patient.Notifications = new List<Notification>();
+                        patient.Notifications = new List<Message>();
                         patient.Prescriptions = new List<Prescription>();
                         patient.FirstName = user.FirstName;
                         patient.LastName = user.LastName;
@@ -228,7 +710,8 @@ namespace HealthApp.MVC.Controllers
             return View(model);
         }
 
-        // FORGOT PASSWORD
+
+        // account/forgot_password.cshtml
         public IActionResult forgot_password()
         {
             return View();
@@ -356,7 +839,8 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        // EDIT ACCOUNT
+
+        // account/edit.cshtml
         [HttpGet]
         //[Authorize]
         public async Task<IActionResult> Edit()
@@ -386,7 +870,7 @@ namespace HealthApp.MVC.Controllers
             });
         }
 
-        // ACCESS TO PROFILE, MEDICAL HISTORY, PRESCRIPTIONS
+        // account/my_profile.cshtml
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> my_profile()
@@ -469,27 +953,69 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("my_profile", "account");
         }
 
+        // account/my_medical_history.cshtml
         [HttpGet]
         [Authorize]
-        public IActionResult my_medical_history()
+        public async Task<IActionResult> my_medical_history([FromQuery] string searchInput, [FromQuery] string searchField)
         {
-            var user = _userManager.GetUserAsync(User).Result;
-            var userRoles = _userManager.GetRolesAsync(user).Result;
+            var user = await _userManager.GetUserAsync(User);
+            var userRoles = await _userManager.GetRolesAsync(user);
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
-            var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
-            if (patient != null)
+            if (searchInput == null || searchField == null)
             {
-                var medicalHistories = _context.MedicalHistories.Where(mh => mh.PatientId == patient.UserId).ToList();
-                ViewBag.MedicalHistories = medicalHistories;
+                searchInput = "";
+                searchField = "";
             }
+
+            var medicalHistories = searchMedicalHistory(searchInput, searchField, user.Id);
+
+            if (searchInput != "" && searchField != "" && medicalHistories.Count == 0)
+            {
+                TempData["ErrorMessage"] = "No medical history found.";
+                _logger.LogError($"******************************\nNo medical history found while searching for medical histories with {searchField} containing {searchInput}.\n******************************\n");
+            }
+
+            _logger.BeginScope($"******************************\nUser {user.UserName} has searched for medical history with {searchField} containing {searchInput}.\n******************************\n");
+
+            ViewBag.MedicalHistories = medicalHistories;
 
             return View();
         }
 
+        public List<MedicalHistory> searchMedicalHistory(string searchInput, string searchField, string patientId)
+        {
+            var medicalHistories = _context.MedicalHistories.ToList().Where(mh => mh.PatientId == patientId).ToList();
+
+            if (searchField == "Date")
+            {
+                medicalHistories = medicalHistories.Where(mh => mh.Date.ToLower().Contains(searchInput) && mh.PatientId == patientId).ToList();
+            }
+            else if (searchField == "Doctor")
+            {
+                medicalHistories = medicalHistories.Where(mh => mh.DoctorFirstName.ToLower().Contains(searchInput) || mh.DoctorLastName.ToLower().Contains(searchInput) && mh.PatientId == patientId).ToList();
+            }
+            else if (searchField == "Speciality")
+            {
+                medicalHistories = medicalHistories.Where(mh => mh.Specialization.ToLower().Contains(searchInput) && mh.PatientId == patientId).ToList();
+            }
+            else if (searchField == "Location")
+            {
+                medicalHistories = medicalHistories.Where(mh => mh.Location.ToLower().Contains(searchInput) && mh.PatientId == patientId).ToList();
+            }
+            else
+            {
+                searchInput = "";
+                searchField = "";
+            }
+
+            return medicalHistories;
+        }
+
+        // account/my_prescriptions.cshtml
         [HttpGet]
         [Authorize]
         public IActionResult my_prescriptions()
@@ -511,7 +1037,6 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        // CHANGE EMAIL
         [HttpPost]
         public async Task<IActionResult> change_email(ChangeEmailInputModel model)
         {
@@ -595,7 +1120,6 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("edit", "account");
         }
 
-        // CHANGE PASSWORD
         [HttpPost]
         public async Task<IActionResult> change_password(ChangePasswordInputModel model)
         {
@@ -661,7 +1185,6 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("edit", "account");
         }
 
-        // DELETE ACCOUNT BY DELETING ALL INFORMATIONS
         [HttpPost]
         public async Task<IActionResult> delete_all()
         {

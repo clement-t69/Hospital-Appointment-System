@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HealthApp.Domain.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250401093413_NewDoctor")]
-    partial class NewDoctor
+    [Migration("20250406180900_Notifications4")]
+    partial class Notifications4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,7 +26,12 @@ namespace HealthApp.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DoctorFirstName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DoctorId")
@@ -34,6 +39,14 @@ namespace HealthApp.Domain.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DoctorLastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PatientFirstName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -45,11 +58,16 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Specialization")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<TimeSpan>("Time")
+                    b.Property<string>("Time")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -64,6 +82,10 @@ namespace HealthApp.Domain.Migrations
             modelBuilder.Entity("HealthApp.Domain.Models.Doctor", b =>
                 {
                     b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
@@ -89,10 +111,15 @@ namespace HealthApp.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("Date")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Diagnosis")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DoctorFirstName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -129,24 +156,62 @@ namespace HealthApp.Domain.Migrations
                     b.ToTable("MedicalHistories");
                 });
 
-            modelBuilder.Entity("HealthApp.Domain.Models.Notification", b =>
+            modelBuilder.Entity("HealthApp.Domain.Models.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Date")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DoctorId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Message")
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Object")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReceiverFirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("ReceiverId");
+
+                    b.Property<string>("ReceiverLastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderFirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("SenderId");
+
+                    b.Property<string>("SenderLastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -156,12 +221,50 @@ namespace HealthApp.Domain.Migrations
 
                     b.HasIndex("PatientId");
 
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("HealthApp.Domain.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
                     b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Patient", b =>
                 {
                     b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LastName")
@@ -179,7 +282,8 @@ namespace HealthApp.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("Date")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DoctorId")
@@ -194,7 +298,8 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<DateTime>("ExpirationDate")
+                    b.Property<string>("ExpirationDate")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Frequency")
@@ -502,7 +607,7 @@ namespace HealthApp.Domain.Migrations
                     b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("HealthApp.Domain.Models.Notification", b =>
+            modelBuilder.Entity("HealthApp.Domain.Models.Message", b =>
                 {
                     b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
                         .WithMany("Notifications")

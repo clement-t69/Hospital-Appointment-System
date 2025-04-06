@@ -19,8 +19,8 @@ namespace HealthApp.MVC.Models
         [Required]
         public string Pharmacy { get; set; }
         [Required]
-        public DateTime ExpirationDate { get; set; }
+        public string ExpirationDate { get; set; }
         [Required]
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
     }
 }

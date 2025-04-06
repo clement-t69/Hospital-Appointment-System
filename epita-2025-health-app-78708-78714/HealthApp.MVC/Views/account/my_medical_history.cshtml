@@ -22,44 +22,49 @@
                 </div>
                 <section>
                     <hr />
-                    <div class="col-md-4" style="border-right: 1px solid #dee2e6;">
-                        <div>
-                            <h3 class="text-center">My Medical History</h3>
-                            <hr />
-                        </div>
-                        <div class="list-group">
-                            <!-- FILTER BY DATE, DOCTOR, SPECIALITY, LOCATION -->
-                            <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                                <input type="text" id="prescriptionsSearchInput" name="prescriptionsSearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
-                                <select id="prescriptionsSearchField" name="prescriptionsSearchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
-                                    <option value="Date">Date</option>
-                                    <option value="DoctorLastName">Doctor</option>
-                                    <option value="Specialization">Speciality</option>
-                                    <option value="Location">Location</option>
-                                </select>
-                                <button class="btn little-white-button" id="mhSearchButton" onclick="location.href='@Url.Action("patients", "care")?searchInput=' + document.getElementById('prescriptionsSearchInput').value + '&searchField=' + document.getElementById('prescriptionsSearchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
-                            </section>
+                    <!-- FILTER BY DATE, DOCTOR, SPECIALITY, LOCATION -->
+                    <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                        <input type="text" id="medicalHistorySearchInput" name="medicalHistorySearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                        <select id="medicalHistorySearchField" name="medicalHistorySearchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                            <option value="Date">Date</option>
+                            <option value="DoctorLastName">Doctor</option>
+                            <option value="Specialization">Speciality</option>
+                            <option value="Location">Location</option>
+                        </select>
+                        <button class="btn little-white-button" id="mhSearchButton" onclick="location.href='@Url.Action("my_medical_history", "account")?searchInput=' + document.getElementById('medicalHistorySearchInput').value + '&searchField=' + document.getElementById('medicalHistorySearchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                    </section>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Doctor Name</th>
+                                <th>Speciality</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.MedicalHistories == null || ViewBag.MedicalHistories.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" style="text-align: center">No medical history found.</td>
+                                </tr>
+                            }
+
                             <!-- MEDICAL HISTORY LIST -->
                             @if (ViewBag.MedicalHistories != null)
                             {
                                 @foreach (var mh in ViewBag.MedicalHistories)
                                 {
                                     <tr>
-										<td>
-											<div class="list-group-item list-group-item-action">
-												<div class="d-flex w-100 justify-content-between">
-                                                    <h5 class="mb-1">Date: @mh.Date</h5>
-                                                    <small>Doctor: @mh.DoctorLastName</small>
-                                                    <small>Speciality: @mh.Specialization</small>
-                                                    <small>Location: @mh.Location</small>
-												</div>
-											</div>
-                                        </td>
+                                        <td style="vertical-align: middle;">@mh.Date</td>
+                                        <td style="vertical-align: middle;">@mh.DoctorFirstName @mh.DoctorLastName</td>
+                                        <td style="vertical-align: middle;">@mh.Specialization</td>
+                                        <td style="vertical-align: middle;">@mh.Location</td>
                                     </tr>
                                 }
                             }
-                        </div>
-                    </div>
+                        </tbody>
+                    </table>
                 </section>
             </div>
         </div>

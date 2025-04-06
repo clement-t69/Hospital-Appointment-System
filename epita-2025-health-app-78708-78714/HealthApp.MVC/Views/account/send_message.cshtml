@@ -1,65 +1,169 @@
-﻿@{
+﻿@model HealthApp.MVC.Models.NewMessageInputModel
+
+@{
     ViewData["Title"] = "Send Message";
+	var date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt");
 }
 
 @if (ViewBag.IsLogged == true)
 {
-    <div class="container d-flex justify-content-center" style="min-height: 50vh;">
-        <div class="row justify-content-center">
-            <div>
-                <div style="color: white; user-select: none;">
-                    <a>_________________________________________________________________________________________</a>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
-                        <div class="text-content fs-6 px-2 fw-bold text-center">
-                            <div>&lt; Back</div>
+    if (ViewBag.IsPatient == true)
+    {
+        <div class="container d-flex justify-content-center" style="min-height: 50vh;">
+            <div class="row justify-content-center">
+                <div>
+                    <div style="color: white; user-select: none;">
+                        <a>_________________________________________________________________________________________</a>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
+                            <div class="text-content fs-6 px-2 fw-bold text-center">
+                                <div>&lt; Back</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="text-center" style="flex-grow: 1;">
+                        <h1 style="font-weight: 700">Send a Message</h1>
+                    </div>
+                    <section>
+                        <hr />
+
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                        }
+
+                        <div class="mb-3">
+                            <form id="sendMessageForm" asp-controller="account" asp-action="new_message" method="post">
+								<input type="hidden" id="Id" name="Id" value="0" required />
+								<input type="hidden" id="SenderId" name="SenderId" value="@ViewBag.User.Id" required />
+                                <input type="hidden" id="Type" name="Type" value="New" required />
+                                <input type="hidden" id="Date" name="Date" value="@date" required />
+
+                                <select class="form-select mb-3" style="border-radius: 64px; height: 3rem;" name="ReceiverId" required>
+                                    <option value="" selected disabled>Select Doctor</option>
+                                    @if (ViewBag.Doctors != null && (ViewBag.Doctors).Count != 0)
+                                    {
+                                        @foreach (var d in ViewBag.Doctors)
+                                        {
+                                            <option value="@d.UserId">@d.FirstName @d.LastName</option>
+                                        }
+                                    }
+                                </select>
+
+                                <div class="rounded_fields mb-3">
+                                    <input type="text" class="form-control" id="Object" name="Object" placeholder="Object" required />
+                                </div>
+
+                                <div class="rounded_textarea form-label mb-3">
+                                    <textarea class="form-control" id="Message" name="Message" rows="4" placeholder="Enter your message..." required></textarea>
+                                </div>
+                            </form>
                         </div>
-                    </a>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <a class="little-blue-button" href="#" onclick="document.getElementById('sendMessageForm').submit(); return false;" style="text-decoration: none;">
+                                <div class="text-content fs-6 px-2 fw-bold">
+                                    <div>📨 Send Message</div>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
                 </div>
-                <div class="text-center" style="flex-grow: 1;">
-                    <h1 style="font-weight: 700">Send a Message</h1>
-                </div>
-                <section>
-                    <hr />
-                    <div class="mb-3">
-                        <select class="form-select" style="border-radius: 64px; height: 3rem;" id="Doctor" name="Doctor" required>
-                            <option value="" selected disabled>Select Doctor</option>
-
-                            @if (ViewBag.Doctors != null && (ViewBag.Doctors).Count != 0)
-                            {
-                                @foreach (var d in ViewBag.Doctors)
-                                {
-                                    <option data-id="@d.UserId" data-firstname="@d.FirstName" data-lastname="@d.LastName" data-specialization="@d.Specialization" data-location="@d.Location">@d.FirstName @d.LastName</option>
-                                }
-                            }
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <input type="text" class="form-control" id="ObjectContent" name="ObjectContent" placeholder="Object" required></input>
-                    </div>
-
-                    <div class="mb-3">
-                        <textarea class="form-control" id="MessageContent" name="MessageContent" rows="4" placeholder="Enter your message..." required></textarea>
-                    </div>
-
-                    <div style="display: flex; justify-content: flex-end;">
-                        <button type="submit" class="btn btn-primary">Send</button>
-                    </div>
-                </section>
             </div>
         </div>
-    </div>
 
-    @section scripts 
+        @section scripts 
+        {
+            <script>
+                function goBack()
+                {
+                    window.history.go(-1);
+                }
+            </script>
+        }
+    }
+    else if (ViewBag.IsDoctor == true)
     {
-        <script>
-            function goBack() 
-            {
-                window.history.go(-1);
-            }
-        </script>
+        <div class="container d-flex justify-content-center" style="min-height: 50vh;">
+            <div class="row justify-content-center">
+                <div>
+                    <div style="color: white; user-select: none;">
+                        <a>_________________________________________________________________________________________</a>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
+                            <div class="text-content fs-6 px-2 fw-bold text-center">
+                                <div>&lt; Back</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="text-center" style="flex-grow: 1;">
+                        <h1 style="font-weight: 700">Send a Message</h1>
+                    </div>
+                    <section>
+                        <hr />
+
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                        }
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                        }
+
+                        <div class="mb-3">
+                            <form id="sendMessageForm" asp-controller="account" asp-action="new_message" method="post">
+                                <input type="hidden" id="Id" name="Id" value="0" required />
+                                <input type="hidden" id="SenderId" name="SenderId" value="@ViewBag.User.Id" required />
+                                <input type="hidden" id="Type" name="Type" value="New" required />
+                                <input type="hidden" id="Date" name="Date" value="@date" required />
+
+                                <select class="form-select mb-3" style="border-radius: 64px; height: 3rem;" name="ReceiverId" required>
+                                    <option value="" selected disabled>Select Patient</option>
+                                    @if (ViewBag.Patients != null && (ViewBag.Patients).Count != 0)
+                                    {
+                                        @foreach (var d in ViewBag.Patients)
+                                        {
+                                            <option value="@d.UserId">@d.FirstName @d.LastName</option>
+                                        }
+                                    }
+                                </select>
+
+                                <div class="rounded_fields mb-3">
+                                    <input type="text" class="form-control" id="Object" name="Object" placeholder="Object" required />
+                                </div>
+
+                                <div class="rounded_textarea form-label mb-3">
+                                    <textarea class="form-control" id="Message" name="Message" rows="4" placeholder="Enter your message..." required></textarea>
+                                </div>
+                            </form>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <a class="little-blue-button" href="#" onclick="document.getElementById('sendMessageForm').submit(); return false;" style="text-decoration: none;">
+                                <div class="text-content fs-6 px-2 fw-bold">
+                                    <div>📨 Send Message</div>
+                                </div>
+                            </a>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        @section scripts
+        {
+            <script>
+                function goBack()
+                {
+                    window.history.go(-1);
+                }
+            </script>
+        }
     }
 }
 else

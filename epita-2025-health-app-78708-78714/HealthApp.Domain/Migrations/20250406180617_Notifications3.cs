@@ -5,25 +5,25 @@
 namespace HealthApp.Domain.Migrations
 {
     /// <inheritdoc />
-    public partial class Appt : Migration
+    public partial class Notifications3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "Location",
-                table: "Appointments",
-                type: "TEXT",
+            migrationBuilder.AddColumn<bool>(
+                name: "isRead",
+                table: "Notifications",
+                type: "INTEGER",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: false);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Location",
-                table: "Appointments");
+                name: "isRead",
+                table: "Notifications");
         }
     }
 }

@@ -204,7 +204,7 @@ namespace HealthApp.MVC.Controllers
                             {
                                 UserId = user.Id
                             };
-                            doctor.Notifications = new List<Notification>();
+                            doctor.Notifications = new List<Message>();
                             doctor.Appointments = new List<Appointment>();
                             doctor.Specialization = "General Practician";
                             doctor.Location = "Unknown";
@@ -221,7 +221,7 @@ namespace HealthApp.MVC.Controllers
                             {
                                 UserId = user.Id
                             };
-                            patient.Notifications = new List<Notification>();
+                            patient.Notifications = new List<Message>();
                             patient.MedicalHistories = new List<MedicalHistory>();
                             patient.Appointments = new List<Appointment>();
                             patient.Prescriptions = new List<Prescription>();
@@ -332,7 +332,7 @@ namespace HealthApp.MVC.Controllers
                                 {
                                     UserId = user.Id
                                 };
-                                doctor.Notifications = new List<Notification>();
+                                doctor.Notifications = new List<Message>();
                                 doctor.Appointments = new List<Appointment>();
                                 doctor.Specialization = "General Practician";
                                 doctor.Location = "Unknown";
@@ -348,7 +348,7 @@ namespace HealthApp.MVC.Controllers
                                 {
                                     UserId = user.Id
                                 };
-                                patient.Notifications = new List<Notification>();
+                                patient.Notifications = new List<Message>();
                                 patient.MedicalHistories = new List<MedicalHistory>();
                                 patient.Appointments = new List<Appointment>();
                                 patient.Prescriptions = new List<Prescription>();

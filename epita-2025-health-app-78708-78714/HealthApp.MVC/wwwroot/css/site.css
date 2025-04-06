@@ -251,6 +251,7 @@ footer {
     background-color: #0e43ad;
     color: white;
     border-radius: 64px;
+    width: 100%;
 }
 
 .calendar-slot 
@@ -260,8 +261,15 @@ footer {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-    .calendar-slot:hover 
+.calendar-slot:hover 
     {
         background-color: #0e43ad;
         cursor: pointer;
     }
+
+.rounded_textarea .form-control 
+{
+    border-radius: 16px;
+    height: 3rem;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}

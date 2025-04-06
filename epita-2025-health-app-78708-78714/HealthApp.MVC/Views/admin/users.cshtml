@@ -284,38 +284,38 @@
             </div>
         </div>
     </div>
-    @section scripts 
+    @section scripts
     {
-        <script>
-            function searchUsers()
+    <script>
+        function searchUsers()
+        {
+            var searchInput = document.getElementById('searchInput').value;
+            var searchField = document.getElementById('searchField').value;
+
+            if (searchInput == "" || searchField == "")
             {
-                var searchInput = document.getElementById('searchInput').value;
-                var searchField = document.getElementById('searchField').value;
-
-                if (searchInput == "" || searchField == "") 
-                {
-				    searchField = "";
-			        searchInput = "";
-                } 
-                else 
-                {
-                    location.href = '@Url.Action("users", "admin")?searchInput=' + searchInput + '&searchField=' + searchField;
-                }
+                searchField = "";
+                searchInput = "";
             }
+            else
+            {
+                location.href = '@Url.Action("users", "admin")?searchInput=' + searchInput + '&searchField=' + searchField;
+            }
+        }
 
-		    function goBack()
-		    {
-			    window.history.go(-1);
-		    }
-        </script>
+        function goBack()
+        {
+            window.history.go(-1);
+        }
+    </script>
     }
 }
 else
 {
-    @section scripts 
+    @section scripts
     {
-        <script>
-            window.location.href = '@Url.Action("error", "home")';
-        </script>
+    <script>
+        window.location.href = '@Url.Action("error", "home")';
+    </script>
     }
 }

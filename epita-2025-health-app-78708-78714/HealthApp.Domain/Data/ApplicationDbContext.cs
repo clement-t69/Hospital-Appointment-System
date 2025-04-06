@@ -9,14 +9,13 @@ namespace HealthApp.Domain.Data
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
-        //public DbSet<User> Users { get; set; }
-        //public DbSet<Administrator> Administrators { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
         public DbSet<Doctor> Doctors { get; set; }
         public DbSet<MedicalHistory> MedicalHistories { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Message> Messages { get; set; }
         public DbSet<Patient> Patients { get; set; }
         public DbSet<Prescription> Prescriptions { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -28,27 +27,11 @@ namespace HealthApp.Domain.Data
                 .WithOne()
                 .HasForeignKey<Doctor>(d => d.UserId);
 
-            modelBuilder.Entity<Doctor>()
-                .HasMany(d => d.Notifications)
-                .WithOne(n => n.Doctor)
-                .HasForeignKey(n => n.DoctorId);
-
             // MedicalHistory
             modelBuilder.Entity<MedicalHistory>()
                 .HasOne(mh => mh.Patient)
                 .WithMany(p => p.MedicalHistories)
                 .HasForeignKey(mh => mh.PatientId);
-
-            // Notification
-            modelBuilder.Entity<Notification>()
-                .HasOne(n => n.Doctor)
-                .WithMany(d => d.Notifications)
-                .HasForeignKey(n => n.DoctorId);
-
-            modelBuilder.Entity<Notification>()
-                .HasOne(n => n.Patient)
-                .WithMany(p => p.Notifications)
-                .HasForeignKey(n => n.PatientId);
 
             // Patient
             modelBuilder.Entity<Patient>()
@@ -66,16 +49,20 @@ namespace HealthApp.Domain.Data
                 .WithOne(pr => pr.Patient)
                 .HasForeignKey(pr => pr.PatientId);
 
-            modelBuilder.Entity<Patient>()
-                .HasMany(p => p.Notifications)
-                .WithOne(n => n.Patient)
-                .HasForeignKey(n => n.PatientId);
-
             // Prescription
             modelBuilder.Entity<Prescription>()
                 .HasOne(pr => pr.Patient)
                 .WithMany(p => p.Prescriptions)
                 .HasForeignKey(pr => pr.PatientId);
+
+            // Message
+            modelBuilder.Entity<Message>()
+                .Property(n => n.SenderId)
+                .HasColumnName("SenderId");
+
+            modelBuilder.Entity<Message>()
+                .Property(n => n.ReceiverId)
+                .HasColumnName("ReceiverId");
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
