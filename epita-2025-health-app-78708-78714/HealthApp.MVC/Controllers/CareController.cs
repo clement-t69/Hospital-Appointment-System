@@ -299,7 +299,19 @@ namespace HealthApp.MVC.Controllers
                     Date = model.Date
                 };
 
+                var notification = new Notification
+                {
+                    Id = _context.Notifications.Max(n => n.Id) + 1,
+                    Content = $"You have a new prescription for {model.Name} from doctor {model.DoctorId}.",
+                    Title = "New Prescription",
+                    Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                    SenderId = model.DoctorId,
+                    ReceiverId = model.PatientId,
+                    IsRead = false
+                };
+
                 _context.Prescriptions.Add(prescription);
+                _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();
                 _logger.LogInformation($"******************************\nPrescription created for patient {patient.Email} by doctor {model.DoctorId}.\n******************************\n");
             }
@@ -322,38 +334,6 @@ namespace HealthApp.MVC.Controllers
             var patient = await _userManager.FindByIdAsync(patientId);
             ViewBag.Patient = patient;
             return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> create_medical_history(string patientId, MedicalHistoryInputModel model)
-        {
-            var patient = _context.Patients.Find(patientId);
-            var p = await _userManager.FindByIdAsync(patientId);
-            var d = await _userManager.FindByIdAsync(model.DoctorId);
-
-            if (ModelState.IsValid)
-            {
-                var medicalHistory = new MedicalHistory
-                {
-                    Date = model.Date,
-                    Diagnosis = model.Diagnosis,
-                    DoctorId = model.DoctorId,
-                    PatientId = model.PatientId,
-                    Specialization = model.Specialization,
-                    Location = model.Location
-                };
-
-                var doctor = _context.Doctors.Find(model.DoctorId);
-
-                medicalHistory.DoctorLastName = doctor.LastName;
-                medicalHistory.PatientLastName = patient.LastName;
-
-                _context.MedicalHistories.Add(medicalHistory);
-                await _context.SaveChangesAsync();
-                _logger.LogInformation($"******************************\nMedical history created for patient {p.Email} by doctor {model.DoctorId}.\n******************************\n");
-            }
-
-            return RedirectToAction("patient", "care");
         }
 
         // care/doctors.cshtml
@@ -552,11 +532,32 @@ namespace HealthApp.MVC.Controllers
                     PatientFirstName = model.PatientFirstName
                 };
 
+                var doctorNotification = new Notification
+                {
+                    Id = _context.Notifications.Max(n => n.Id) + 1,
+                    Content = $"You have a new appointment request from patient {model.PatientFirstName} {model.PatientLastName}.",
+                    Title = "New Appointment Request",
+                    Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                    SenderId = model.PatientId,
+                    ReceiverId = model.DoctorId,
+                    IsRead = false
+                };
+
+                var patientNotification = new Notification
+                {
+                    Id = _context.Notifications.Max(n => n.Id) + 2,
+                    Content = $"Your appointment request has been sent to doctor {doctor.FirstName} {doctor.LastName}.",
+                    Title = "Appointment Request Sent",
+                    Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                    SenderId = model.DoctorId,
+                    ReceiverId = model.PatientId,
+                    IsRead = false
+                };
+
+                _context.Notifications.Add(doctorNotification);
+                _context.Notifications.Add(patientNotification);
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
-
-                // SEND MESSAGE TO PATIENT
-                // SEND MESSAGE TO DOCTOR
 
                 TempData["SuccessMessage"] = "Appointment booked successfully.";
                 _logger.LogInformation($"******************************\nAppointment booked for patient {model.PatientId} with doctor {model.DoctorId}.\n******************************\n");
@@ -636,12 +637,34 @@ namespace HealthApp.MVC.Controllers
 
             _context.Appointments.Update(appointment);
 
+            var doctorNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with patient {appointment.PatientFirstName} {appointment.PatientLastName} has been rescheduled to {model.Date} {model.Hour}.",
+                Title = "Appointment Rescheduled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = model.PId,
+                ReceiverId = model.DId,
+                IsRead = false
+            };
+
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 2,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been rescheduled to {model.Date} {model.Hour}.",
+                Title = "Appointment Rescheduled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = model.DId,
+                ReceiverId = model.PId,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(doctorNotification);
+            _context.Notifications.Add(patientNotification);
+
             _logger.LogInformation($"******************************\nAppointment with id {Id} rescheduled.\n******************************\n");
 
             await _context.SaveChangesAsync();
-
-            // SEND MESSAGE TO PATIENT
-            // SEND MESSAGE TO DOCTOR
 
             TempData["SuccessMessage"] = "Appointment rescheduled successfully.";
             return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
@@ -670,12 +693,23 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care", new { sunday = sunday });
             }
 
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been approved.",
+                Title = "Appointment Approved",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.PatientId,
+                IsRead = false
+            };
+
             appointment.Status = "Approved";
+
+            _context.Notifications.Add(patientNotification);
+
             _logger.LogInformation($"******************************\nAppointment with id {id} approved.\n******************************\n");
             await _context.SaveChangesAsync();
-
-            // SEND MESSAGE TO PATIENT
-            // SEND MESSAGE TO DOCTOR
 
             TempData["SuccessMessage"] = "Appointment approved successfully.";
             return RedirectToAction("appointments", "care", new { sunday = sunday });
@@ -705,11 +739,22 @@ namespace HealthApp.MVC.Controllers
             }
 
             appointment.Status = "Rejected";
+
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been rejected.",
+                Title = "Appointment Rejected",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.PatientId,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(patientNotification);
+
             _logger.LogInformation($"******************************\nAppointment with id {id} rejected.\n******************************\n");
             await _context.SaveChangesAsync();
-
-            // SEND MESSAGE TO PATIENT
-            // SEND MESSAGE TO DOCTOR
 
             TempData["SuccessMessage"] = "Appointment rejected successfully.";
             return RedirectToAction("appointments", "care", new { sunday = sunday });
@@ -739,11 +784,38 @@ namespace HealthApp.MVC.Controllers
             }
 
             appointment.Status = "Completed";
+
+            var mhId = _context.MedicalHistories.Max(mh => mh.Id) + 1;
+            var medicalHistory = new MedicalHistory
+            {
+                Id = mhId,
+                Date = appointment.Date,
+                Diagnosis = "",
+                DoctorId = appointment.DoctorId,
+                DoctorFirstName = appointment.DoctorFirstName,
+                DoctorLastName = appointment.DoctorLastName,
+                PatientId = appointment.PatientId,
+                PatientLastName = appointment.PatientLastName,
+                Specialization = appointment.Specialization,
+                Location = appointment.Location
+            };
+
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been completed.",
+                Title = "Appointment Completed",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.PatientId,
+                IsRead = false
+            };
+
+            _context.MedicalHistories.Add(medicalHistory);
+            _context.Notifications.Add(patientNotification);
+
             _logger.LogInformation($"******************************\nAppointment with id {id} completed.\n******************************\n");
             await _context.SaveChangesAsync();
-
-            // SEND MESSAGE TO PATIENT
-            // SEND MESSAGE TO DOCTOR
 
             TempData["SuccessMessage"] = "Appointment completed successfully.";
             return RedirectToAction("appointments", "care", new { sunday = sunday });
@@ -791,12 +863,34 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care");
             }
 
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been cancelled.",
+                Title = "Appointment Cancelled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.PatientId,
+                IsRead = false
+            };
+
+            var doctorNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 2,
+                Content = $"Your appointment with patient {appointment.PatientFirstName} {appointment.PatientLastName} has been cancelled.",
+                Title = "Appointment Cancelled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.PatientId,
+                ReceiverId = appointment.DoctorId,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(patientNotification);
+            _context.Notifications.Add(doctorNotification);
+
             appointment.Status = "Cancelled";
             _logger.LogInformation($"******************************\nAppointment with id {id} cancelled.\n******************************\n");
             await _context.SaveChangesAsync();
-
-            // SEND MESSAGE TO PATIENT
-            // SEND MESSAGE TO DOCTOR
 
             TempData["SuccessMessage"] = "Appointment cancelled successfully.";
             return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
@@ -871,10 +965,20 @@ namespace HealthApp.MVC.Controllers
                     PatientFirstName = model.PatientFirstName
                 };
 
+                var doctorNotification = new Notification
+                {
+                    Id = _context.Notifications.Max(n => n.Id) + 1,
+                    Content = $"You have declared unavailability for {model.appointmentDate} {model.appointmentHour}.",
+                    Title = "Unavailability Declared",
+                    Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                    SenderId = doctorId,
+                    ReceiverId = doctorId,
+                    IsRead = false
+                };
+
+                _context.Notifications.Add(doctorNotification);
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
-
-                // SEND MESSAGE TO DOCTOR
 
                 TempData["SuccessMessage"] = "Unavailability declared successfully.";
                 _logger.LogInformation($"******************************\nUnavailability declared for doctor {doctorId}.\n******************************\n");
@@ -899,11 +1003,21 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care", new { sunday = sunday });
             }
 
+            var doctorNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your unavailability for {appointment.Date} {appointment.Time} has been cancelled.",
+                Title = "Unavailability Cancelled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.DoctorId,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(doctorNotification);
             _context.Appointments.Remove(appointment);
             _logger.LogInformation($"******************************\nUnavailability with id {id} cancelled.\n******************************\n");
             await _context.SaveChangesAsync();
-
-            // SEND MESSAGE TO DOCTOR
 
             TempData["SuccessMessage"] = "Unavailability cancelled successfully.";
             return RedirectToAction("appointments", "care", new { sunday = sunday });

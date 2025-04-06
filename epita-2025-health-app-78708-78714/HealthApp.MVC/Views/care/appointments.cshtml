@@ -480,72 +480,73 @@
     <script>
         function goBack()
         {
-        window.history.go(-1);
+            window.history.go(-1);
         }
 
         function close()
         {
-        window.history.reload();
+            window.history.reload();
         }
 
         $(document).ready(function () 
         {
-        $('.calendar-slot button').click(function () 
-        {
-        var cell = $(this).parent('td');
-        var day = cell.index();
-        var hour = cell.closest('tr').find('td:first').text().trim();
+            $('.calendar-slot button').click(function () 
+            {
+                var cell = $(this).parent('td');
+                var day = cell.index();
+                var hour = cell.closest('tr').find('td:first').text().trim();
 
-        var sunday = new Date('@(((DateTime)ViewBag.Sunday).ToString("yyyy-MM-dd"))');
-        var selectedDate = new Date(sunday.setDate(sunday.getDate() + (day - 1)));
+                var sunday = new Date('@(((DateTime)ViewBag.Sunday).ToString("yyyy-MM-dd"))');
+                var selectedDate = new Date(sunday.setDate(sunday.getDate() + (day - 1)));
 
-        var formattedDate = selectedDate.toISOString().slice(0, 10);
-        var formattedHour = formatHour(hour);
+                var formattedDate = selectedDate.toISOString().slice(0, 10);
+                var formattedHour = formatHour(hour);
 
-        $('#appointmentDate').val(formattedDate);
-        $('#appointmentHour').val(formattedHour);
-        });
+                $('#appointmentDate').val(formattedDate);
+                $('#appointmentHour').val(formattedHour);
+            });
         });
 
         function formatHour(hour) 
         {
-        var parts = hour.split(':');
-        var hours = parseInt(parts[0]);
-        var minutes = parts[1].substring(0, 2);
-        var ampm = parts[1].substring(3, 5);
+            var parts = hour.split(':');
+            var hours = parseInt(parts[0]);
+            var minutes = parts[1].substring(0, 2);
+            var ampm = parts[1].substring(3, 5);
 
-        if (hours < 10) {
-        hours = hours.toString().padStart(2, '0');
-        }
+            if (hours < 10) 
+            {
+                hours = hours.toString().padStart(2, '0');
+            }
 
-        return hours + ':' + minutes + ' ' + ampm;
+            return hours + ':' + minutes + ' ' + ampm;
         }
 
         var doctorId = '@ViewBag.DoctorId';
 
         if (doctorId) 
         {
-        $('#Doctor').val(function()
-        {
-        return $('option[data-id="' + doctorId + '"]', this).val();
-        });
+            $('#Doctor').val(function()
+            {
+                return $('option[data-id="' + doctorId + '"]', this).val();
+            });
 
-        var selectedOption = $('#Doctor option:selected');
-        $('#DoctorId').val(selectedOption.data('id'));
-        $('#DoctorFirstName').val(selectedOption.data('firstname'));
-        $('#DoctorLastName').val(selectedOption.data('lastname'));
-        $('#Specialization').val(selectedOption.data('specialization'));
-        $('#Location').val(selectedOption.data('location'));
+            var selectedOption = $('#Doctor option:selected');
+            $('#DoctorId').val(selectedOption.data('id'));
+            $('#DoctorFirstName').val(selectedOption.data('firstname'));
+            $('#DoctorLastName').val(selectedOption.data('lastname'));
+            $('#Specialization').val(selectedOption.data('specialization'));
+            $('#Location').val(selectedOption.data('location'));
         }
 
         $('#Doctor').change(function()
         {
-        var selectedOption = $(this).find('option:selected');
-        $('#DoctorId').val(selectedOption.data('id'));
-        $('#DoctorFirstName').val(selectedOption.data('firstname'));
-        $('#DoctorLastName').val(selectedOption.data('lastname'));
-        $('#Specialization').val(selectedOption.data('specialization'));
-        $('#Location').val(selectedOption.data('location'));
+            var selectedOption = $(this).find('option:selected');
+            $('#DoctorId').val(selectedOption.data('id'));
+            $('#DoctorFirstName').val(selectedOption.data('firstname'));
+            $('#DoctorLastName').val(selectedOption.data('lastname'));
+            $('#Specialization').val(selectedOption.data('specialization'));
+            $('#Location').val(selectedOption.data('location'));
         });
     </script>
     }
@@ -905,7 +906,7 @@ else if (ViewBag.IsLogged == true && ViewBag.IsDoctor == true)
                                             {
                                                 if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
                                                 {
-                                                    if (a.Status == "Cancelled")
+                                                    if (a.Status == "Cancelled" || a.Status == "Rejected")
                                                     {
                                                         isAvailable = true;
                                                         cellColor = "";
@@ -926,10 +927,6 @@ else if (ViewBag.IsLogged == true && ViewBag.IsDoctor == true)
                                                         else if (a.Status == "Completed")
                                                         {
                                                             cellColor = "background-color: green;";
-                                                        }
-                                                        else if (a.Status == "Rejected")
-                                                        {
-                                                            cellColor = "background-color: red;";
                                                         }
 														else if (a.Status == "Unavailable")
 														{
@@ -1002,7 +999,7 @@ else if (ViewBag.IsLogged == true && ViewBag.IsDoctor == true)
                                             {
                                                 if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
                                                 {
-                                                    if (a.Status == "Cancelled")
+                                                    if (a.Status == "Cancelled" || a.Status == "Rejected")
                                                     {
                                                         isAvailable = true;
                                                         cellColor = "";
@@ -1023,10 +1020,6 @@ else if (ViewBag.IsLogged == true && ViewBag.IsDoctor == true)
                                                         else if (a.Status == "Completed")
                                                         {
                                                             cellColor = "background-color: green;";
-                                                        }
-                                                        else if (a.Status == "Rejected")
-                                                        {
-                                                            cellColor = "background-color: red;";
                                                         }
 														else if (a.Status == "Unavailable")
 														{

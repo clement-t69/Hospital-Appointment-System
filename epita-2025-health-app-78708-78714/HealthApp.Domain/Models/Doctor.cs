@@ -16,7 +16,7 @@ namespace HealthApp.Domain.Models
 
         public string Specialization { get; set; }
         public string Location { get; set; }
-        public List<Notification> Notifications { get; set; } = new List<Notification>();
+        public List<Message> Notifications { get; set; } = new List<Message>();
         public List<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }

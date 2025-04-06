@@ -5,12 +5,13 @@ namespace HealthApp.Domain.Models
     public class MedicalHistory
     {
         public int Id { get; set; }
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
         public string Diagnosis { get; set; }
         
         [ForeignKey("DoctorId")]
         public string DoctorId { get; set; }
         public Doctor Doctor { get; set; }
+        public string DoctorFirstName { get; set; }
         public string DoctorLastName { get; set; }
 
         [ForeignKey("PatientId")]

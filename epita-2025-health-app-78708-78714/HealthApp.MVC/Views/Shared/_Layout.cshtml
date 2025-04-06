@@ -27,6 +27,8 @@
                         {
                             if (ViewBag.IsDoctor == true)
                             {
+                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_notifications">🔔</a>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="care" asp-action="appointments">My Appointments</a>
@@ -42,6 +44,8 @@
                             }
                             else if (ViewBag.IsPatient == true)
                             {
+                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_notifications">🔔</a>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="care" asp-action="appointments">My Appointments</a>
@@ -55,6 +59,8 @@
                             }
                             else if (ViewBag.IsAdmin == true)
                             {
+                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_notifications">🔔</a>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="admin" asp-action="panel">Administration</a>

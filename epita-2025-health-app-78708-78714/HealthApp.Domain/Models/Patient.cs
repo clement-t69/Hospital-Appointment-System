@@ -17,6 +17,6 @@ namespace HealthApp.Domain.Models
         public List<MedicalHistory> MedicalHistories { get; set; } = new List<MedicalHistory>();
         public List<Prescription> Prescriptions { get; set; } = new List<Prescription>();
         public List<Appointment> Appointments { get; set; } = new List<Appointment>();
-        public List<Notification> Notifications { get; set; } = new List<Notification>();
+        public List<Message> Notifications { get; set; } = new List<Message>();
     }
 }

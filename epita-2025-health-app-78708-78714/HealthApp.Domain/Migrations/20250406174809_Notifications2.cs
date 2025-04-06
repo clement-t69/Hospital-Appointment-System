@@ -5,28 +5,21 @@
 namespace HealthApp.Domain.Migrations
 {
     /// <inheritdoc />
-    public partial class Appointments : Migration
+    public partial class Notifications2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "DoctorFirstName",
-                table: "Appointments",
+                name: "ReceiverId",
+                table: "Notifications",
                 type: "TEXT",
                 nullable: false,
                 defaultValue: "");
 
             migrationBuilder.AddColumn<string>(
-                name: "PatientFirstName",
-                table: "Appointments",
-                type: "TEXT",
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Specialization",
-                table: "Appointments",
+                name: "SenderId",
+                table: "Notifications",
                 type: "TEXT",
                 nullable: false,
                 defaultValue: "");
@@ -36,16 +29,12 @@ namespace HealthApp.Domain.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "DoctorFirstName",
-                table: "Appointments");
+                name: "ReceiverId",
+                table: "Notifications");
 
             migrationBuilder.DropColumn(
-                name: "PatientFirstName",
-                table: "Appointments");
-
-            migrationBuilder.DropColumn(
-                name: "Specialization",
-                table: "Appointments");
+                name: "SenderId",
+                table: "Notifications");
         }
     }
 }
