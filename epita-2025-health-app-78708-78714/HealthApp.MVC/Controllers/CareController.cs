@@ -142,27 +142,27 @@ namespace HealthApp.MVC.Controllers
 
             ViewBag.Patient = patient;
 
-            List<Appointment> appointments = await _context.Appointments
+            var appointments = _context.Appointments
                 .Where(a => a.PatientId == id)
-                .ToListAsync();
+                .ToList();
 
             if (appointmentsSearchField != null && appointmentsSearchInput != null)
             {
                 appointments = searchAppointment(appointmentsSearchInput, appointmentsSearchField);
             }
 
-            List<Prescription> prescriptions = await _context.Prescriptions
+            var prescriptions = _context.Prescriptions
                 .Where(p => p.PatientId == id)
-                .ToListAsync();
+                .ToList();
 
             if (prescriptionsSearchField != null && prescriptionsSearchInput != null)
             {
                 prescriptions = searchPrescription(prescriptionsSearchInput, prescriptionsSearchField);
             }
 
-            List<MedicalHistory> medicalHistories = await _context.MedicalHistories
+            var medicalHistories = _context.MedicalHistories
                 .Where(mh => mh.PatientId == id)
-                .ToListAsync();
+                .ToList();
 
             if (medicalHistoriesSearchField != null && medicalHistoriesSearchInput != null)
             {
