@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Identity;
 
 namespace HealthApp.Domain.Models
 {
@@ -10,14 +9,13 @@ namespace HealthApp.Domain.Models
         [ForeignKey("User")]
         public string UserId { get; set; }
 
-        //public IdentityUser User { get; set; }
+        public User User { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
-        [ForeignKey("SpecializationId")]
-        public int SpecializationId { get; set; }
-        public DoctorSpecialization Specialization { get; set; }
+        public string Specialization { get; set; }
         public string Location { get; set; }
-        public List<DoctorAvailability> DoctorAvailabilities { get; set; } = new List<DoctorAvailability>();
-        public List<Notification> Notifications { get; set; } = new List<Notification>();
+        public List<Message> Notifications { get; set; } = new List<Message>();
         public List<Appointment> Appointments { get; set; } = new List<Appointment>();
     }
 }

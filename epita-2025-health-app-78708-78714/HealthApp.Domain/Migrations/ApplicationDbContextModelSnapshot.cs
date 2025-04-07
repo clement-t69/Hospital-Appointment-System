@@ -17,26 +17,33 @@ namespace HealthApp.Domain.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.2");
 
-            modelBuilder.Entity("HealthApp.Domain.Models.Administrator", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("Administrators");
-                });
-
             modelBuilder.Entity("HealthApp.Domain.Models.Appointment", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DoctorFirstName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DoctorId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DoctorLastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PatientFirstName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -44,7 +51,20 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<TimeSpan>("Time")
+                    b.Property<string>("PatientLastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Specialization")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Time")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -61,57 +81,25 @@ namespace HealthApp.Domain.Migrations
                     b.Property<string>("UserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("SpecializationId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Specialization")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("UserId");
 
-                    b.HasIndex("SpecializationId")
-                        .IsUnique();
-
                     b.ToTable("Doctors");
-                });
-
-            modelBuilder.Entity("HealthApp.Domain.Models.DoctorAvailability", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("DoctorId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("TEXT");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DoctorId");
-
-                    b.ToTable("DoctorAvailabilities");
-                });
-
-            modelBuilder.Entity("HealthApp.Domain.Models.DoctorSpecialization", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DoctorSpecializations");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.MedicalHistory", b =>
@@ -120,10 +108,15 @@ namespace HealthApp.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("Date")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Diagnosis")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DoctorFirstName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -131,15 +124,27 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("DoctorLastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PatientFirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PatientId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Title")
+                    b.Property<string>("PatientLastName")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Treatment")
+                    b.Property<string>("Specialization")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -152,24 +157,62 @@ namespace HealthApp.Domain.Migrations
                     b.ToTable("MedicalHistories");
                 });
 
-            modelBuilder.Entity("HealthApp.Domain.Models.Notification", b =>
+            modelBuilder.Entity("HealthApp.Domain.Models.Message", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Date")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DoctorId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Message")
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Object")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("PatientId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReceiverFirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("ReceiverId");
+
+                    b.Property<string>("ReceiverLastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderFirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("SenderId");
+
+                    b.Property<string>("SenderLastName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -179,12 +222,54 @@ namespace HealthApp.Domain.Migrations
 
                     b.HasIndex("PatientId");
 
+                    b.ToTable("Messages");
+                });
+
+            modelBuilder.Entity("HealthApp.Domain.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ReceiverId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SenderId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
                     b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Patient", b =>
                 {
                     b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("UserId");
@@ -198,6 +283,10 @@ namespace HealthApp.Domain.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Date")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("DoctorId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -208,9 +297,6 @@ namespace HealthApp.Domain.Migrations
 
                     b.Property<string>("Duration")
                         .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Frequency")
@@ -451,6 +537,9 @@ namespace HealthApp.Domain.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -469,56 +558,34 @@ namespace HealthApp.Domain.Migrations
                     b.HasDiscriminator().HasValue("User");
                 });
 
-            modelBuilder.Entity("HealthApp.Domain.Models.Administrator", b =>
-                {
-                    b.HasOne("HealthApp.Domain.Models.User", null)
-                        .WithOne()
-                        .HasForeignKey("HealthApp.Domain.Models.Administrator", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("HealthApp.Domain.Models.Appointment", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.Doctor", null)
+                    b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
                         .WithMany("Appointments")
                         .HasForeignKey("DoctorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("HealthApp.Domain.Models.Patient", null)
+                    b.HasOne("HealthApp.Domain.Models.Patient", "Patient")
                         .WithMany("Appointments")
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Doctor");
+
+                    b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Doctor", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.DoctorSpecialization", "Specialization")
-                        .WithOne()
-                        .HasForeignKey("HealthApp.Domain.Models.Doctor", "SpecializationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("HealthApp.Domain.Models.User", null)
+                    b.HasOne("HealthApp.Domain.Models.User", "User")
                         .WithOne()
                         .HasForeignKey("HealthApp.Domain.Models.Doctor", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Specialization");
-                });
-
-            modelBuilder.Entity("HealthApp.Domain.Models.DoctorAvailability", b =>
-                {
-                    b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
-                        .WithMany("DoctorAvailabilities")
-                        .HasForeignKey("DoctorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Doctor");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.MedicalHistory", b =>
@@ -540,7 +607,7 @@ namespace HealthApp.Domain.Migrations
                     b.Navigation("Patient");
                 });
 
-            modelBuilder.Entity("HealthApp.Domain.Models.Notification", b =>
+            modelBuilder.Entity("HealthApp.Domain.Models.Message", b =>
                 {
                     b.HasOne("HealthApp.Domain.Models.Doctor", "Doctor")
                         .WithMany("Notifications")
@@ -561,11 +628,13 @@ namespace HealthApp.Domain.Migrations
 
             modelBuilder.Entity("HealthApp.Domain.Models.Patient", b =>
                 {
-                    b.HasOne("HealthApp.Domain.Models.User", null)
+                    b.HasOne("HealthApp.Domain.Models.User", "User")
                         .WithOne()
                         .HasForeignKey("HealthApp.Domain.Models.Patient", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HealthApp.Domain.Models.Prescription", b =>
@@ -641,8 +710,6 @@ namespace HealthApp.Domain.Migrations
             modelBuilder.Entity("HealthApp.Domain.Models.Doctor", b =>
                 {
                     b.Navigation("Appointments");
-
-                    b.Navigation("DoctorAvailabilities");
 
                     b.Navigation("Notifications");
                 });

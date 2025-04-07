@@ -11,7 +11,7 @@
                     <a>_________________________________________________________________________________________</a>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <a class="little-white-button" asp-controller="admin" asp-action="panel" style="text-decoration: none; width: 90px; box-shadow:none">
+                    <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
                         <div class="text-content fs-6 px-2 fw-bold text-center">
                             <div>&lt; Back</div>
                         </div>
@@ -22,10 +22,266 @@
                 </div>
                 <section>
                     <hr />
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                    }
+                    @if (TempData["WarningMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+
+                    <div class="col-md-4" style="width: 100%">
+                        <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                            <input type="text" id="SearchInput" name="SearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 512px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                            <select id="SearchField" name="SearchField" class="form-select rounded-0" style="width: 128px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                                <option value="Date">Date</option>
+                                <option value="Patient">Patient</option>
+                                <option value="Doctor">Doctor</option>
+                                <option value="Status">Status</option>
+                            </select>
+                            <button class="btn little-white-button" id="SearchButton" onclick="location.href='@Url.Action("appointments", "admin")?searchInput=' + document.getElementById('SearchInput').value + '&searchField=' + document.getElementById('SearchField').value;" style="width: 64px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                        </section>
+
+                        <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#createAppointmentModal" style="text-decoration: none; box-shadow:none; width:100%">
+                            <span class="icon"></span>
+                            <div class="text-content fs-6 px-2 fw-bold">
+                                <div>➕ Create an Appointment</div>
+                            </div>
+                        </a>
+
+                        <div class="modal fade" id="createAppointmentModal" tabindex="-1" aria-labelledby="createAppointmentModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="createAppointmentModalLabel" style="margin-left: 8px">Create an Appointment</h5>
+                                        <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("appointments", "admin")';" aria-label="Close" style="margin-right: 6px"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="createAppointmentForm" asp-controller="admin" asp-action="create_appointment" method="post">
+                                            <div class="rounded_fields form-label mb-3">
+                                                <input type="date" class="form-control" id="appointmentDate" name="appointmentDate" aria-required="true" placeholder="....-..-.." style="width:100%;">
+                                            </div>
+                                            <div class="rounded_fields form-label mb-3">
+                                                <select class="form-control" id="appointmentHour" name="appointmentHour" aria-required="true" style="width:100%;">
+                                                    <option value="" selected disabled>Select Hour</option>
+                                                    <option value="09:00 AM">09:00 AM</option>
+                                                    <option value="10:00 AM">10:00 AM</option>
+                                                    <option value="11:00 AM">11:00 AM</option>
+                                                    <option value="01:00 PM">01:00 PM</option>
+                                                    <option value="02:00 PM">02:00 PM</option>
+                                                    <option value="03:00 PM">03:00 PM</option>
+                                                    <option value="04:00 PM">04:00 PM</option>
+                                                    <option value="05:00 PM">05:00 PM</option>
+                                                </select>
+                                            </div>
+                                            <div class="rounded_fields form-label mb-3">
+                                                <select class="form-control" id="DoctorId" name="DoctorId" aria-required="true" style="width:100%;">
+                                                    <option value="" selected disabled>Select Doctor</option>
+													@foreach (var d in ViewBag.Doctors)
+													{
+														<option value="@d.UserId">@d.FirstName @d.LastName</option>
+													}
+                                                </select>
+                                            </div>
+                                            <div class="rounded_fields form-label mb-3">
+                                                <select class="form-control" id="PatientId" name="PatientId" aria-required="true" style="width:100%;">
+                                                    <option value="" selected disabled>Select Patient</option>
+                                                    @foreach (var p in ViewBag.Patients)
+                                                    {
+                                                        <option value="@p.UserId">@p.FirstName @p.LastName</option>
+                                                    }
+                                                </select>
+                                            </div>
+
+                                            <div class="rounded_fields form-label mb-3">
+                                                <input type="text" class="form-control" id="Specialization" name="Specialization" aria-required="true" placeholder="Specialization" style="width:100%;">
+                                            </div>
+
+                                            <div class="rounded_fields form-label mb-3">
+                                                <input type="text" class="form-control" id="Location" name="Location" aria-required="true" placeholder="Location" style="width:100%;">
+                                            </div>
+
+											<div class="rounded_fields form-label mb-3">
+												<select class="form-control" id="Status" name="Status" aria-required="true" style="width:100%;">
+                                                    <option value="" selected disabled>Select Status</option>
+													<option value="Pending">Pending</option>
+													<option value="Approved">Approved</option>
+													<option value="Completed">Completed</option>
+													<option value="Rejected">Rejected</option>
+													<option value="Cancelled">Cancelled</option>
+												</select>
+											</div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="little-blue-button" href="#" onclick="document.getElementById('createAppointmentForm').submit(); return false;" style="text-decoration: none;">
+                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                <div>➕ Create Appointment</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table class="table">
+                            <tbody>
+                                @if (ViewBag.Appointments == null || (ViewBag.Appointments).Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="4" style="text-align: center">No appointments found.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var a in ViewBag.Appointments)
+                                    {
+                                        @if (a.Id == 0)
+                                        {
+                                            @if (ViewBag.Appointments.Count == 1)
+                                            {
+                                                <tr>
+                                                    <td colspan="4" style="text-align: center">No appointments found.</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <!-- APPOINTMENT DETAILS -->
+                                            <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editAppointmentModal-@a.Id" style="cursor: pointer;">
+                                                <td>
+                                                    <div style="padding: 8px;" class="mb-3">
+                                                        <strong>@a.Date - @a.Time</strong>
+                                                        <br />Doctor: <strong>@a.DoctorFirstName @a.DoctorLastName</strong>
+                                                        <br />Patient: <strong>@a.PatientFirstName @a.PatientLastName</strong>
+                                                        <br />Location: @a.Location
+                                                        <br />Specialization: @a.Specialization
+                                                    </div>
+                                                    @if (a.Status == "Pending")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-warning">@a.Status</span></div>
+                                                    }
+                                                    else if (a.Status == "Approved")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                    }
+                                                    else if (a.Status == "Completed")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                    }
+                                                    else if (a.Status == "Cancelled")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                    }
+                                                    else if (a.Status == "Rejected")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div style="padding: 8px;">Status: Unknown</div>
+                                                    }
+                                                </td>
+                                            </tr>
+
+                                            <!-- EDIT APPOINTMENT MODAL -->
+                                            <div class="modal fade" id="editAppointmentModal-@a.Id" tabindex="-1" aria-labelledby="editAppointmentModalLabel-@a.Id" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="editAppointmentModalLabel-@a.Id" style="margin-left: 8px">Edit an Appointment</h5>
+                                                            <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="editAppointmentForm-@a.Id" asp-controller="admin" asp-action="edit_appointment" method="post">
+                                                                <input type="hidden" name="Id" value="@a.Id" />
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="date" class="form-control" id="editAppointmentDate-@a.Id" name="Date" aria-required="true" style="width:100%;" value="@a.Date">
+                                                                </div>
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <select class="form-control" id="editAppointmentHour-@a.Id" name="Hour" aria-required="true" style="width:100%;">
+                                                                            <option value="09:00 AM">09:00 AM</option>
+                                                                            <option value="10:00 AM">10:00 AM</option>
+                                                                            <option value="11:00 AM">11:00 AM</option>
+                                                                            <option value="01:00 PM">01:00 PM</option>
+                                                                            <option value="02:00 PM">02:00 PM</option>
+                                                                            <option value="03:00 PM">03:00 PM</option>
+                                                                            <option value="04:00 PM">04:00 PM</option>
+                                                                            <option value="05:00 PM">05:00 PM</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editAppointmentSpe-@a.Id" name="Spe" aria-required="true" style="width:100%;" value="@a.Specialization">
+                                                                </div>
+
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editAppointmentLoc-@a.Id" name="Loc" aria-required="true" style="width:100%;" value="@a.Location">
+                                                                </div>
+
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <select class="form-control" id="editAppointmentStat-@a.Id" name="Stat" aria-required="true" style="width:100%;">
+                                                                            <option value="Pending">Pending</option>
+                                                                            <option value="Approved">Approved</option>
+                                                                            <option value="Completed">Completed</option>
+                                                                            <option value="Rejected">Rejected</option>
+                                                                            <option value="Cancelled">Cancelled</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <input type="hidden" id="DId" name="DId" value="@a.DoctorId" />
+                                                                <input type="hidden" id="PId" name="PId" value="@a.PatientId" />
+                                                                <input type="hidden" id="PLastName" name="PLastName" value="@a.PatientLastName" />
+                                                                <input type="hidden" id="PFirstName" name="PFirstName" value="@a.PatientFirstName" />
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <a class="little-blue-button" href="#" onclick="document.getElementById('editAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                                    <div>📝 Edit Appointment</div>
+                                                                </div>
+                                                            </a>
+                                                            <form id="deleteAppointmentForm-@a.Id" asp-controller="admin" asp-action="delete_appointment" method="post" style="display: none;">
+                                                                <input type="hidden" name="Id" value="@a.Id" />
+                                                            </form>
+                                                            <a class="little-blue-button" href="#" onclick="document.getElementById('deleteAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                                    <div>🗑️ Delete Appointment</div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
                 </section>
             </div>
         </div>
     </div>
+
+    @section scripts {
+        <script>
+            function goBack()
+            {
+                window.history.go(-1);
+            }
+        </script>
+    }
 }
 else
 {

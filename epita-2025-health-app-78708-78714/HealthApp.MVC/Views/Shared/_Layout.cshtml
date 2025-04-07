@@ -6,6 +6,10 @@
     <title>@ViewData["Title"] - Hospital Appointment System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.2/main.min.js"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js'></script>
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header>
@@ -23,9 +27,11 @@
                         {
                             if (ViewBag.IsDoctor == true)
                             {
+                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_notifications">🔔</a>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
-                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_appointments">My Appointments</a>
+                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="care" asp-action="appointments">My Appointments</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="care" asp-action="patients">Care Center</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
@@ -38,9 +44,11 @@
                             }
                             else if (ViewBag.IsPatient == true)
                             {
+                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_notifications">🔔</a>
+                                <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
-                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_appointments">My Appointments</a>
+                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="care" asp-action="appointments">My Appointments</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="edit">My Account</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
@@ -51,7 +59,7 @@
                             }
                             else if (ViewBag.IsAdmin == true)
                             {
-                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_messages">My Messages</a>
+                                <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="account" asp-action="my_notifications">🔔</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
                                 <a class="nav-link fw-bold mx-3" style="color:aliceblue" asp-area="" asp-controller="admin" asp-action="panel">Administration</a>
                                 <div style="border-left:1px solid aliceblue;height:41px; opacity:0.7"></div>
@@ -88,13 +96,15 @@
             &copy; NICOLAY Loris and THOREZ Clément - Use only for educational purposes at
             <span class="mx-1"><a href="https://dorset.ie/" target="_blank" rel="noopener noreferrer">Dorset College, Dublin</a></span> - 2025
         </div>
-        <div class="container justify-content-center align-items-center pb-3">
+
+        <div class="container pb-3 d-flex" style="align-items:center; justify-content: center">
             <a class="nav-link" asp-area="" asp-controller="home" asp-action="cancellation_policy">Cancellation Policy</a>
+            <a class="nav-link" asp-area="" asp-controller="home" asp-action="contact">Contact</a>
         </div>
+        
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

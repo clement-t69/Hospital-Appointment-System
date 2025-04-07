@@ -1,5 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Messages";
+	var date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt");
 }
 
 @if (ViewBag.IsLogged == true && ViewBag.IsAdmin == true)
@@ -11,7 +12,7 @@
                     <a>_________________________________________________________________________________________</a>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <a class="little-white-button" asp-controller="admin" asp-action="panel" style="text-decoration: none; width: 90px; box-shadow:none">
+                    <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
                         <div class="text-content fs-6 px-2 fw-bold text-center">
                             <div>&lt; Back</div>
                         </div>
@@ -22,10 +23,257 @@
                 </div>
                 <section>
                     <hr />
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                    }
+                    @if (TempData["WarningMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+
+                    <div class="row m-0 w-100">
+                        <div class="col" style="border-right: 1px solid #dee2e6;">
+                            <div>
+                                <h3 class="text-center">Messages</h3>
+                                <hr />
+                            </div>
+                            <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                <input type="text" id="messagesSearchInput" name="messagesSearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 256px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                                <select id="messagesSearchField" name="messagesSearchField" class="form-select rounded-0" style="width: 128px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                                    <option value="Date">Date</option>
+                                    <option value="Sender">Sender</option>
+                                    <option value="Receiver">Receiver</option>
+                                    <option value="Object">Object</option>
+                                </select>
+                                <button class="btn little-white-button" id="mSearchButton" onclick="location.href='@Url.Action("messages", "admin")?searchInput=' + document.getElementById('messagesSearchInput').value + '&searchField=' + document.getElementById('messagesSearchField').value;" style="width: 64px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                            </section>
+
+                            <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#sysMessageModal" style="text-decoration: none; box-shadow:none; width:100%">
+                                <span class="icon"></span>
+                                <div class="text-content fs-6 px-2 fw-bold">
+                                    <div>📨 Send a System Message</div>
+                                </div>
+                            </a>
+
+                            <div class="modal fade" id="sysMessageModal" tabindex="-1" aria-labelledby="sysMessageModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="sysMessageModalLabel" style="margin-left: 8px">New System Message</h5>
+                                            <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("messages", "admin")'" aria-label="Close" style="margin-right: 6px"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="sysMessageForm" asp-controller="admin" asp-action="system_message" method="post">
+                                                <input type="hidden" name="Id" value="0" />
+                                                <input type="hidden" name="SenderId" value="@ViewBag.UserId" />
+                                                <input type="hidden" name="ReceiverId" value="@ViewBag.UserId" />
+
+                                                <div class="rounded_fields mb-3">
+                                                    <input type="text" class="form-control" id="Object" name="Object" placeholder="Object" required />
+                                                </div>
+
+                                                <div class="rounded_textarea form-label mb-3">
+                                                    <textarea class="form-control" id="Message" name="Message" rows="4" placeholder="Enter your message..." required></textarea>
+                                                </div>
+
+                                                <input type="hidden" id="Type" name="Type" value="New" required />
+                                                <input type="hidden" id="Date" name="Date" value="@date" required />
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a class="little-blue-button" href="#" onclick="document.getElementById('sysMessageForm').submit(); return false;" style="text-decoration: none;">
+                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                    <div>📨 Send Message</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="table">
+                                <tbody>
+                                    @if (ViewBag.Messages == null || ViewBag.Messages.Count == 0)
+                                    {
+                                        <tr>
+                                            <td style="text-align: center">No messages found.</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var m in ViewBag.Messages)
+                                        {
+                                            @if (m.Id == 0)
+                                            {
+                                                @if (ViewBag.Messages.Count == 1)
+                                                {
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center">No messages found.</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr class="big-white-button-table"
+                                                onclick="window.location.href='@Url.Action("message", "admin", new { id = @m.Id })';"
+                                                style="cursor: pointer;">
+                                                    <td>
+                                                        <div style="padding: 8px; display: flex; justify-content: space-between;">
+                                                            <div>
+                                                                <strong>@m.Object</strong>
+                                                                <br />@m.Date
+                                                                <br />From <strong>@m.SenderFirstName @m.SenderLastName</strong>
+                                                                <br />To <strong>@m.ReceiverFirstName @m.ReceiverLastName</strong>
+                                                            </div>
+                                                            <div style="margin-right: 8px;">
+                                                                <form asp-controller="admin" asp-action="delete_message" method="post">
+                                                                    <input type="hidden" name="id" value="@m.Id" />
+                                                                    <button type="submit" style="background: none; border: none; cursor: pointer;">🗑️</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col">
+                            <div>
+                                <h3 class="text-center">Requests</h3>
+                                <hr />
+                            </div>
+                            <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                <input type="text" id="messagesSearchInput" name="messagesSearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 256px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                                <select id="messagesSearchField" name="messagesSearchField" class="form-select rounded-0" style="width: 128px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                                    <option value="Date">Date</option>
+                                    <option value="Sender">Sender</option>
+                                    <option value="Receiver">Receiver</option>
+                                    <option value="Object">Object</option>
+                                </select>
+                                <button class="btn little-white-button" id="mSearchButton" onclick="location.href='@Url.Action("messages", "admin")?searchInput=' + document.getElementById('messagesSearchInput').value + '&searchField=' + document.getElementById('messagesSearchField').value;" style="width: 64px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                            </section>
+
+                            <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#newMessageModal" style="text-decoration: none; box-shadow:none; width:100%">
+                                <span class="icon"></span>
+                                <div class="text-content fs-6 px-2 fw-bold">
+                                    <div>📨 Send a Message</div>
+                                </div>
+                            </a>
+
+                            <div class="modal fade" id="newMessageModal" tabindex="-1" aria-labelledby="newMessageModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="newMessageModalLabel" style="margin-left: 8px">New Message</h5>
+                                            <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("messages", "admin")'" aria-label="Close" style="margin-right: 6px"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="newMessageForm" asp-controller="admin" asp-action="send_message" method="post">
+                                                <input type="hidden" name="Id" value="0" />
+                                                <input type="hidden" name="SenderId" value="@ViewBag.UserId" />
+                                                <select class="form-select mb-3" style="border-radius: 64px; height: 3rem;" name="ReceiverId" required>
+                                                    <option value="" selected disabled>Select Receiver</option>
+                                                    @if (ViewBag.Users != null && (ViewBag.Users).Count != 0)
+                                                    {
+                                                        @foreach (var u in ViewBag.Users)
+                                                        {
+                                                            <option value="@u.Id">@u.FirstName @u.LastName</option>
+                                                        }
+                                                    }
+                                                </select>
+
+                                                <div class="rounded_fields mb-3">
+                                                    <input type="text" class="form-control" id="Object" name="Object" placeholder="Object" required />
+                                                </div>
+
+                                                <div class="rounded_textarea form-label mb-3">
+                                                    <textarea class="form-control" id="Message" name="Message" rows="4" placeholder="Enter your message..." required></textarea>
+                                                </div>
+
+                                                <input type="hidden" id="Type" name="Type" value="New" required />
+                                                <input type="hidden" id="Date" name="Date" value="@date" required />
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a class="little-blue-button" href="#" onclick="document.getElementById('newMessageForm').submit(); return false;" style="text-decoration: none;">
+                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                    <div>📨 Send Message</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table class="table">
+                                <tbody>
+                                    @if (ViewBag.AdminMessages == null || ViewBag.AdminMessages.Count == 0)
+                                    {
+                                        <tr>
+                                            <td style="text-align: center">No messages found.</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        @foreach (var m in ViewBag.AdminMessages)
+                                        {
+                                            @if (m.Id == 0)
+                                            {
+                                                @if (ViewBag.AdminMessages.Count == 1)
+                                                {
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center">No messages found.</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr class="big-white-button-table"
+                                                    onclick="window.location.href='@Url.Action("message", "admin", new { id = @m.Id })';"
+                                                    style="cursor: pointer;">
+                                                    <td>
+                                                        <div style="padding: 8px; display: flex; justify-content: space-between;">
+                                                            <div>
+                                                                <strong>@m.Object</strong>
+                                                                <br />@m.Date
+                                                                <br />From <strong>@m.SenderFirstName @m.SenderLastName</strong>
+                                                            </div>
+                                                            <div style="margin-right: 8px;">
+                                                                <form asp-controller="admin" asp-action="delete_message" method="post">
+                                                                    <input type="hidden" name="id" value="@m.Id" />
+                                                                    <button type="submit" style="background: none; border: none; cursor: pointer;">🗑️</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </section>
             </div>
         </div>
     </div>
+    @section scripts {
+        <script>
+            function goBack()
+            {
+                window.history.go(-1);
+            }
+        </script>
+    }
 }
 else
 {

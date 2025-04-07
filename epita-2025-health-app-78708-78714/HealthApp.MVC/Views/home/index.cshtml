@@ -15,14 +15,14 @@
                     <h1 style="color:aliceblue; font-weight: 700">Find care, book fast.</h1>
                 </div>
             </div>
-            <section style="display: flex; align-items: center; justify-content: center;">
-                <input type="text" class="form-control" placeholder="Search..." style="padding:24px; width: 524px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.3), 0px 4px 8px -4px rgba(0, 0, 0, 0.3), 0px -4px 8px -4px rgba(0, 0, 0, 0.3);" />
-                <select class="form-select rounded-0" style="width: 160px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.3), 0px -4px 8px -4px rgba(0, 0, 0, 0.3); z-index: 1">
-                    <option value="doctor">Doctor</option>
-                    <option value="location">Location</option>
-                    <option value="specialization">Specialization</option>
+            <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                <input type="text" id="searchInput" name="searchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                <select id="searchField" name="searchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                    <option value="Name">Doctor</option>
+                    <option value="Specialization">Specialization</option>
+                    <option value="Location">Location</option>
                 </select>
-                <button class="btn little-white-button" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">Search 🔍</button>
+                <button class="btn little-white-button" id="searchButton" onclick="location.href='@Url.Action("doctors", "care")?searchInput=' + document.getElementById('searchInput').value + '&searchField=' + document.getElementById('searchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍 Search</button>
             </section>
             <section style="margin-bottom: 48px">
                 <div class="text-center" style="flex-grow: 1; margin-top: 128px">
@@ -88,4 +88,25 @@
             </section>
         </div>
     </div>
+
+    @section scripts {
+        <script>
+            function searchDoctors()
+            {
+                var searchInput = document.getElementById('searchInput').value;
+                var searchField = document.getElementById('searchField').value;
+
+                if (searchInput == "" || searchField == "")
+                {
+                    searchField = "";
+                    searchInput = "";
+                }
+                else
+                {
+                    location.href = '@Url.Action("doctors", "care")?searchInput=' + searchInput + '&searchField=' + searchField;
+                }
+            }
+        </script>
+	}
+
 </div>

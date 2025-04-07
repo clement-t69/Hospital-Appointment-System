@@ -11,7 +11,7 @@
                     <a>_________________________________________________________________________________________</a>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <a class="little-white-button" asp-controller="account" asp-action="edit" style="text-decoration: none; width: 90px; box-shadow:none">
+                    <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
                         <div class="text-content fs-6 px-2 fw-bold text-center">
                             <div>&lt; Back</div>
                         </div>
@@ -22,10 +22,112 @@
                 </div>
                 <section>
                     <hr />
+                    <!-- FILTER BY DATE, DOCTOR, SPECIALITY, LOCATION -->
+                    <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                        <input type="text" id="medicalHistorySearchInput" name="medicalHistorySearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                        <select id="medicalHistorySearchField" name="medicalHistorySearchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                            <option value="Date">Date</option>
+                            <option value="DoctorLastName">Doctor</option>
+                            <option value="Specialization">Speciality</option>
+                            <option value="Location">Location</option>
+                        </select>
+                        <button class="btn little-white-button" id="mhSearchButton" onclick="location.href='@Url.Action("my_medical_history", "account")?searchInput=' + document.getElementById('medicalHistorySearchInput').value + '&searchField=' + document.getElementById('medicalHistorySearchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                    </section>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Doctor Name</th>
+                                <th>Speciality</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.MedicalHistories == null || ViewBag.MedicalHistories.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" style="text-align: center">No medical history found.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                <!-- MEDICAL HISTORY LIST -->
+                                @foreach (var mh in ViewBag.MedicalHistories)
+                                {
+                                    @if (mh.Id == 0)
+                                    {
+                                        @if (ViewBag.MedicalHistories.Count == 1)
+                                        {
+                                            <tr>
+                                                <td colspan="4" style="text-align: center">No medical history found.</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#viewMHModal-@mh.Id" style="cursor: pointer;">
+                                            <td style="vertical-align: middle;">@mh.Date</td>
+                                            <td style="vertical-align: middle;">@mh.DoctorFirstName @mh.DoctorLastName</td>
+                                            <td style="vertical-align: middle;">@mh.Specialization</td>
+                                            <td style="vertical-align: middle;">@mh.Location</td>
+                                        </tr>
+                                    
+                                        <!-- VIEW MEDICAL HISTORY MODAL -->
+                                        <div class="modal fade" id="viewMHModal-@mh.Id" tabindex="-1" aria-labelledby="viewMHModalLabel-@mh.Id" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="viewMHModalLabel-@mh.Id" style="margin-left: 8px">@mh.Date</h5>
+                                                        <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("my_medical_history", "account")';" aria-label="Close" style="margin-right: 6px"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h5 class="modal-title" style="margin-left: 8px">Issued by <strong>@mh.DoctorFirstName @mh.DoctorLastName</strong></h5>
+                                                        <div class="d-flex justify-content-between" style="margin-left: 8px; margin-top: 8px">
+                                                            <div>
+                                                                <p class="mb-2"><strong>Specialization:</strong> @mh.Specialization</p>
+                                                                <p class="mb-2"><strong>Location:</strong> @mh.Location</p>
+                                                                <p class="mb-2"><strong>Diagnosis:</strong> @mh.Diagnosis</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            }
+                        </tbody>
+                    </table>
                 </section>
             </div>
         </div>
     </div>
+
+	@section scripts 
+    {
+        <script>
+            function searchMedicalHistory()
+            {
+                var medicalHistoriesSearchInput = document.getElementById('medicalHistoriesSearchInput').value;
+                var medicalHistoriesSearchField = document.getElementById('medicalHistoriesSearchField').value;
+
+                if (medicalHistoriesSearchInput == "" || medicalHistoriesSearchField == "")
+                {
+                    medicalHistoriesSearchField = "";
+                    medicalHistoriesSearchInput = "";
+                }
+                else
+                {
+                location.href = '@Url.Action("care", "patient")?searchInput=' + medicalHistoriesSearchInput + '&searchField=' + medicalHistoriesSearchField;
+                }
+            }
+
+            function goBack() 
+            {
+                window.history.go(-1);
+            }
+        </script>
+    }
 }
 else
 {
