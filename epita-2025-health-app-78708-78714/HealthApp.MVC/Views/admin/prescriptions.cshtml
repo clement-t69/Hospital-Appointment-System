@@ -52,79 +52,91 @@
                                 }
                                 else
                                 {
-                                    @foreach (Prescription p in ViewBag.Prescriptions)
+                                    @foreach (var p in ViewBag.Prescriptions)
                                     {
-                                        <!-- PRESCRIPTION DETAILS -->
-                                        <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editPrescriptionModal-@p.Id" style="cursor: pointer;">
-                                            <td>
-                                                <div style="padding: 8px; mb-3">
-                                                    <strong>@p.Date</strong>
-                                                    <br />Doctor: <strong>@p.DoctorId</strong>
-                                                    <br />Patient: <strong>@p.PatientId</strong>
-                                                    <br />Name: @p.Name
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <!-- EDIT PRESCRIPTION MODAL -->
-                                        <div class="modal fade" id="editPrescriptionModal-@p.Id" tabindex="-1" aria-labelledby="editPrescriptionModalLabel-@p.Id" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="editPrescriptionModalLabel-@p.Id" style="margin-left: 8px">Edit a Medical History</h5>
-                                                        <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                        @if (p.Id == 0)
+                                        {
+                                            @if (ViewBag.Prescriptions.Count == 1)
+                                            {
+                                                <tr>
+                                                    <td colspan="4" style="text-align: center">No prescription found.</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <!-- PRESCRIPTION DETAILS -->
+                                            <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editPrescriptionModal-@p.Id" style="cursor: pointer;">
+                                                <td>
+                                                    <div style="padding: 8px;" class="mb-3">
+                                                        <strong>@p.Date</strong>
+                                                        <br />Doctor: <strong>@p.DoctorId</strong>
+                                                        <br />Patient: <strong>@p.PatientId</strong>
+                                                        <br />Name: @p.Name
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <form id="editPrescriptionForm-@p.Id" asp-controller="admin" asp-action="edit_prescription" method="post">
-                                                            <input type="hidden" name="Id" value="@p.Id" />
+                                                </td>
+                                            </tr>
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="date" class="form-control" id="editPrescriptionDate-@p.Id" name="Date" aria-required="true" style="width:100%;" value="@p.Date">
-                                                            </div>
+                                            <!-- EDIT PRESCRIPTION MODAL -->
+                                            <div class="modal fade" id="editPrescriptionModal-@p.Id" tabindex="-1" aria-labelledby="editPrescriptionModalLabel-@p.Id" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="editPrescriptionModalLabel-@p.Id" style="margin-left: 8px">Edit a Medical History</h5>
+                                                            <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="editPrescriptionForm-@p.Id" asp-controller="admin" asp-action="edit_prescription" method="post">
+                                                                <input type="hidden" name="Id" value="@p.Id" />
 
-                                                            <input type="hidden" name="DoctorId" value="@p.DoctorId" />
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="date" class="form-control" id="editPrescriptionDate-@p.Id" name="Date" aria-required="true" style="width:100%;" value="@p.Date">
+                                                                </div>
 
-                                                            <input type="hidden" name="PatientId" value="@p.PatientId" />
+                                                                <input type="hidden" name="DoctorId" value="@p.DoctorId" />
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="text" class="form-control" id="editPrescriptionName-@p.Id" name="Name" aria-required="true" style="width:100%;" value="@p.Name">
-                                                            </div>
+                                                                <input type="hidden" name="PatientId" value="@p.PatientId" />
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="number" class="form-control" id="editPrescriptionDosage-@p.Id" name="Dosage" aria-required="true" style="width:100%;" value="@p.Dosage">
-                                                            </div>
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editPrescriptionName-@p.Id" name="Name" aria-required="true" style="width:100%;" value="@p.Name">
+                                                                </div>
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="number" class="form-control" id="editPrescriptionFrequency-@p.Id" name="Frequency" aria-required="true" style="width:100%;" value="@p.Frequency">
-                                                            </div>
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="number" class="form-control" id="editPrescriptionDosage-@p.Id" name="Dosage" aria-required="true" style="width:100%;" value="@p.Dosage">
+                                                                </div>
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="number" class="form-control" id="editPrescriptionDuration-@p.Id" name="Duration" aria-required="true" style="width:100%;" value="@p.Duration">
-                                                            </div>
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="number" class="form-control" id="editPrescriptionFrequency-@p.Id" name="Frequency" aria-required="true" style="width:100%;" value="@p.Frequency">
+                                                                </div>
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="text" class="form-control" id="editPrescriptionPharmacy-@p.Id" name="Pharmacy" aria-required="true" style="width:100%;" value="@p.Pharmacy">
-                                                            </div>                                                            
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('editPrescriptionForm-@p.Id').submit(); return false;" style="text-decoration: none;">
-                                                            <div class="text-content fs-6 px-2 fw-bold">
-                                                                <div>📝 Edit Prescription</div>
-                                                            </div>
-                                                        </a>
-                                                        <form id="deletePrescriptionForm-@p.Id" asp-controller="admin" asp-action="delete_prescription" method="post" style="display: none;">
-                                                            <input type="hidden" name="Id" value="@p.Id" />
-                                                        </form>
-                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('deletePrescriptionForm-@p.Id').submit(); return false;" style="text-decoration: none;">
-                                                            <div class="text-content fs-6 px-2 fw-bold">
-                                                                <div>🗑️ Delete Prescription</div>
-                                                            </div>
-                                                        </a>
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="number" class="form-control" id="editPrescriptionDuration-@p.Id" name="Duration" aria-required="true" style="width:100%;" value="@p.Duration">
+                                                                </div>
+
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editPrescriptionPharmacy-@p.Id" name="Pharmacy" aria-required="true" style="width:100%;" value="@p.Pharmacy">
+                                                                </div>                                                            
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <a class="little-blue-button" href="#" onclick="document.getElementById('editPrescriptionForm-@p.Id').submit(); return false;" style="text-decoration: none;">
+                                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                                    <div>📝 Edit Prescription</div>
+                                                                </div>
+                                                            </a>
+                                                            <form id="deletePrescriptionForm-@p.Id" asp-controller="admin" asp-action="delete_prescription" method="post" style="display: none;">
+                                                                <input type="hidden" name="Id" value="@p.Id" />
+                                                            </form>
+                                                            <a class="little-blue-button" href="#" onclick="document.getElementById('deletePrescriptionForm-@p.Id').submit(); return false;" style="text-decoration: none;">
+                                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                                    <div>🗑️ Delete Prescription</div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        }
                                     }
                                 }
                             </tbody>

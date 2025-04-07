@@ -40,7 +40,7 @@
                         <div class="mb-3">
                             <form id="sendMessageForm" asp-controller="account" asp-action="new_message" method="post">
 								<input type="hidden" id="Id" name="Id" value="0" required />
-								<input type="hidden" id="SenderId" name="SenderId" value="@ViewBag.User.Id" required />
+								<input type="hidden" id="SenderId" name="SenderId" value="@ViewBag.UserId" required />
                                 <input type="hidden" id="Type" name="Type" value="New" required />
                                 <input type="hidden" id="Date" name="Date" value="@date" required />
 

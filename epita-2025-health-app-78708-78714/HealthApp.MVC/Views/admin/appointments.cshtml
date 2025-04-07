@@ -141,116 +141,128 @@
                                 {
                                     @foreach (var a in ViewBag.Appointments)
                                     {
-                                        <!-- APPOINTMENT DETAILS -->
-                                        <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editAppointmentModal-@a.Id" style="cursor: pointer;">
-                                            <td>
-                                                <div style="padding: 8px; mb-3">
-                                                    <strong>@a.Date - @a.Time</strong>
-                                                    <br />Doctor: <strong>@a.DoctorFirstName @a.DoctorLastName</strong>
-                                                    <br />Patient: <strong>@a.PatientFirstName @a.PatientLastName</strong>
-                                                    <br />Location: @a.Location
-                                                    <br />Specialization: @a.Specialization
-                                                </div>
-                                                @if (a.Status == "Pending")
-                                                {
-                                                    <div style="padding: 8px;">Status: <span class="badge bg-warning">@a.Status</span></div>
-                                                }
-                                                else if (a.Status == "Approved")
-                                                {
-                                                    <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
-                                                }
-                                                else if (a.Status == "Completed")
-                                                {
-                                                    <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
-                                                }
-                                                else if (a.Status == "Cancelled")
-                                                {
-                                                    <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
-                                                }
-                                                else if (a.Status == "Rejected")
-                                                {
-                                                    <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
-                                                }
-                                                else
-                                                {
-                                                    <div style="padding: 8px;">Status: Unknown</div>
-                                                }
-                                            </td>
-                                        </tr>
-
-                                        <!-- EDIT APPOINTMENT MODAL -->
-                                        <div class="modal fade" id="editAppointmentModal-@a.Id" tabindex="-1" aria-labelledby="editAppointmentModalLabel-@a.Id" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="editAppointmentModalLabel-@a.Id" style="margin-left: 8px">Edit an Appointment</h5>
-                                                        <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                        @if (a.Id == 0)
+                                        {
+                                            @if (ViewBag.Appointments.Count == 1)
+                                            {
+                                                <tr>
+                                                    <td colspan="4" style="text-align: center">No appointments found.</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <!-- APPOINTMENT DETAILS -->
+                                            <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editAppointmentModal-@a.Id" style="cursor: pointer;">
+                                                <td>
+                                                    <div style="padding: 8px;" class="mb-3">
+                                                        <strong>@a.Date - @a.Time</strong>
+                                                        <br />Doctor: <strong>@a.DoctorFirstName @a.DoctorLastName</strong>
+                                                        <br />Patient: <strong>@a.PatientFirstName @a.PatientLastName</strong>
+                                                        <br />Location: @a.Location
+                                                        <br />Specialization: @a.Specialization
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <form id="editAppointmentForm-@a.Id" asp-controller="admin" asp-action="edit_appointment" method="post">
-                                                            <input type="hidden" name="Id" value="@a.Id" />
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="date" class="form-control" id="editAppointmentDate-@a.Id" name="Date" aria-required="true" style="width:100%;" value="@a.Date">
-                                                            </div>
-                                                            <div class="rounded_fields form-label mb-3">
+                                                    @if (a.Status == "Pending")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-warning">@a.Status</span></div>
+                                                    }
+                                                    else if (a.Status == "Approved")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                    }
+                                                    else if (a.Status == "Completed")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                    }
+                                                    else if (a.Status == "Cancelled")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                    }
+                                                    else if (a.Status == "Rejected")
+                                                    {
+                                                        <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div style="padding: 8px;">Status: Unknown</div>
+                                                    }
+                                                </td>
+                                            </tr>
+
+                                            <!-- EDIT APPOINTMENT MODAL -->
+                                            <div class="modal fade" id="editAppointmentModal-@a.Id" tabindex="-1" aria-labelledby="editAppointmentModalLabel-@a.Id" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="editAppointmentModalLabel-@a.Id" style="margin-left: 8px">Edit an Appointment</h5>
+                                                            <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="editAppointmentForm-@a.Id" asp-controller="admin" asp-action="edit_appointment" method="post">
+                                                                <input type="hidden" name="Id" value="@a.Id" />
                                                                 <div class="rounded_fields form-label mb-3">
-                                                                    <select class="form-control" id="editAppointmentHour-@a.Id" name="Hour" aria-required="true" style="width:100%;">
-                                                                        <option value="09:00 AM">09:00 AM</option>
-                                                                        <option value="10:00 AM">10:00 AM</option>
-                                                                        <option value="11:00 AM">11:00 AM</option>
-                                                                        <option value="01:00 PM">01:00 PM</option>
-                                                                        <option value="02:00 PM">02:00 PM</option>
-                                                                        <option value="03:00 PM">03:00 PM</option>
-                                                                        <option value="04:00 PM">04:00 PM</option>
-                                                                        <option value="05:00 PM">05:00 PM</option>
-                                                                    </select>
+                                                                    <input type="date" class="form-control" id="editAppointmentDate-@a.Id" name="Date" aria-required="true" style="width:100%;" value="@a.Date">
                                                                 </div>
-                                                            </div>
-
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="text" class="form-control" id="editAppointmentSpe-@a.Id" name="Spe" aria-required="true" style="width:100%;" value="@a.Specialization">
-                                                            </div>
-
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="text" class="form-control" id="editAppointmentLoc-@a.Id" name="Loc" aria-required="true" style="width:100%;" value="@a.Location">
-                                                            </div>
-
-                                                            <div class="rounded_fields form-label mb-3">
                                                                 <div class="rounded_fields form-label mb-3">
-                                                                    <select class="form-control" id="editAppointmentStat-@a.Id" name="Stat" aria-required="true" style="width:100%;">
-                                                                        <option value="Pending">Pending</option>
-                                                                        <option value="Approved">Approved</option>
-                                                                        <option value="Completed">Completed</option>
-                                                                        <option value="Rejected">Rejected</option>
-                                                                        <option value="Cancelled">Cancelled</option>
-                                                                    </select>
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <select class="form-control" id="editAppointmentHour-@a.Id" name="Hour" aria-required="true" style="width:100%;">
+                                                                            <option value="09:00 AM">09:00 AM</option>
+                                                                            <option value="10:00 AM">10:00 AM</option>
+                                                                            <option value="11:00 AM">11:00 AM</option>
+                                                                            <option value="01:00 PM">01:00 PM</option>
+                                                                            <option value="02:00 PM">02:00 PM</option>
+                                                                            <option value="03:00 PM">03:00 PM</option>
+                                                                            <option value="04:00 PM">04:00 PM</option>
+                                                                            <option value="05:00 PM">05:00 PM</option>
+                                                                        </select>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <input type="hidden" id="DId" name="DId" value="@a.DoctorId" />
-                                                            <input type="hidden" id="PId" name="PId" value="@a.PatientId" />
-                                                            <input type="hidden" id="PLastName" name="PLastName" value="@a.PatientLastName" />
-                                                            <input type="hidden" id="PFirstName" name="PFirstName" value="@a.PatientFirstName" />
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('editAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
-                                                            <div class="text-content fs-6 px-2 fw-bold">
-                                                                <div>📝 Edit Appointment</div>
-                                                            </div>
-                                                        </a>
-                                                        <form id="deleteAppointmentForm-@a.Id" asp-controller="admin" asp-action="delete_appointment" method="post" style="display: none;">
-                                                            <input type="hidden" name="Id" value="@a.Id" />
-                                                        </form>
-                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('deleteAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
-                                                            <div class="text-content fs-6 px-2 fw-bold">
-                                                                <div>🗑️ Delete Appointment</div>
-                                                            </div>
-                                                        </a>
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editAppointmentSpe-@a.Id" name="Spe" aria-required="true" style="width:100%;" value="@a.Specialization">
+                                                                </div>
+
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editAppointmentLoc-@a.Id" name="Loc" aria-required="true" style="width:100%;" value="@a.Location">
+                                                                </div>
+
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <select class="form-control" id="editAppointmentStat-@a.Id" name="Stat" aria-required="true" style="width:100%;">
+                                                                            <option value="Pending">Pending</option>
+                                                                            <option value="Approved">Approved</option>
+                                                                            <option value="Completed">Completed</option>
+                                                                            <option value="Rejected">Rejected</option>
+                                                                            <option value="Cancelled">Cancelled</option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+
+                                                                <input type="hidden" id="DId" name="DId" value="@a.DoctorId" />
+                                                                <input type="hidden" id="PId" name="PId" value="@a.PatientId" />
+                                                                <input type="hidden" id="PLastName" name="PLastName" value="@a.PatientLastName" />
+                                                                <input type="hidden" id="PFirstName" name="PFirstName" value="@a.PatientFirstName" />
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <a class="little-blue-button" href="#" onclick="document.getElementById('editAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                                    <div>📝 Edit Appointment</div>
+                                                                </div>
+                                                            </a>
+                                                            <form id="deleteAppointmentForm-@a.Id" asp-controller="admin" asp-action="delete_appointment" method="post" style="display: none;">
+                                                                <input type="hidden" name="Id" value="@a.Id" />
+                                                            </form>
+                                                            <a class="little-blue-button" href="#" onclick="document.getElementById('deleteAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                                    <div>🗑️ Delete Appointment</div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        }
                                     }
                                 }
                             </tbody>

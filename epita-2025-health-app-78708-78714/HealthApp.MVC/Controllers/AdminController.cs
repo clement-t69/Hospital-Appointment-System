@@ -809,10 +809,60 @@ namespace HealthApp.MVC.Controllers
 
 
         // admin/messages.cshtml
-        public IActionResult messages()
+        public async Task<IActionResult> messages([FromQuery] string searchInput, [FromQuery] string searchField)
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+            ViewBag.UserId = user.Id;
+            ViewBag.Users = _userManager.Users.ToList();
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                await _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            if (searchInput == null)
+            {
+                searchInput = "";
+            }
+            if (searchField == null)
+            {
+                searchField = "";
+            }
+
+            var messages = search_messages(searchInput, searchField);
+
+            var adminMessages = _context.Messages
+                .Where(m => m.ReceiverId == user.Id)
+                .ToList();
+
+            var patients = _context.Patients.ToList();
+            var doctors = _context.Doctors.ToList();
+
+            ViewBag.Patients = patients;
+            ViewBag.Doctors = doctors;
+            ViewBag.Messages = messages;
+            ViewBag.AdminMessages = adminMessages;
+
+            return View();
+        }
+
+        public IActionResult message(int id)
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
-
             if (user == null)
             {
                 TempData["ErrorMessage"] = "User not found.";
@@ -831,7 +881,212 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            var message = _context.Messages.FirstOrDefault(m => m.Id == id);
+            if (message == null)
+            {
+                TempData["ErrorMessage"] = "Message not found.";
+                return RedirectToAction("messages", "admin");
+            }
+            ViewBag.Message = message;
+
             return View();
+        }
+
+        public List<Message> search_messages(string searchInput, string searchField)
+        {
+            var messages = _context.Messages
+                .OrderByDescending(m => m.Date)
+                .ToList();
+
+            searchInput = searchInput.ToLower();
+
+            if (searchField == "Date")
+            {
+                messages = messages
+                    .Where(m => m.Date.ToString().ToLower().Contains(searchInput))
+                    .OrderByDescending(m => m.Date)
+                    .ToList();
+            }
+            else if (searchField == "Object")
+            {
+                messages = messages
+                    .Where(m => m.Object.ToLower().Contains(searchInput))
+                    .OrderByDescending(m => m.Date)
+                    .ToList();
+            }
+            else if (searchField == "Sender")
+            {
+                messages = messages
+                    .Where(m => m.SenderFirstName.ToLower().Contains(searchInput) || m.SenderLastName.ToLower().Contains(searchInput))
+                    .OrderByDescending(m => m.Date)
+                    .ToList();
+            }
+            else if (searchField == "Receiver")
+            {
+                messages = messages.Where(m => m.ReceiverFirstName.ToLower().Contains(searchInput) || m.ReceiverLastName.ToLower().Contains(searchInput))
+                    .OrderByDescending(m => m.Date)
+                    .ToList();
+            }
+            else
+            {
+                searchInput = "";
+                searchField = "";
+            }
+
+            return messages;
+        }
+
+        public async Task<IActionResult> send_message(NewMessageInputModel model)
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var receiver = await _userManager.FindByIdAsync(model.ReceiverId);
+
+                var message = new Message
+                {
+                    Id = _context.Messages.Max(m => m.Id) + 1,
+                    Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                    SenderId = user.Id,
+                    SenderFirstName = "Hospital",
+                    SenderLastName = "Appointment System",
+                    ReceiverId = model.ReceiverId,
+                    ReceiverFirstName = receiver.FirstName,
+                    ReceiverLastName = receiver.LastName,
+                    DoctorId = "79b4a630-45a4-45f2-8fa6-af550e965cce",
+                    PatientId = "f27dde93-f22b-4a81-a322-4336fc5232f4",
+                    Object = model.Object,
+                    Content = model.Message,
+                    Type = "New",
+                    IsRead = false
+                };
+
+                try
+                {
+                    _context.Messages.Add(message);
+                    _context.SaveChanges();
+                    TempData["SuccessMessage"] = "Message sent successfully to all users.";
+                    return RedirectToAction("messages", "admin");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError($"******************************\nError when sending message: {e.Message}\n******************************\n");
+                    TempData["ErrorMessage"] = $"Error when sending message: {e.Message}\n";
+                    return RedirectToAction("messages", "admin");
+                }
+            }
+            else
+            {
+                _logger.LogError($"******************************\n");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError($"Error when sending message: {error.ErrorMessage}\n");
+                    TempData["ErrorMessage"] = $"{error.ErrorMessage}\n";
+                }
+                _logger.LogError($"******************************\n");
+                return RedirectToAction("messages", "admin");
+            }
+        }
+
+        public async Task<IActionResult> system_message(NewMessageInputModel model)
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (ModelState.IsValid)
+            {
+                var users = _userManager.Users.ToList();
+
+                foreach (var u in users)
+                {
+                    var message = new Message
+                    {
+                        Id = _context.Messages.Max(m => m.Id) + 1,
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        SenderId = user.Id,
+                        SenderFirstName = "Hospital",
+                        SenderLastName = "Appointment System",
+                        ReceiverId = u.Id,
+                        ReceiverFirstName = u.FirstName,
+                        ReceiverLastName = u.LastName,
+                        DoctorId = "79b4a630-45a4-45f2-8fa6-af550e965cce",
+                        PatientId = "f27dde93-f22b-4a81-a322-4336fc5232f4",
+                        Object = model.Object,
+                        Content = model.Message,
+                        Type = "New",
+                        IsRead = false
+                    };
+
+                    try
+                    {
+                        _context.Messages.Add(message);
+                        _context.SaveChanges();
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogError($"******************************\nError when sending message: {e.Message}\n******************************\n");
+                        TempData["ErrorMessage"] = $"Error when sending message: {e.Message}\n";
+                        return RedirectToAction("messages", "admin");
+                    }
+                }
+
+                TempData["SuccessMessage"] = "Message sent successfully to all users.";
+                return RedirectToAction("messages", "admin");
+            }
+            else
+            {
+                _logger.LogError($"******************************\n");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError($"Error when sending message: {error.ErrorMessage}\n");
+                    TempData["ErrorMessage"] = $"{error.ErrorMessage}\n";
+                }
+                _logger.LogError($"******************************\n");
+                return RedirectToAction("messages", "admin");
+            }
+        }
+
+        public async Task<IActionResult> delete_message(int id)
+        {
+            if (id == 0)
+            {
+                TempData["ErrorMessage"] = "You cannot delete this message.";
+                return RedirectToAction("messages", "admin");
+            }
+
+            var message = await _context.Messages.FindAsync(id);
+
+            if (message == null)
+            {
+                TempData["ErrorMessage"] = "Message not found.";
+                return RedirectToAction("messages", "admin");
+            }
+            try
+            {
+                _context.Messages.Remove(message);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Message deleted successfully.";
+                return RedirectToAction("messages", "admin");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"******************************\nError when deleting message: {e.Message}\n******************************\n");
+                TempData["ErrorMessage"] = $"Error when deleting message: {e.Message}\n";
+                return RedirectToAction("messages", "admin");
+            }
         }
 
 
@@ -875,14 +1130,14 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
-            medicalHistories = searchMedicalHistories(searchInput, searchField);
+            medicalHistories = search_medical_histories(searchInput, searchField);
 
             ViewBag.MedicalHistories = medicalHistories;
 
             return View();
         }
 
-        public List<MedicalHistory> searchMedicalHistories(string searchInput, string searchField)
+        public List<MedicalHistory> search_medical_histories(string searchInput, string searchField)
         {
             var medicalHistories = _context.MedicalHistories
                 .OrderByDescending(m => m.Date)
@@ -1027,14 +1282,14 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
-            prescriptions = searchPrescriptions(searchInput, searchField);
+            prescriptions = search_prescriptions(searchInput, searchField);
 
             ViewBag.Prescriptions = prescriptions;
 
             return View();
         }
 
-        public List<Prescription> searchPrescriptions(string searchInput, string searchField)
+        public List<Prescription> search_prescriptions(string searchInput, string searchField)
         {
             var prescriptions = _context.Prescriptions
                 .OrderByDescending(m => m.Date)

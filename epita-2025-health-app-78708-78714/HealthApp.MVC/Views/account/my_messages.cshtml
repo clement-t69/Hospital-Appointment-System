@@ -59,29 +59,41 @@
                                     {
                                         @foreach (var m in ViewBag.Messages)
                                         {
-                                            <tr class="big-white-button-table"
-                                                onclick="window.location.href='@Url.Action("message", "account", new { id = @m.Id })';"
-                                                style="cursor: pointer;">
-                                                <td>
-                                                    <div style="padding: 8px; display: flex; justify-content: space-between;">
-                                                        <div>
-                                                            <strong>@m.Object</strong>
-                                                            <br />@m.Date
-                                                            <br />To <strong>@m.SenderFirstName @m.SenderLastName</strong>
+                                            @if (m.Id == 0)
+                                            {
+                                                @if (ViewBag.Messages.Count == 1)
+                                                {
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center">No messages found.</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr class="big-white-button-table"
+                                                    onclick="window.location.href='@Url.Action("message", "account", new { id = @m.Id })';"
+                                                    style="cursor: pointer;">
+                                                    <td>
+                                                        <div style="padding: 8px; display: flex; justify-content: space-between;">
+                                                            <div>
+                                                                <strong>@m.Object</strong>
+                                                                <br />@m.Date
+                                                                <br />From <strong>@m.SenderFirstName @m.SenderLastName</strong>
+                                                            </div>
+                                                            <div style="margin-right: 8px;">
+                                                                @if (m.IsRead)
+                                                                {
+                                                                    <span style="color: gray;"><small>Read</small></span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span style="color: gray;"><small>Sent</small></span>
+                                                                }
+                                                            </div>
                                                         </div>
-                                                        <div style="margin-right: 8px;">
-                                                            @if (m.IsRead)
-                                                            {
-                                                                <span style="color: gray;"><small>Read</small></span>
-                                                            }
-                                                            else
-                                                            {
-                                                                <span style="color: gray;"><small>Sent</small></span>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
+                                            }
                                         }
                                     }
                                 </tbody>
@@ -113,29 +125,41 @@
                                     {
                                         @foreach (var m in ViewBag.SentMessages)
                                         {
-                                            <tr class="big-white-button-table"
-                                                onclick="window.location.href='@Url.Action("message", "account", new { id = @m.Id })';"
-                                                style="cursor: pointer;">
-                                                <td>
-                                                    <div style="padding: 8px; display: flex; justify-content: space-between;">
-                                                        <div>
-                                                            <strong>@m.Object</strong>
-                                                            <br />@m.Date
-                                                            <br />To <strong>@m.ReceiverFirstName @m.ReceiverLastName</strong>
+                                            @if (m.Id == 0)
+                                            {
+                                                @if (ViewBag.SentMessages.Count == 1)
+                                                {
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center">No messages found.</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr class="big-white-button-table"
+                                                    onclick="window.location.href='@Url.Action("message", "account", new { id = @m.Id })';"
+                                                    style="cursor: pointer;">
+                                                    <td>
+                                                        <div style="padding: 8px; display: flex; justify-content: space-between;">
+                                                            <div>
+                                                                <strong>@m.Object</strong>
+                                                                <br />@m.Date
+                                                                <br />To <strong>@m.ReceiverFirstName @m.ReceiverLastName</strong>
+                                                            </div>
+                                                            <div style="margin-right: 8px;">
+                                                                @if (m.IsRead)
+                                                                {
+                                                                    <span style="color: gray;"><small>Read</small></span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span style="color: gray;"><small>Sent</small></span>
+                                                                }
+                                                            </div>
                                                         </div>
-                                                        <div style="margin-right: 8px;">
-                                                            @if (m.IsRead)
-                                                            {
-                                                                <span style="color: gray;"><small>Read</small></span>
-                                                            }
-                                                            else
-                                                            {
-                                                                <span style="color: gray;"><small>Sent</small></span>
-                                                            }
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
+                                            }
                                         }
                                     }
                                 </tbody>

@@ -51,35 +51,48 @@
                                 <!-- PRESCRIPTIONS LIST -->
                                 @foreach (var p in ViewBag.Prescriptions)
                                 {
-                                    <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#viewPrescriptionModal-@p.Id" style="cursor: pointer;">
-                                        <td style="vertical-align: middle;">@p.Name</td>
-                                        <td style="vertical-align: middle;">@p.Date</td>
-                                        <td style="vertical-align: middle;">@p.Duration days</td>
-                                    </tr>
+                                    @if (p.Id == 0)
+                                    {
+                                        @if (ViewBag.Prescriptions.Count == 1)
+                                        {
+                                            <tr>
+                                                <td colspan="4" style="text-align: center">No prescription found.</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#viewPrescriptionModal-@p.Id" style="cursor: pointer;">
+                                            <td style="vertical-align: middle;">@p.Name</td>
+                                            <td style="vertical-align: middle;">@p.Date</td>
+                                            <td style="vertical-align: middle;">@p.Duration days</td>
+                                        </tr>
 
-                                    <!-- VIEW PRESCRIPTION MODAL -->
-                                    <div class="modal fade" id="viewPrescriptionModal-@p.Id" tabindex="-1" aria-labelledby="viewPrescriptionModalLabel-@p.Id" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="viewPrescriptionModalLabel-@p.Id" style="margin-left: 8px">Prescription</h5>
-                                                    <button type="button" class="btn-close" onclick="location.href='@Url.Action("my_prescriptions", "account")';" aria-label="Close" style="margin-right: 6px"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <h5 class="modal-title" style="margin-left: 8px"><strong>@p.Name</strong></h5>
-                                                    <div class="d-flex justify-content-between" style="margin-left: 8px; margin-top: 8px">
-                                                        <div>
-                                                            <p class="mb-2"><strong>Issued Date:</strong> @p.Date</p>
-                                                            <p class="mb-2"><strong>Dosage:</strong> @p.Dosage mg</p>
-                                                            <p class="mb-2"><strong>Frequency:</strong> @p.Frequency per day</p>
-                                                            <p class="mb-2"><strong>Duration:</strong> @p.Duration days</p>
-                                                            <p class="mb-2"><strong>Pharmacy:</strong> @p.Pharmacy</p>
+                                        <!-- VIEW PRESCRIPTION MODAL -->
+                                        <div class="modal fade" id="viewPrescriptionModal-@p.Id" tabindex="-1" aria-labelledby="viewPrescriptionModalLabel-@p.Id" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="viewPrescriptionModalLabel-@p.Id" style="margin-left: 8px">Prescription</h5>
+                                                        <button type="button" class="btn-close" onclick="location.href='@Url.Action("my_prescriptions", "account")';" aria-label="Close" style="margin-right: 6px"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h5 class="modal-title" style="margin-left: 8px"><strong>@p.Name</strong></h5>
+                                                        <div class="d-flex justify-content-between" style="margin-left: 8px; margin-top: 8px">
+                                                            <div>
+                                                                <p class="mb-2"><strong>Issued Date:</strong> @p.Date</p>
+                                                                <p class="mb-2"><strong>Dosage:</strong> @p.Dosage mg</p>
+                                                                <p class="mb-2"><strong>Frequency:</strong> @p.Frequency per day</p>
+                                                                <p class="mb-2"><strong>Duration:</strong> @p.Duration days</p>
+                                                                <p class="mb-2"><strong>Pharmacy:</strong> @p.Pharmacy</p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                
+                                    }
                                 }
                             }
                         </tbody>

@@ -22,7 +22,7 @@ namespace HealthApp.Domain.Models
         public string Location { get; set; }
 
         public string Status { get; set; }
-                /*
+        /*
            Pending,
            Approved,
            Rejected,
