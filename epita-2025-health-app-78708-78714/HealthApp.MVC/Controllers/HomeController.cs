@@ -21,7 +21,9 @@ namespace HealthApp.MVC.Controllers
             _context = context;
         }
 
-        // ERROR
+        /*
+         * This method is used to display the error page.
+         */
         public IActionResult error()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -39,6 +41,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*****************************************/
+
+        /*
+         * This method is used to display the home page.
+         */
         public IActionResult index()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -54,20 +61,32 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to display the home page.
+         * seachInput: the input from the search bar
+         * searchField: the field to search in
+         */
         [HttpPost]
         public async Task<IActionResult> index([FromQuery] string searchInput, [FromQuery] string searchField)
         {
-            return RedirectToAction("doctors", "care", new { searchInput = searchInput, searchField = searchField });
+            return RedirectToAction("doctors", "care", new { searchInput, searchField });
         }
 
-        // HEADER
-        // IF NOT LOGGED IN
+        /*****************************************/
+
+        /*
+         * This method is used to display the login or register page.
+         */
         public IActionResult login_or_register()
         {
             return View();
         }
 
-        // IF LOGGED IN
+        /*****************************************/
+
+        /*
+         * This method is used to display the user's messages page.
+         */
         public IActionResult my_messages()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -82,7 +101,12 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
-        
+
+        /*****************************************/
+
+        /*
+         * This method is used to display the user's appointments page.
+         */
         public IActionResult my_appointments()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -98,7 +122,12 @@ namespace HealthApp.MVC.Controllers
 
             return RedirectToAction("appointments", "care");
         }
-        
+
+        /***************************************/
+
+        /*
+         * This method is used to display the user's account page.
+         */
         public IActionResult edit()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -113,7 +142,12 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
-        
+
+        /**************************************/
+
+        /*
+         * This method is used to log out the user.
+         */
         [HttpPost]
         public async Task<IActionResult> logout()
         {
@@ -124,7 +158,11 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("index", "home");
         }
 
-        // FOOTER
+        /************************************/
+
+        /*
+         * This method is used to display the cancellation policy page.
+         */
         public IActionResult cancellation_policy()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -139,21 +177,33 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
         }
-    
+
+        /************************************/
+
+        /*
+         * This method is used to display the contact page.
+         * model: The model containing the message data.
+         */
         public async Task<IActionResult> contact(ContactInputModel model)
         {
+            // Get the current user
             var user = await _signInManager.UserManager.GetUserAsync(User);
+            // Get the list of administrators
             var admins = await _signInManager.UserManager.GetUsersInRoleAsync("administrator");
 
             var isLogged = user != null;
             ViewBag.IsLogged = user != null;
 
+            // Check if the user is logged in
             if (!isLogged)
             {
+                // If not logged in, set the sender ID to a guest user ID
                 user = await _signInManager.UserManager.FindByIdAsync("f27dde93-f22b-4a81-a322-4336fc5232f4");
-                
+
+                // Check if all the fields are filled
                 if (ModelState.IsValid)
                 {
+                    // Send the message to all administrators
                     foreach (var admin in admins)
                     {
                         var adminId = admin.Id;
@@ -181,7 +231,7 @@ namespace HealthApp.MVC.Controllers
                         }
                         catch (Exception ex)
                         {
-                            _logger.LogError($"Error adding message: {ex.Message}");
+                            _logger.LogError($"Error sending message: {ex.Message}");
                             ModelState.AddModelError("", "An error occurred while sending your message. Please try again later.");
                             return View(model);
                         }
@@ -200,6 +250,7 @@ namespace HealthApp.MVC.Controllers
             }
             else
             {
+                // If logged in, set the sender ID to the logged-in user's ID
                 ViewBag.User = user;
                 var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
                 ViewBag.IsLogged = user != null;
@@ -207,8 +258,10 @@ namespace HealthApp.MVC.Controllers
                 ViewBag.IsPatient = userRoles.Contains("patient");
                 ViewBag.IsAdmin = userRoles.Contains("administrator");
 
+                // Check if all the fields are filled
                 if (ModelState.IsValid)
                 {
+                    // Send the message to all administrators
                     foreach (var admin in admins)
                     {
                         var adminId = admin.Id;

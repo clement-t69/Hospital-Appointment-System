@@ -4,12 +4,8 @@ using HealthApp.Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using HealthApp.MVC.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Net;
 using HealthApp.Domain.Data;
-using System.Net.NetworkInformation;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -40,7 +36,9 @@ namespace HealthApp.MVC.Controllers
             _context = context;
         }
 
-        // home/error.cshtml
+        /*
+         * This method is used to display the error page.
+         */
         public IActionResult error()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -54,9 +52,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*****************************************/
 
-        // Shared/_Layout.cshtml
-        // IF NOT LOGGED IN
+        /*
+         * This method is used to display the login or register page.
+         */
         public IActionResult login_or_register()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -69,7 +69,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        // IF LOGGED IN
+        /*****************************************/
+
+        /*
+         * This method is used to display the users's notifications page.
+         */
         public IActionResult my_notifications()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -95,6 +99,7 @@ namespace HealthApp.MVC.Controllers
 
             ViewBag.userId = user.Id;
 
+            // Get the notifications for the user
             var notifications = _context.Notifications
                 .Where(n => n.ReceiverId == user.Id)
                 .OrderByDescending(n => n.Date)
@@ -105,8 +110,13 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to mark all notifications as read.
+         * userId: The id of the user to mark notifications as read.
+         */
         public IActionResult mark_as_read(string userId)
         {
+            // Get the notifications for the user
             var notifications = _context.Notifications
                 .Where(n => n.ReceiverId == userId && n.IsRead == false)
                 .OrderByDescending(n => n.Date)
@@ -119,6 +129,7 @@ namespace HealthApp.MVC.Controllers
             }
             else
             {
+                // Mark all notifications as read
                 foreach (var notification in notifications)
                 {
                     notification.IsRead = true;
@@ -129,15 +140,13 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("my_notifications", "account");
         }
 
+        /*
+         * This method is used to delete a notification.
+         * id: The id of the notification to delete.
+         */
         public IActionResult delete_notification(int id)
         {
             var notification = _context.Notifications.FirstOrDefault(n => n.Id == id);
-
-            if (id == 0)
-            {
-                TempData["ErrorMessage"] = "You cannot delete this notification.";
-                return RedirectToAction("my_notifications", "account");
-            }
 
             if (notification == null)
             {
@@ -151,6 +160,7 @@ namespace HealthApp.MVC.Controllers
             }
             else
             {
+                // Delete the notification
                 _context.Notifications.Remove(notification);
                 _context.SaveChanges();
             }
@@ -158,6 +168,15 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("my_notifications", "account");
         }
 
+        /****************************************/
+
+        /*
+         * This method is used to display the users's messages page.
+         * messagesSearchInput: The search input for the messages.
+         * messagesSearchField: The search field for the messages.
+         * sentMessagesSearchInput: The search input for the sent messages.
+         * sentMessagesSearchField: The search field for the sent messages.
+         */
         public IActionResult my_messages([FromQuery] string messagesSearchInput, 
             [FromQuery] string messagesSearchField, 
             [FromQuery] string sentMessagesSearchInput, 
@@ -184,11 +203,13 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
+            // Get the messages for the user
             List<Message> messages = _context.Messages
                 .Where(m => m.ReceiverId == user.Id)
                 .OrderByDescending(m => m.Date)
                 .ToList();
 
+            // Get the sent messages for the user
             List<Message> sentMessages = _context.Messages
                 .Where(m => m.SenderId == user.Id)
                 .OrderByDescending(m => m.Date)
@@ -205,11 +226,13 @@ namespace HealthApp.MVC.Controllers
                 sentMessagesSearchField = "";
             }
 
+            // Search messages
             if (messagesSearchInput != null || messagesSearchField != null)
             {
                 messages = searchMessages(messagesSearchInput, messagesSearchField, user.Id);
             }
 
+            // Search sent messages
             if (sentMessagesSearchInput != null || sentMessagesSearchField != null)
             {
                 sentMessages = searchSentMessages(sentMessagesSearchInput, sentMessagesSearchField, user.Id);
@@ -221,8 +244,15 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to search messages.
+         * searchInput: The search input for the messages.
+         * searchField: The search field for the messages.
+         * receiverId: The id of the receiver.
+         */
         public List<Message> searchMessages(string searchInput, string searchField, string receiverId)
         {
+            // Get the messages of the user
             var messages = _context.Messages.ToList().Where(m => m.ReceiverId == receiverId).ToList();
 
             if (searchField == "Date")
@@ -246,8 +276,15 @@ namespace HealthApp.MVC.Controllers
             return messages;
         }
 
+        /*
+         * This method is used to search sent messages.
+         * searchInput: The search input for the sent messages.
+         * searchField: The search field for the sent messages.
+         * senderId: The id of the sender.
+         */
         public List<Message> searchSentMessages(string searchInput, string searchField, string senderId)
         {
+            // Get the sent messages of the user
             var messages = _context.Messages.ToList().Where(m => m.SenderId == senderId).ToList();
 
             if (searchField == "Date")
@@ -271,6 +308,10 @@ namespace HealthApp.MVC.Controllers
             return messages;
         }
 
+        /*
+         * This method is used to display a message.
+         * id: The id of the message to display.
+         */
         public async Task<IActionResult> message(int id)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -301,6 +342,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("login_or_register", "account");
             }
 
+            // Get the message
             var message = _context.Messages.FirstOrDefault(m => m.Id == id);
 
             if (message == null)
@@ -320,6 +362,9 @@ namespace HealthApp.MVC.Controllers
             return View(message);
         }
 
+        /*
+         * This method is used to display the send message page.
+         */
         public async Task<IActionResult> send_message()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -365,7 +410,11 @@ namespace HealthApp.MVC.Controllers
 
             return View();
         }
-        
+
+        /*
+         * This method is used to send a new message.
+         * model: The model containing the message data.
+         */
         public async Task<IActionResult> new_message(NewMessageInputModel model)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -399,13 +448,16 @@ namespace HealthApp.MVC.Controllers
 
             var id = _context.Messages.Max(m => m.Id) + 1;
 
+            // Check if all the fields are filled
             if (ModelState.IsValid)
             {
+                // Check if the user is a doctor
                 if (userRoles.Contains("doctor"))
                 {
                     var doctorId = user.Id;
                     var patientId = model.ReceiverId;
 
+                    // Create a new message
                     var message = new Message
                     {
                         Id = id,
@@ -424,6 +476,7 @@ namespace HealthApp.MVC.Controllers
                         IsRead = false
                     };
 
+                    // Create a new notification
                     var notification = new Notification
                     {
                         Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -436,6 +489,7 @@ namespace HealthApp.MVC.Controllers
 
                     try
                     {
+                        // Add the message and notification to the database
                         _context.Messages.Add(message);
                         _context.Notifications.Add(notification);
                         _sendEmailModel.SendMessageEmail(receiver.FirstName, receiver.LastName, receiver.UserName);
@@ -449,11 +503,13 @@ namespace HealthApp.MVC.Controllers
                         TempData["ErrorMessage"] = "An error occurred while sending the message.";
                     }
                 }
+                // Check if the user is a patient
                 else if (userRoles.Contains("patient"))
                 {
                     var doctorId = model.ReceiverId;
                     var patientId = user.Id;
 
+                    // Create a new message
                     var message = new Message
                     {
                         Id = id,
@@ -472,6 +528,7 @@ namespace HealthApp.MVC.Controllers
                         IsRead = false
                     };
 
+                    // Create a new notification
                     var notification = new Notification
                     {
                         Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -484,6 +541,7 @@ namespace HealthApp.MVC.Controllers
 
                     try
                     {
+                        // Add the message and notification to the database
                         _context.Messages.Add(message);
                         _context.Notifications.Add(notification);
                         _context.SaveChanges();
@@ -504,6 +562,10 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("my_messages", "account");
         }
 
+        /*
+         * This method is used to display the reply message page.
+         * id: The id of the message to reply to.
+         */
         public async Task<IActionResult> reply_message(ReplyMessageInputModel model)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -541,13 +603,16 @@ namespace HealthApp.MVC.Controllers
 
             var id = _context.Messages.Max(m => m.Id) + 1;
 
+            // Check if all the fields are filled
             if (ModelState.IsValid)
             {
+                // Check if the user is a doctor
                 if (userRoles.Contains("doctor"))
                 {
                     var doctorId = user.Id;
                     var patientId = model.replyReceiverId;
 
+                    // Create a new message
                     var message = new Message
                     {
                         Id = id,
@@ -566,6 +631,7 @@ namespace HealthApp.MVC.Controllers
                         IsRead = false
                     };
 
+                    // Create a new notification
                     var notification = new Notification
                     {
                         Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -578,6 +644,7 @@ namespace HealthApp.MVC.Controllers
 
                     try
                     {
+                        // Add the message and notification to the database
                         _context.Messages.Add(message);
                         _context.Notifications.Add(notification);
                         _context.SaveChanges();
@@ -591,11 +658,13 @@ namespace HealthApp.MVC.Controllers
                         TempData["ErrorMessage"] = "An error occurred while sending the message.";
                     }
                 }
+                // Check if the user is a patient
                 else if (userRoles.Contains("patient"))
                 {
                     var doctorId = model.replyReceiverId;
                     var patientId = user.Id;
 
+                    // Create a new message
                     var message = new Message
                     {
                         Id = id,
@@ -614,6 +683,7 @@ namespace HealthApp.MVC.Controllers
                         IsRead = false
                     };
 
+                    // Create a new notification
                     var notification = new Notification
                     {
                         Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -626,6 +696,7 @@ namespace HealthApp.MVC.Controllers
 
                     try
                     {
+                        // Add the message and notification to the database
                         _context.Messages.Add(message);
                         _context.Notifications.Add(notification);
                         _context.SaveChanges();
@@ -646,32 +717,11 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("message", "account", new {Id = id});
         }
 
-        public IActionResult edit()
-        {
-            var user = _userManager.GetUserAsync(User).Result;
+        /*****************************************/
 
-            if (user == null)
-            {
-                TempData["ErrorMessage"] = "User not found.";
-                return RedirectToAction("login_or_register", "account");
-            }
-
-            if (user.IsActive == false)
-            {
-                _signInManager.SignOutAsync();
-                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
-                return RedirectToAction("login", "account");
-            }
-
-            var userRoles = _userManager.GetRolesAsync(user).Result;
-            ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("doctor");
-            ViewBag.IsPatient = userRoles.Contains("patient");
-            ViewBag.IsAdmin = userRoles.Contains("administrator");
-
-            return View();
-        }
-        
+        /*
+         * This method is used to log out the user.
+         */
         [HttpPost]
         public async Task<IActionResult> logout()
         {
@@ -682,7 +732,11 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("index", "home");
         }
 
-        // FOOTER
+        /*****************************************/
+
+        /*
+         * This method is used to display the cancellation policy page.
+         */
         public IActionResult cancellation_policy()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -695,12 +749,16 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*****************************************/
 
-        // account/login.cshtml
+        /*
+         * This method is used to display the login page.
+         */
         public IActionResult login()
         {
             var user = _userManager.GetUserAsync(User).Result;
 
+            // Check if the user is logged in
             if (user != null)
             {
                 ViewBag.IsLogged = true;
@@ -708,21 +766,21 @@ namespace HealthApp.MVC.Controllers
 
             return View();
         }
-        
+
+        /*
+         * This method is used to log in the user.
+         * model: The model containing the login data.
+         */
         [HttpPost]
         public async Task<IActionResult> login(LoginInputModel model)
         {
+            // Get the user by email
             var user = await _userManager.FindByEmailAsync(model.Email.ToLower());
 
-            /*if (user == null) 
-            {
-                _logger.LogError($"******************************\nUser {model.Email} has failed to log in.\n******************************\n");
-                TempData["ErrorMessage"] = "Wrong credentials.\n";
-                return View(model);
-            }*/
-
+            // Check if all the fields are filled
             if (ModelState.IsValid)
             {
+                // Check if the user exists
                 var result = await _signInManager.PasswordSignInAsync(
                     model.Email,
                     model.Password,
@@ -747,8 +805,11 @@ namespace HealthApp.MVC.Controllers
             return View(model);
         }
 
+        /*****************************************/
 
-        // account/register.cshtml
+        /*
+         * This method is used to display the register page.
+         */
         public IActionResult register()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -761,11 +822,26 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to register a new user.
+         * model: The model containing the registration data.
+         */
         [HttpPost]
         public async Task<IActionResult> register(RegisterInputModel model)
         {
+            // Check if all the fields are filled
             if (ModelState.IsValid)
             {
+                // Check if the user already exists
+                var existingUser = await _userManager.FindByEmailAsync(model.Email.ToLower());
+                if (existingUser != null)
+                {
+                    _logger.LogError($"******************************\nUser {model.Email} already exists.\n******************************\n");
+                    TempData["ErrorMessage"] = "User already exists.\n";
+                    return View(model);
+                }
+
+                // Create a new user
                 var user = new User
                 {
                     FirstName = model.FirstName,
@@ -777,20 +853,28 @@ namespace HealthApp.MVC.Controllers
                     Address = model.Address
                 };
 
+                // Check if the user can be created
                 var result = await _userManager.CreateAsync(user, model.Password);
+
+                // Setting the default role for the user
                 var roleName = "Patient";
 
                 if (result.Succeeded)
                 {
                     _logger.LogInformation($"******************************\nUser {model.Email} has registered.\n******************************\n");
 
+                    // Send a confirmation email
                     _sendEmailModel.SendCreateConfirmation(model.FirstName, model.LastName, model.Email, "user");
 
+                    // Sign in the user
                     await _signInManager.SignInAsync(user, isPersistent: true);
+
+                    // Add the role to the user
                     await _userManager.AddToRoleAsync(user, roleName);
 
                     try
                     {
+                        // Create a new patient
                         var patient = new Patient
                         {
                             UserId = user.Id
@@ -802,6 +886,7 @@ namespace HealthApp.MVC.Controllers
                         patient.FirstName = user.FirstName;
                         patient.LastName = user.LastName;
 
+                        // Add the patient to the database
                         _context.Patients.Add(patient);
                         _context.SaveChanges();
                     }
@@ -827,13 +912,20 @@ namespace HealthApp.MVC.Controllers
             return View(model);
         }
 
+        /*****************************************/
 
-        // account/forgot_password.cshtml
+        /*
+         * This method is used to display the forgot password page.
+         */
         public IActionResult forgot_password()
         {
             return View();
         }
 
+        /*
+         * This method is used to send a password reset email.
+         * model: The model containing the email data.
+         */
         [HttpPost]
         public async Task<IActionResult> forgot_password(ForgotPasswordInputModel model)
         {
@@ -841,6 +933,7 @@ namespace HealthApp.MVC.Controllers
             {
                 string emailToLower = model.Email.ToLower();
 
+                // Find the user by email
                 var user = await _userManager.FindByEmailAsync(emailToLower);
 
                 if (user == null)
@@ -856,12 +949,13 @@ namespace HealthApp.MVC.Controllers
                     return RedirectToAction("login", "account");
                 }
 
+                // Generate the password reset token
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
                 var existingToken = _context.UserTokens.FirstOrDefault(t => t.UserId == user.Id && t.LoginProvider == "Default" && t.Name == "PasswordReset");
 
+                // Check if the token already exists
                 if (existingToken == null)
                 {
-                    //_logger.LogError($"******************************\nToken {token} has been generated for User {model.Email}.\n******************************\n");
                     try
                     {
                         _context.UserTokens.Add(new IdentityUserToken<string>
@@ -871,8 +965,6 @@ namespace HealthApp.MVC.Controllers
                             Name = "PasswordReset",
                             Value = token
                         });
-
-                        //_logger.LogInformation($"******************************\nToken {token} has been inserted manually for User {model.Email}.\n******************************\n");
                     }
                     catch (Exception ex)
                     {
@@ -884,15 +976,15 @@ namespace HealthApp.MVC.Controllers
 
                 await _context.SaveChangesAsync();
 
+                // Create the callback URL
                 var callbackUrl = Url.Action(
                     "reset_password",
                     "account",
                     new { token = WebUtility.UrlEncode(token), email = user.UserName },
-                    //new { token, email = user.UserName },
                     Request.Scheme
                 );
 
-
+                // Send the password reset email
                 _sendEmailModel.SendForgotPassword(user.FirstName, user.LastName, model.Email, token, callbackUrl);
 
                 _logger.LogInformation($"******************************\nUser {model.Email} has requested a Password reset.\n******************************\n");
@@ -906,27 +998,37 @@ namespace HealthApp.MVC.Controllers
             return View(model);
         }
 
+        /******************************************/
+
+        /*
+         * This method is used to display the reset password page.
+         * token: The password reset token.
+         * email: The email of the user.
+         */
         public IActionResult reset_password(string token, string email)
         {
             ViewBag.token = WebUtility.UrlDecode(token);
             ViewBag.email = email;
 
-            //_logger.LogInformation($"Recevied Email (GET) : {email}");
             return View();
         }
 
+        /*
+         * This method is used to reset the password.
+         * model: The model containing the new password data.
+         */
         [HttpPost]
         public async Task<IActionResult> reset_password(ResetPasswordInputModel model)
         {
-            //_logger.LogInformation($"Received Email (POST) : {model.Email}");
-
+            // Check if all the fields are filled
             if (ModelState.IsValid)
             {
+                // Decode the token
                 var decodedToken = WebUtility.UrlDecode(model.Token);
-                //var decodedToken = model.Token;
 
                 _logger.LogInformation($"******************************\nEmail: {model.Email}\n******************************\n");
 
+                // Find the user by email
                 var user = await _userManager.FindByEmailAsync(model.Email);
                 if (user == null)
                 {
@@ -936,7 +1038,8 @@ namespace HealthApp.MVC.Controllers
                 }
 
                 _logger.LogInformation($"******************************\nEmail: {user.UserName}\nPassword: {model.NewPassword}\n******************************\n");
-                
+
+                // Check if the password can be reset
                 var result = await _userManager.ResetPasswordAsync(user, decodedToken, model.NewPassword);
                 if (result.Succeeded)
                 {
@@ -958,16 +1061,22 @@ namespace HealthApp.MVC.Controllers
             return View(model);
         }
 
+        /******************************************/
+
+        /*
+         * This method is used to display the password changed page.
+         */
         public IActionResult password_changed()
         {
             return View();
         }
 
+        /**********************************/
 
-        // account/edit.cshtml
-        [HttpGet]
-        //[Authorize]
-        public async Task<IActionResult> Edit()
+        /*
+         * This method is used to display the users's account page.
+         */
+        public async Task<IActionResult> edit()
         {
             var user = await _userManager.GetUserAsync(User);
 
@@ -995,16 +1104,19 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
-            return View(new EditAccountViewModel
+            /*return View(new EditAccountViewModel
             {
                 ChangeEmail = new ChangeEmailInputModel(),
                 ChangePassword = new ChangePasswordInputModel()
-            });
+            });*/
+            return View();
         }
 
-        // account/my_profile.cshtml
-        [HttpGet]
-        [Authorize]
+        /*****************************************/
+
+        /*
+         * This method is used to change the users's information.
+         */
         public async Task<IActionResult> my_profile()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -1034,8 +1146,10 @@ namespace HealthApp.MVC.Controllers
             ViewBag.Phone = user.Phone;
             ViewBag.Address = user.Address;
 
+            // Check if the user is a doctor
             if ((await _userManager.GetRolesAsync(user)).Contains("doctor") || (await _userManager.GetRolesAsync(user)).Contains("Doctor"))
             {
+                // Get the doctor information
                 var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
 
                 if (doctor != null)
@@ -1048,15 +1162,20 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to change the users's information.
+         * model: The model containing the new information.
+         */
         [HttpPost]
-        [Authorize]
         public async Task<IActionResult> change_info(ChangeInfoInputModel model)
         {
             var user = await _userManager.GetUserAsync(User);
 
+            // Get the user by id
             var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
             var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
 
+            // Check if the user is a doctor or a patient
             if (patient != null)
             {
                 user.Phone = model.Phone;
@@ -1099,9 +1218,14 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("my_profile", "account");
         }
 
-        // account/my_medical_history.cshtml
+        /************************************/
+
+        /*
+         * This method is used to display the users's medical history page.
+         * searchInput: The search input for the medical history.
+         * searchField: The search field for the medical history.
+         */
         [HttpGet]
-        [Authorize]
         public async Task<IActionResult> my_medical_history([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -1131,6 +1255,7 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
+            // Get the medical histories for the user
             var medicalHistories = searchMedicalHistory(searchInput, searchField, user.Id);
 
             if (searchInput != "" && searchField != "" && medicalHistories.Count == 0)
@@ -1146,6 +1271,12 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to search the medical history.
+         * searchInput: The search input for the medical history.
+         * searchField: The search field for the medical history.
+         * patientId: The id of the patient.
+         */
         public List<MedicalHistory> searchMedicalHistory(string searchInput, string searchField, string patientId)
         {
             var medicalHistories = _context.MedicalHistories.ToList().Where(mh => mh.PatientId == patientId).ToList();
@@ -1175,9 +1306,12 @@ namespace HealthApp.MVC.Controllers
             return medicalHistories;
         }
 
-        // account/my_prescriptions.cshtml
+        /************************************/
+
+        /*
+         * This method is used to display the users's prescriptions page.
+         */
         [HttpGet]
-        [Authorize]
         public IActionResult my_prescriptions()
         {
             var user = _userManager.GetUserAsync(User).Result;
@@ -1201,6 +1335,7 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
+            // Get the prescriptions for the user
             var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
             if (patient != null)
             {
@@ -1214,6 +1349,12 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /***********************************/
+
+        /*
+         * This method is used to change the users's email.
+         * model: The model containing the new email data.
+         */
         [HttpPost]
         public async Task<IActionResult> change_email(ChangeEmailInputModel model)
         {
@@ -1252,6 +1393,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("edit", "account");
             }
 
+            // Check if all the fields are filled
             if (ModelState.IsValid)
             {
                 var existingUser = await _userManager.FindByEmailAsync(model.NewEmail);
@@ -1297,6 +1439,12 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("edit", "account");
         }
 
+        /***********************************/
+
+        /*
+         * This method is used to change the users's password.
+         * model: The model containing the new password data.
+         */
         [HttpPost]
         public async Task<IActionResult> change_password(ChangePasswordInputModel model)
         {
@@ -1314,6 +1462,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("edit", "account");
             }
 
+            // Check if the current password field corresponds to the current password
             var passwordCheck = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
 
             if (!passwordCheck)
@@ -1338,6 +1487,8 @@ namespace HealthApp.MVC.Controllers
             }
 
             user.Password = model.NewPassword;
+
+            // Check if the password can be changed
             var passwordResult = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
 
             if (!passwordResult.Succeeded)
@@ -1362,6 +1513,11 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("edit", "account");
         }
 
+        /***********************************/
+
+        /*
+         * This method is used to disable the users's account.
+         */
         [HttpPost]
         public async Task<IActionResult> disable()
         {
@@ -1372,8 +1528,11 @@ namespace HealthApp.MVC.Controllers
                 TempData["ErrorMessage"] = "User not found.";
                 return RedirectToAction("login", "account");
             }
+
+            // Check if the user is active
             if (user.IsActive)
             {
+                // Disable the account
                 user.IsActive = false;
                 _sendEmailModel.SendDisableAccount(user.FirstName, user.LastName, user.UserName);
                 _logger.LogInformation($"******************************\nUser {user.Email} has disabled their account.\n******************************\n");
@@ -1386,6 +1545,11 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("edit", "account");
         }
 
+        /************************************/
+
+        /*
+         * This method is used to delete the users's account.
+         */
         [HttpPost]
         public async Task<IActionResult> delete_all()
         {
@@ -1400,6 +1564,7 @@ namespace HealthApp.MVC.Controllers
                     var userFirstName = user.FirstName;
                     var userLastName = user.LastName;
 
+                    // Check if the user is the admin
                     if (userEmail == "admin@test.fr")
                     {
                         _logger.LogError($"******************************\nUser {userEmail} has failed to delete their account: Admin account cannot be deleted.\n******************************\n");
@@ -1407,13 +1572,16 @@ namespace HealthApp.MVC.Controllers
                         return RedirectToAction("edit", "account");
                     }
 
+                    // Check if the user can be deleted
                     var result = await _userManager.DeleteAsync(user);
                     if (result.Succeeded)
                     {
                         try
                         {
+                            // Check if the user is a patient or a doctor
                             if (userRoles.Contains("patient"))
                             {
+                                // Remove the patient from the database
                                 var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
                                 if (patient != null)
                                 {
@@ -1425,6 +1593,7 @@ namespace HealthApp.MVC.Controllers
                             }
                             else if (userRoles.Contains("doctor"))
                             {
+                                // Remove the doctor from the database
                                 var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
                                 if (doctor != null)
                                 {

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.Security.Policy;
 
 namespace HealthApp.Domain.Models
 {

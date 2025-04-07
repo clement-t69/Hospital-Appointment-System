@@ -1,12 +1,8 @@
 using HealthApp.Domain.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.Contracts;
 using System.Net.WebSockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -21,6 +17,9 @@ namespace HealthApp.MVC.Controllers
             _logger = logger;
         }
 
+        /*
+         * This method is used to display the error page.
+         */
         public IActionResult error()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -37,6 +36,8 @@ namespace HealthApp.MVC.Controllers
             _logger.LogError($"******************************\nUser {user.Email} has encountered an error. (redirected to error page)\n******************************\n");
             return View();
         }
+
+        /*****************************************/
 
         [HttpGet("/ws")]
         public async Task Get()
