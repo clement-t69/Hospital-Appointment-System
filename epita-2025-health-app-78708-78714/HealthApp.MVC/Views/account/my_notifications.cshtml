@@ -51,44 +51,56 @@
                             {
                                 @foreach (var n in ViewBag.Notifications)
                                 {
-                                    <tr>
-                                        @if (!n.IsRead)
+                                    @if (n.Id == 0)
+                                    {
+                                        @if (ViewBag.Notifications.Count == 1)
                                         {
-                                            <td style="background-color: #ffe3e3">
-                                                <div style="padding: 8px; display: flex; align-items:center; justify-content: space-between;">
-                                                    <div>
-                                                        <strong>@n.Title</strong>
-                                                        <br />@n.Date
-                                                        <br />@n.Content
-                                                    </div>
-                                                    <div style="margin-right: 8px;">
-                                                        <form asp-controller="account" asp-action="delete_notification" method="post">
-                                                            <input type="hidden" name="id" value="@n.Id" />
-                                                            <button type="submit" style="background: none; border: none; cursor: pointer;">🗑️</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </td>
+                                            <tr>
+                                                <td colspan="4" style="text-align: center">No notifications to display.</td>
+                                            </tr>
                                         }
-                                        else
-                                        {
-                                            <td>
-                                                <div style="padding: 8px; display: flex; align-items:center; justify-content: space-between;">
-                                                    <div>
-                                                        <strong>@n.Title</strong>
-                                                        <br />@n.Date
-                                                        <br />@n.Content
+                                    }
+                                    else
+                                    {
+                                        <tr>
+                                            @if (!n.IsRead)
+                                            {
+                                                <td style="background-color: #ffe3e3">
+                                                    <div style="padding: 8px; display: flex; align-items:center; justify-content: space-between;">
+                                                        <div>
+                                                            <strong>@n.Title</strong>
+                                                            <br />@n.Date
+                                                            <br />@n.Content
+                                                        </div>
+                                                        <div style="margin-right: 8px;">
+                                                            <form asp-controller="account" asp-action="delete_notification" method="post">
+                                                                <input type="hidden" name="id" value="@n.Id" />
+                                                                <button type="submit" style="background: none; border: none; cursor: pointer;">🗑️</button>
+                                                            </form>
+                                                        </div>
                                                     </div>
-                                                    <div style="margin-right: 8px;">
-                                                        <form asp-controller="account" asp-action="delete_notification" method="post">
-                                                            <input type="hidden" name="id" value="@n.Id" />
-                                                            <button type="submit" style="background: none; border: none; cursor: pointer;">🗑️</button>
-                                                        </form>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td>
+                                                    <div style="padding: 8px; display: flex; align-items:center; justify-content: space-between;">
+                                                        <div>
+                                                            <strong>@n.Title</strong>
+                                                            <br />@n.Date
+                                                            <br />@n.Content
+                                                        </div>
+                                                        <div style="margin-right: 8px;">
+                                                            <form asp-controller="account" asp-action="delete_notification" method="post">
+                                                                <input type="hidden" name="id" value="@n.Id" />
+                                                                <button type="submit" style="background: none; border: none; cursor: pointer;">🗑️</button>
+                                                            </form>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                        }
-                                    </tr>
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
                                 }
                             }
                         </tbody>

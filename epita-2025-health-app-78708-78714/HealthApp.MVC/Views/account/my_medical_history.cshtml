@@ -54,34 +54,46 @@
                                 <!-- MEDICAL HISTORY LIST -->
                                 @foreach (var mh in ViewBag.MedicalHistories)
                                 {
-                                    <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#viewMHModal-@mh.Id" style="cursor: pointer;">
-                                        <td style="vertical-align: middle;">@mh.Date</td>
-                                        <td style="vertical-align: middle;">@mh.DoctorFirstName @mh.DoctorLastName</td>
-                                        <td style="vertical-align: middle;">@mh.Specialization</td>
-                                        <td style="vertical-align: middle;">@mh.Location</td>
-                                    </tr>
+                                    @if (mh.Id == 0)
+                                    {
+                                        @if (ViewBag.MedicalHistories.Count == 1)
+                                        {
+                                            <tr>
+                                                <td colspan="4" style="text-align: center">No medical history found.</td>
+                                            </tr>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#viewMHModal-@mh.Id" style="cursor: pointer;">
+                                            <td style="vertical-align: middle;">@mh.Date</td>
+                                            <td style="vertical-align: middle;">@mh.DoctorFirstName @mh.DoctorLastName</td>
+                                            <td style="vertical-align: middle;">@mh.Specialization</td>
+                                            <td style="vertical-align: middle;">@mh.Location</td>
+                                        </tr>
                                     
-                                    <!-- VIEW MEDICAL HISTORY MODAL -->
-                                    <div class="modal fade" id="viewMHModal-@mh.Id" tabindex="-1" aria-labelledby="viewMHModalLabel-@mh.Id" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="viewMHModalLabel-@mh.Id" style="margin-left: 8px">@mh.Date</h5>
-                                                    <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("my_medical_history", "account")';" aria-label="Close" style="margin-right: 6px"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <h5 class="modal-title" style="margin-left: 8px">Issued by <strong>@mh.DoctorFirstName @mh.DoctorLastName</strong></h5>
-                                                    <div class="d-flex justify-content-between" style="margin-left: 8px; margin-top: 8px">
-                                                        <div>
-                                                            <p class="mb-2"><strong>Specialization:</strong> @mh.Specialization</p>
-                                                            <p class="mb-2"><strong>Location:</strong> @mh.Location</p>
-                                                            <p class="mb-2"><strong>Diagnosis:</strong> @mh.Diagnosis</p>
+                                        <!-- VIEW MEDICAL HISTORY MODAL -->
+                                        <div class="modal fade" id="viewMHModal-@mh.Id" tabindex="-1" aria-labelledby="viewMHModalLabel-@mh.Id" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="viewMHModalLabel-@mh.Id" style="margin-left: 8px">@mh.Date</h5>
+                                                        <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("my_medical_history", "account")';" aria-label="Close" style="margin-right: 6px"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <h5 class="modal-title" style="margin-left: 8px">Issued by <strong>@mh.DoctorFirstName @mh.DoctorLastName</strong></h5>
+                                                        <div class="d-flex justify-content-between" style="margin-left: 8px; margin-top: 8px">
+                                                            <div>
+                                                                <p class="mb-2"><strong>Specialization:</strong> @mh.Specialization</p>
+                                                                <p class="mb-2"><strong>Location:</strong> @mh.Location</p>
+                                                                <p class="mb-2"><strong>Diagnosis:</strong> @mh.Diagnosis</p>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    }
                                 }
                             }
                         </tbody>

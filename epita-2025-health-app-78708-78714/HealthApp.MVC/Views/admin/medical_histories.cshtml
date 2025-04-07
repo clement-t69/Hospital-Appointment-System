@@ -48,95 +48,107 @@
                                 @if (ViewBag.MedicalHistories == null || (ViewBag.MedicalHistories).Count == 0)
                                 {
                                     <tr>
-                                        <td colspan="4" style="text-align: center">No Medical history found.</td>
+                                        <td colspan="4" style="text-align: center">No medical history found.</td>
                                     </tr>
                                 }
                                 else
                                 {
                                     @foreach (var mh in ViewBag.MedicalHistories)
                                     {
+                                        @if (mh.Id == 0)
+                                        {
+                                            @if (ViewBag.MedicalHistories.Count == 1)
+                                            {
+                                                <tr>
+                                                    <td colspan="4" style="text-align: center">No medical history found.</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
                                         <!-- MEDICAL HISTORIES DETAILS -->
-                                        <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editMHModal-@mh.Id" style="cursor: pointer;">
-                                            <td>
-                                                <div style="padding: 8px; mb-3">
-                                                    <strong>@mh.Date</strong>
-                                                    <br />Doctor: <strong>@mh.DoctorFirstName @mh.DoctorLastName</strong>
-                                                    <br />Patient: <strong>@mh.PatientFirstName @mh.PatientLastName</strong>
-                                                    <br />Location: @mh.Location
-                                                    <br />Specialization: @mh.Specialization
-                                                    <br />Diagnosis: @mh.Diagnosis
-                                                </div>
-                                            </td>
-                                        </tr>
-
-                                        <!-- EDIT MEDICAL HISTORY MODAL -->
-                                        <div class="modal fade" id="editMHModal-@mh.Id" tabindex="-1" aria-labelledby="editMHModalLabel-@mh.Id" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="editMHModalLabel-@mh.Id" style="margin-left: 8px">Edit a Medical History</h5>
-                                                        <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                            <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editMHModal-@mh.Id" style="cursor: pointer;">
+                                                <td>
+                                                    <div style="padding: 8px;" class="mb-3">
+                                                        <strong>@mh.Date</strong>
+                                                        <br />Doctor: <strong>@mh.DoctorFirstName @mh.DoctorLastName</strong>
+                                                        <br />Patient: <strong>@mh.PatientFirstName @mh.PatientLastName</strong>
+                                                        <br />Location: @mh.Location
+                                                        <br />Specialization: @mh.Specialization
+                                                        <br />Diagnosis: @mh.Diagnosis
                                                     </div>
-                                                    <div class="modal-body">
-                                                        <form id="editMHForm-@mh.Id" asp-controller="admin" asp-action="edit_medical_history" method="post">
-                                                            <input type="hidden" name="Id" value="@mh.Id" />
+                                                </td>
+                                            </tr>
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="date" class="form-control" id="editMHDate-@mh.Id" name="Date" aria-required="true" style="width:100%;" value="@mh.Date">
-                                                            </div>
+                                            <!-- EDIT MEDICAL HISTORY MODAL -->
+                                            <div class="modal fade" id="editMHModal-@mh.Id" tabindex="-1" aria-labelledby="editMHModalLabel-@mh.Id" aria-hidden="true">
+                                                <div class="modal-dialog">
+                                                    <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="editMHModalLabel-@mh.Id" style="margin-left: 8px">Edit a Medical History</h5>
+                                                            <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form id="editMHForm-@mh.Id" asp-controller="admin" asp-action="edit_medical_history" method="post">
+                                                                <input type="hidden" name="Id" value="@mh.Id" />
 
-                                                            <div class="rounded_fields form-label mb-3">
                                                                 <div class="rounded_fields form-label mb-3">
-                                                                    <select class="form-control" id="editMHDoctor-@mh.Id" name="DoctorId" aria-required="true" style="width:100%;">
-                                                                        <option value="" selected disabled>Select Doctor</option>
-																		@foreach (var d in ViewBag.Doctors)
-																		{
-																			if (d.UserId == mh.DoctorId)
-																			{
-																				<option value="@d.UserId" selected>@d.FirstName @d.LastName</option>
-																			}
-																			else
-																			{
-																				<option value="@d.UserId">@d.FirstName @d.LastName</option>
-																			}
-																		}
-                                                                    </select>
+                                                                    <input type="date" class="form-control" id="editMHDate-@mh.Id" name="Date" aria-required="true" style="width:100%;" value="@mh.Date">
                                                                 </div>
-                                                            </div>
 
-                                                            <input type="hidden" name="PatientId" value="@mh.PatientId" />
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <select class="form-control" id="editMHDoctor-@mh.Id" name="DoctorId" aria-required="true" style="width:100%;">
+                                                                            <option value="" selected disabled>Select Doctor</option>
+																		    @foreach (var d in ViewBag.Doctors)
+																		    {
+																			    if (d.UserId == mh.DoctorId)
+																			    {
+																				    <option value="@d.UserId" selected>@d.FirstName @d.LastName</option>
+																			    }
+																			    else
+																			    {
+																				    <option value="@d.UserId">@d.FirstName @d.LastName</option>
+																			    }
+																		    }
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="text" class="form-control" id="editMHSpe-@mh.Id" name="Specialization" aria-required="true" style="width:100%;" value="@mh.Specialization">
-                                                            </div>
+                                                                <input type="hidden" name="PatientId" value="@mh.PatientId" />
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="text" class="form-control" id="editMHLoc-@mh.Id" name="Location" aria-required="true" style="width:100%;" value="@mh.Location">
-                                                            </div>
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editMHSpe-@mh.Id" name="Specialization" aria-required="true" style="width:100%;" value="@mh.Specialization">
+                                                                </div>
 
-                                                            <div class="rounded_fields form-label mb-3">
-                                                                <input type="text" class="form-control" id="editMHDiag-@mh.Id" name="Diagnosis" aria-required="true" style="width:100%;" value="@mh.Diagnosis">
-                                                            </div>
-                                                        </form>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('editMHForm-@mh.Id').submit(); return false;" style="text-decoration: none;">
-                                                            <div class="text-content fs-6 px-2 fw-bold">
-                                                                <div>📝 Edit Medical History</div>
-                                                            </div>
-                                                        </a>
-                                                        <form id="deleteMHForm-@mh.Id" asp-controller="admin" asp-action="delete_medical_history" method="post" style="display: none;">
-                                                            <input type="hidden" name="Id" value="@mh.Id" />
-                                                        </form>
-                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('deleteMHForm-@mh.Id').submit(); return false;" style="text-decoration: none;">
-                                                            <div class="text-content fs-6 px-2 fw-bold">
-                                                                <div>🗑️ Delete Medical History</div>
-                                                            </div>
-                                                        </a>
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editMHLoc-@mh.Id" name="Location" aria-required="true" style="width:100%;" value="@mh.Location">
+                                                                </div>
+
+                                                                <div class="rounded_fields form-label mb-3">
+                                                                    <input type="text" class="form-control" id="editMHDiag-@mh.Id" name="Diagnosis" aria-required="true" style="width:100%;" value="@mh.Diagnosis">
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <a class="little-blue-button" href="#" onclick="document.getElementById('editMHForm-@mh.Id').submit(); return false;" style="text-decoration: none;">
+                                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                                    <div>📝 Edit Medical History</div>
+                                                                </div>
+                                                            </a>
+                                                            <form id="deleteMHForm-@mh.Id" asp-controller="admin" asp-action="delete_medical_history" method="post" style="display: none;">
+                                                                <input type="hidden" name="Id" value="@mh.Id" />
+                                                            </form>
+                                                            <a class="little-blue-button" href="#" onclick="document.getElementById('deleteMHForm-@mh.Id').submit(); return false;" style="text-decoration: none;">
+                                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                                    <div>🗑️ Delete Medical History</div>
+                                                                </div>
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        </div>
+                                        }
                                     }
                                 }
                             </tbody>

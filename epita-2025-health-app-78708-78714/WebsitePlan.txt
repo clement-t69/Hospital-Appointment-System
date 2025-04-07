@@ -2,7 +2,7 @@
 ⏯️: WIP
 ❌: TODO
 
-//////////////////////// Views/home //////////////////////// ⏯️: NEED TO IMPLEMENT CONTACT
+//////////////////////// Views/home //////////////////////// ✅
 
 [✅]	Views/home/index.cshtml:
 		Search bar (field to enter a keyword, a select to choose a category, a button to Search)
@@ -44,7 +44,7 @@
 
 [⏯️]	Views/account/forgot_password.cshtml: NEED TO CORRECT THE INVALID TOKEN ERROR
 
-//////////////////////// Views/account //////////////////////// (only if logged, if not the case, redirect to Error page)
+//////////////////////// Views/account //////////////////////// (only if logged, if not the case, redirect to Error page) ✅
 
 [✅]	Views/account/edit.cshtml (as a patient):
 		Profile (hyperlink to Profile)
@@ -110,7 +110,7 @@
 [✅]	Views/account/my_prescriptions.cshtml (as a patient, if not the case, redirect to Error page)
 		List of prescriptions (can be filtered by doctor name, name, dosage, frequency, duration, pharmacy)
 
-//////////////////////// Views/care ////////////////////////
+//////////////////////// Views/care //////////////////////// ✅
 
 [✅]	Views/care/patients.cshtml (only as a doctor, if not the case redirect to Error page):
 		List of patients (can be filtered by name, email)
@@ -149,7 +149,7 @@
 		Track the number of no-shows and cancellations (red icon with number per month)
 		Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
 
-//////////////////////// Views/admin //////////////////////// (only as an administrator, if not the case redirect to Error page)
+//////////////////////// Views/admin //////////////////////// (only as an administrator, if not the case redirect to Error page) ✅
 
 [✅]	Views/admin/panel.cshtml
 		Buttons to manage users, view appointments, manage doctor schedules, view system logs, send system notifications
@@ -183,7 +183,7 @@
 		Info: Date, User, Action
 		For each log, button to view details
 
-[❌]	Views/admin/messages.cshtml
+[✅]	Views/admin/messages.cshtml
 		List of notifications (can be filtered by date, user, action)
 		Info: Date, User, Action
 		For each notification, button to view details
