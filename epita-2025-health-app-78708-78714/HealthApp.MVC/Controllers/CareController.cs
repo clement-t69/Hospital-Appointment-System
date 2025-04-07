@@ -345,23 +345,6 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = model.PatientId });
         }
 
-        public async Task<IActionResult> create_medical_history(string patientId)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-            ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = await _userManager.IsInRoleAsync(user, "doctor");
-            ViewBag.IsPatient = await _userManager.IsInRoleAsync(user, "patient");
-            ViewBag.IsAdmin = await _userManager.IsInRoleAsync(user, "administrator");
-
-            var patient = await _userManager.FindByIdAsync(patientId);
-            ViewBag.Patient = patient;
-            return View();
-        }
-
         [HttpPost]
         public async Task<IActionResult> patient_edit_appointment(EditAppointmentInputModel model, int Id)
         {
@@ -1209,6 +1192,7 @@ namespace HealthApp.MVC.Controllers
                 DoctorFirstName = appointment.DoctorFirstName,
                 DoctorLastName = appointment.DoctorLastName,
                 PatientId = appointment.PatientId,
+                PatientFirstName = appointment.PatientFirstName,
                 PatientLastName = appointment.PatientLastName,
                 Specialization = appointment.Specialization,
                 Location = appointment.Location

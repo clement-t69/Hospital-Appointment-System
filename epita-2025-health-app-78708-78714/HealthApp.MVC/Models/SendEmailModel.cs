@@ -486,17 +486,17 @@ namespace HealthApp.MVC.Models
                 MailMessage message = new MailMessage();
                 message.From = new MailAddress("hospital.dorset@gmail.com");
                 message.To.Add(email);
-                message.Subject = "Account Disabled - Hospital Appointment System";
+                message.Subject = "Account Activated - Hospital Appointment System";
                 message.Body =
                     $@"
                         <!DOCTYPE html>
                         <html>
                         <head>
-                            <h3>Account Disabled - Hospital Appointment System</h3>
+                            <h3>Account Activated - Hospital Appointment System</h3>
                         </head>
                         <body>
                             <p>Dear {firstname} {lastname},</p>
-                            <p>Your account has been re-enabled. To reactivate it, please <a href='https://localhost:44368/home/contact' target=''_blank"" rel='noopener noreferrer'>contact us</a>.</p>
+                            <p>Your account has been reactivated. You can now log in to the system using your email ({email}) and your password.</p>
                             <p>Regards,</p>
                             <p>The Hospital Appointment System team.</p>
                         </body>

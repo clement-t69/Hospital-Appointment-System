@@ -168,6 +168,16 @@
 		For each appointment, button to cancel an appointment on behalf of a patient and override cancellation restrictions
 		When an appointment is cancelled --> Send a notification to the patient
 
+[✅]	Views/admin/medical_histories.cshtml
+		List of medical histories (can be filtered by date, patient name, doctor name, specialty)
+		Info: Date, Patient name, Doctor name, Specialty, Location
+		For each medical history, button to view details
+
+[✅]	Views/admin/prescriptions.cshtml
+		List of prescriptions (can be filtered by date, patient name, doctor name)
+		Info: Date, Patient name, Doctor name, Pharmacy
+		For each prescription, button to view details
+
 [⏯️]	Views/admin/logs.cshtml: NEED FIXES (ERROR IN THE HTTPS CONNECTION)
 		List of logs (can be filtered by date, user, action)
 		Info: Date, User, Action

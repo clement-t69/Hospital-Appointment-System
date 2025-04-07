@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using HealthApp.MVC.Models;
 using HealthApp.Domain.Data;
+using HealthApp.Domain.Migrations;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -295,6 +296,12 @@ namespace HealthApp.MVC.Controllers
 
         public async Task<IActionResult> delete_appointment(int id)
         {
+            if (id == 0)
+            {
+                TempData["ErrorMessage"] = "You cannot delete this appointment.";
+                return RedirectToAction("appointments", "admin");
+            }
+
             var user = await _userManager.GetUserAsync(User);
 
             var appointment = await _context.Appointments.FindAsync(id);
@@ -825,6 +832,308 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
             return View();
+        }
+
+
+        // admin/medical_histories.cshtml
+        public async Task<IActionResult> medical_histories([FromQuery] string searchInput, [FromQuery] string searchField)
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+
+            var doctors = _context.Doctors.ToList();
+            ViewBag.Doctors = doctors;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                await _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
+            var userRoles = await _signInManager.UserManager.GetRolesAsync(user);
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            var medicalHistories = _context.MedicalHistories
+                .OrderByDescending(m => m.Date)
+                .ToList();
+
+            if (searchInput == null)
+            {
+                searchInput = "";
+            }
+            if (searchField == null)
+            {
+                searchField = "";
+            }
+
+            medicalHistories = searchMedicalHistories(searchInput, searchField);
+
+            ViewBag.MedicalHistories = medicalHistories;
+
+            return View();
+        }
+
+        public List<MedicalHistory> searchMedicalHistories(string searchInput, string searchField)
+        {
+            var medicalHistories = _context.MedicalHistories
+                .OrderByDescending(m => m.Date)
+                .ToList();
+
+            searchInput = searchInput.ToLower();
+
+            if (searchField == "Date")
+            {
+                medicalHistories = medicalHistories.Where(m => m.Date.ToString().ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Patient")
+            {
+                medicalHistories = medicalHistories.Where(m => m.PatientLastName.ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Doctor")
+            {
+                medicalHistories = medicalHistories.Where(m => m.DoctorFirstName.ToLower().Contains(searchInput) || m.DoctorLastName.ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Specialitzation")
+            {
+                medicalHistories = medicalHistories.Where(m => m.Specialization.ToLower().Contains(searchInput)).ToList();
+            }
+            else
+            {
+                searchInput = "";
+                searchField = "";
+            }
+
+            return medicalHistories;
+        }
+
+        public async Task<IActionResult> edit_medical_history(EditMedicalHistoryInputModel model, int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var medical_history = await _context.MedicalHistories.FindAsync(id);
+
+            if (medical_history == null)
+            {
+                TempData["ErrorMessage"] = "Medical history not found.";
+                return RedirectToAction("medical_histories", "admin");
+            }
+
+            if (ModelState.IsValid)
+            {
+                medical_history.Date = model.Date;
+                medical_history.Diagnosis = model.Diagnosis;
+                medical_history.DoctorId = model.DoctorId;
+                medical_history.PatientId = model.PatientId;
+                medical_history.Specialization = model.Specialization;
+                medical_history.Location = model.Location;
+
+                try
+                {
+                    _context.MedicalHistories.Update(medical_history);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Medical history updated successfully.";
+                    return RedirectToAction("medical_histories", "admin");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError($"******************************\nError when updating medical history: {e.Message}\n******************************\n");
+                    TempData["ErrorMessage"] = $"Error when updating medical history: {e.Message}\n";
+                    return RedirectToAction("medical_histories", "admin");
+                }
+            }
+
+            TempData["ErrorMessage"] = "Fill in all the fields.";
+            return RedirectToAction("medical_histories", "admin");
+        }
+
+        public async Task<IActionResult> delete_medical_history(int id)
+        {
+            if (id == 0)
+            {
+                TempData["ErrorMessage"] = "You cannot delete this medical history.";
+                return RedirectToAction("medical_histories", "admin");
+            }
+
+            var medicalHistory = await _context.MedicalHistories.FindAsync(id);
+
+            if (medicalHistory == null)
+            {
+                TempData["ErrorMessage"] = "Medical history not found.";
+                return RedirectToAction("medical_histories", "admin");
+            }
+            try
+            {
+                _context.MedicalHistories.Remove(medicalHistory);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Medical history deleted successfully.";
+                return RedirectToAction("medical_histories", "admin");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"******************************\nError when deleting medical history: {e.Message}\n******************************\n");
+                TempData["ErrorMessage"] = $"Error when deleting medical history: {e.Message}\n";
+                return RedirectToAction("medical_histories", "admin");
+            }
+        }
+
+
+        // admin/prescriptions.cshtml
+        public async Task<IActionResult> prescriptions([FromQuery] string searchInput, [FromQuery] string searchField)
+        {
+            var user = await _signInManager.UserManager.GetUserAsync(User);
+
+            var doctors = _context.Doctors.ToList();
+            ViewBag.Doctors = doctors;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                await _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
+            var userRoles = await _signInManager.UserManager.GetRolesAsync(user);
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            var prescriptions = _context.Prescriptions
+                .OrderByDescending(m => m.Date)
+                .ToList();
+
+            if (searchInput == null)
+            {
+                searchInput = "";
+            }
+            if (searchField == null)
+            {
+                searchField = "";
+            }
+
+            prescriptions = searchPrescriptions(searchInput, searchField);
+
+            ViewBag.Prescriptions = prescriptions;
+
+            return View();
+        }
+
+        public List<Prescription> searchPrescriptions(string searchInput, string searchField)
+        {
+            var prescriptions = _context.Prescriptions
+                .OrderByDescending(m => m.Date)
+                .ToList();
+
+            searchInput = searchInput.ToLower();
+
+            if (searchField == "Date")
+            {
+                prescriptions = prescriptions.Where(p => p.Date.ToString().ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Patient")
+            {
+                prescriptions = prescriptions;
+            }
+            else if (searchField == "Doctor")
+            {
+                prescriptions = prescriptions;
+            }
+            else
+            {
+                searchInput = "";
+                searchField = "";
+            }
+
+            return prescriptions;
+        }
+
+        public async Task<IActionResult> edit_prescription(EditPrescriptionInputModel model, int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var prescription = await _context.Prescriptions.FindAsync(id);
+
+            if (prescription == null)
+            {
+                TempData["ErrorMessage"] = "Prescription not found.";
+                return RedirectToAction("prescriptions", "admin");
+            }
+
+            if (ModelState.IsValid)
+            {
+                prescription.Date = model.Date;
+                prescription.DoctorId = model.DoctorId;
+                prescription.PatientId = model.PatientId;
+                prescription.Name = model.Name;
+                prescription.Dosage = model.Dosage;
+                prescription.Frequency = model.Frequency;
+                prescription.Duration = model.Duration;
+                prescription.Pharmacy = model.Pharmacy;
+
+                try
+                {
+                    _context.Prescriptions.Update(prescription);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Prescription updated successfully.";
+                    return RedirectToAction("prescriptions", "admin");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError($"******************************\nError when updating prescription: {e.Message}\n******************************\n");
+                    TempData["ErrorMessage"] = $"Error when updating prescription: {e.Message}\n";
+                    return RedirectToAction("prescriptions", "admin");
+                }
+            }
+
+            TempData["ErrorMessage"] = "Fill in all the fields.";
+            return RedirectToAction("prescriptions", "admin");
+        }
+
+        public async Task<IActionResult> delete_prescription(int id)
+        {
+            if (id == 0)
+            {
+                TempData["ErrorMessage"] = "You cannot delete this prescription.";
+                return RedirectToAction("prescriptions", "admin");
+            }
+
+            var prescription = await _context.Prescriptions.FindAsync(id);
+
+            if (prescription == null)
+            {
+                TempData["ErrorMessage"] = "Prescription not found.";
+                return RedirectToAction("prescriptions", "admin");
+            }
+            try
+            {
+                _context.Prescriptions.Remove(prescription);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Prescription deleted successfully.";
+                return RedirectToAction("prescriptions", "admin");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"******************************\nError when deleting prescription: {e.Message}\n******************************\n");
+                TempData["ErrorMessage"] = $"Error when deleting prescription: {e.Message}\n";
+                return RedirectToAction("prescriptions", "admin");
+            }
         }
 
 
