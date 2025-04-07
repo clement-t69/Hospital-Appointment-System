@@ -154,15 +154,15 @@
 [✅]	Views/admin/panel.cshtml
 		Buttons to manage users, view appointments, manage doctor schedules, view system logs, send system notifications
 
-[⏯️]	Views/admin/users.cshtml : NEED TO IMPLEMENT DEACTIVATE/REACTIVATE USERS, PREVENT DUPLICATE EMAIL ADDRESSES AND REPORTS
-		✅List of users (can be filtered by name, email, role)
-		✅Create new users (form with First name, Last name, Email, Address, Phone, Role, Password, Create button)
-		✅Edit user information (form with First name, Last name, Email, Address, Phone, Role, Edit button)
+[✅]	Views/admin/users.cshtml : NEED TO IMPLEMENT DEACTIVATE/REACTIVATE USERS, PREVENT DUPLICATE EMAIL ADDRESSES AND REPORTS
+		List of users (can be filtered by name, email, role)
+		Create new users (form with First name, Last name, Email, Address, Phone, Role, Password, Create button)
+		Edit user information (form with First name, Last name, Email, Address, Phone, Role, Edit button)
 		Deactivate/reactivate users (button with a pop-up to confirm)
 		Prevent duplicate email addresses (FailMessage)
-		✅Receive a notification after successful changes (SuccessMessage)
+		Receive a notification after successful changes (SuccessMessage)
 
-[❌]	Views/admin/appointments.cshtml
+[✅]	Views/admin/appointments.cshtml
 		List of appointments (can be filtered by date, patient name, doctor name, status)
 		Info: Date, Time, Patient name, Doctor name, Status (scheduled, completed, cancelled)
 		For each appointment, button to cancel an appointment on behalf of a patient and override cancellation restrictions
