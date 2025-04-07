@@ -29,9 +29,9 @@ namespace HealthApp.Domain.Models
 
         public string Type { get; set; }
         /*
-        New
-         Reply
-         */
+            New
+            Reply
+        */
 
         public bool IsRead { get; set; } = false;
     }

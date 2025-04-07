@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace HealthApp.Domain.Models
+﻿namespace HealthApp.Domain.Models
 {
     public class Appointment
     {

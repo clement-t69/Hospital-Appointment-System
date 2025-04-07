@@ -30,7 +30,9 @@ namespace HealthApp.MVC.Controllers
             _userManager = userManager;
         }
 
-        // ERROR
+        /*
+         * This method is used to display the error page.
+         */
         public IActionResult error()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -48,7 +50,13 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        // care/patients.cshtml
+        /*****************************************/
+
+        /*
+         * This method is used to display the patients page.
+         * searchInput: The input to search for.
+         * searchField: The field to search in.
+         */
         public async Task<IActionResult> patients([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
@@ -104,6 +112,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to search for patients.
+         * searchInput: The input to search for.
+         * searchField: The field to search in.
+         */
         public List<Patient> searchPatients(string searchInput, string searchField)
         {
             var patients = _context.Patients.ToList();
@@ -125,7 +138,18 @@ namespace HealthApp.MVC.Controllers
             return patients;
         }
 
-        // care/patient/{id}.cshtml
+        /*****************************************/
+
+        /*
+         * This method is used to display the patient page.
+         * id: The id of the patient.
+         * appointmentsSearchInput: The input to search for in appointments.
+         * appointmentsSearchField: The field to search in appointments.
+         * prescriptionsSearchInput: The input to search for in prescriptions.
+         * prescriptionsSearchField: The field to search in prescriptions.
+         * medicalHistoriesSearchInput: The input to search for in medical histories.
+         * medicalHistoriesSearchField: The field to search in medical histories.
+         */
         public async Task<IActionResult> patient(string id,
             [FromQuery] string appointmentsSearchInput, [FromQuery] string appointmentsSearchField,
             [FromQuery] string prescriptionsSearchInput, [FromQuery] string prescriptionsSearchField,
@@ -202,6 +226,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to search for appointments.
+         * searchInput: The input to search for.
+         * searchField: The field to search in.
+         */
         public List<Appointment> searchAppointment(string searchInput, string searchField)
         {
             var appointments = _context.Appointments.ToList();
@@ -236,6 +265,11 @@ namespace HealthApp.MVC.Controllers
             return appointments;
         }
 
+        /*
+         * This method is used to search for medical histories.
+         * searchInput: The input to search for.
+         * searchField: The field to search in.
+         */
         public List<MedicalHistory> searchMedicalHistory(string searchInput, string searchField)
         {
             var medicalHistories = _context.MedicalHistories.ToList();
@@ -273,6 +307,11 @@ namespace HealthApp.MVC.Controllers
             return medicalHistories;
         }
 
+        /*
+         * This method is used to search for prescriptions.
+         * searchInput: The input to search for.
+         * searchField: The field to search in.
+         */
         public List<Prescription> searchPrescription(string searchInput, string searchField)
         {
             var prescriptions = _context.Prescriptions.ToList();
@@ -302,14 +341,25 @@ namespace HealthApp.MVC.Controllers
             return prescriptions;
         }
 
+        /*****************************************/
+
+        /*
+         * This method is used to create a new prescription.
+         * patientId: The id of the patient.
+         * model: The input model for the prescription.
+         */
         [HttpPost]
         public async Task<IActionResult> create_prescription(string patientId, PrescriptionInputModel model)
         {
+            /// Get the patient
             var patient = await _userManager.FindByIdAsync(patientId);
+
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
                 var id = _context.Prescriptions.Max(p => p.Id) + 1;
 
+                // Create a new prescription
                 var prescription = new Prescription
                 {
                     Id = id,
@@ -323,8 +373,10 @@ namespace HealthApp.MVC.Controllers
                     Date = model.Date
                 };
 
+                // Get the doctor
                 var doctor = await _userManager.FindByIdAsync(model.DoctorId);
 
+                // Create a new notification for the patient
                 var notification = new Notification
                 {
                     Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -336,6 +388,7 @@ namespace HealthApp.MVC.Controllers
                     IsRead = false
                 };
 
+                // Add the prescription and notification to the database
                 _context.Prescriptions.Add(prescription);
                 _context.Notifications.Add(notification);
                 await _context.SaveChangesAsync();
@@ -345,39 +398,36 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = model.PatientId });
         }
 
+        /*****************************************/
+
+        /*
+         * This method is used to edit an appointment.
+         * model: The input model for the appointment.
+         * Id: The id of the appointment.
+         */
         [HttpPost]
         public async Task<IActionResult> patient_edit_appointment(EditAppointmentInputModel model, int Id)
         {
             var today = DateTime.Today.ToString("yyyy-MM-dd");
 
+            // Get the appointment
             var appointment = _context.Appointments.Find(model.Id);
 
             var patientId = model.PId;
 
+            // Check if the appointment is in the past
             if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
             {
                 TempData["ErrorMessage"] = "Cannot reschedule past appointments.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Check if the appointment is already approved
             if (appointment.Status != "Pending")
             {
                 TempData["ErrorMessage"] = "Cannot reschedule this appointments.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
-
-            _logger.LogInformation($"******************************\n");
-            _logger.LogInformation($"Id = {Id}\n");
-            _logger.LogInformation($"Date = {model.Date}\n");
-            _logger.LogInformation($"Time = {model.Hour}\n");
-            _logger.LogInformation($"DoctorId = {model.DId}\n");
-            _logger.LogInformation($"PatientId = {model.PId}\n");
-            _logger.LogInformation($"Specialization = {model.Spe}\n");
-            _logger.LogInformation($"Location = {model.Loc}\n");
-            _logger.LogInformation($"Status = {model.Stat}\n");
-            _logger.LogInformation($"PatientLastName = {model.PLastName}\n");
-            _logger.LogInformation($"PatientFirstName = {model.PFirstName}\n");
-            _logger.LogInformation($"******************************\n");
 
             if (model.Date == null || model.Hour == null || model.DId == null)
             {
@@ -390,6 +440,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("patients", "care");
             }
 
+            // Check if the doctor is available
             List<Appointment> doctorAppointments = _context.Appointments
                 .Where(a => a.DoctorId == model.DId)
                 .ToList();
@@ -407,6 +458,7 @@ namespace HealthApp.MVC.Controllers
                 }
             }
 
+            // Edit the appointment
             appointment.Date = model.Date;
             appointment.Time = model.Hour;
             appointment.DoctorId = model.DId;
@@ -419,6 +471,7 @@ namespace HealthApp.MVC.Controllers
 
             _context.Appointments.Update(appointment);
 
+            // Create notifications for the doctor and patient
             var doctorNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -441,6 +494,7 @@ namespace HealthApp.MVC.Controllers
                 IsRead = false
             };
 
+            // Add the notifications to the database
             _context.Notifications.Add(doctorNotification);
             _context.Notifications.Add(patientNotification);
 
@@ -452,10 +506,17 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = patientId });
         }
 
+        /*
+         * This method is used to approve an appointment.
+         * id: The id of the appointment.
+         */
         [HttpPost]
         public async Task<IActionResult> patient_approve_appointment(int id)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
+
+            var today = DateTime.Today.ToString("yyyy-MM-dd");
 
             var patientId = appointment.PatientId;
 
@@ -465,18 +526,28 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("patients", "care");
             }
 
+            // Check if the appointment is in the past
+            if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
+            {
+                TempData["ErrorMessage"] = "Cannot approve past appointments.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            // Check if the appointment is already approved
             if (appointment.Status == "Approved")
             {
                 TempData["ErrorMessage"] = "Appointment already approved.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Check if the appointment can be approved
             if (appointment.Status != "Pending" && appointment.Status != "Approved")
             {
                 TempData["ErrorMessage"] = "Cannot approve this appointment.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Create a new notification for the patient
             var patientNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -499,10 +570,17 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = patientId });
         }
 
+        /*
+         * This method is used to reject an appointment.
+         * id: The id of the appointment.
+         */
         [HttpPost]
         public async Task<IActionResult> patient_reject_appointment(int id)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
+
+            var today = DateTime.Today.ToString("yyyy-MM-dd");
 
             var patientId = appointment.PatientId;
 
@@ -512,12 +590,28 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("patients", "care");
             }
 
+            // Check if the appointment is in the past
+            if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
+            {
+                TempData["ErrorMessage"] = "Cannot reject past appointments.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            // Check if the appointment is already approved
             if (appointment.Status == "Approved")
             {
                 TempData["ErrorMessage"] = "Approved appointments cannot be rejected.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Check if the appointment is already rejected
+            if (appointment.Status == "Rejected")
+            {
+                TempData["ErrorMessage"] = "Appointment already rejected.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            // Check if the appointment can be rejected
             if (appointment.Status != "Pending" && appointment.Status != "Rejected")
             {
                 TempData["ErrorMessage"] = "Cannot reject this appointment.";
@@ -526,6 +620,7 @@ namespace HealthApp.MVC.Controllers
 
             appointment.Status = "Rejected";
 
+            // Create a new notification for the patient
             var patientNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -546,9 +641,14 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = patientId });
         }
 
+        /*
+         * This method is used to complete an appointment.
+         * id: The id of the appointment.
+         */
         [HttpPost]
         public async Task<IActionResult> patient_complete_appointment(int id)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
 
             var patientId = appointment.PatientId;
@@ -559,12 +659,14 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("patients", "care");
             }
 
+            // Check if the appointment is already completed
             if (appointment.Status == "Completed")
             {
                 TempData["ErrorMessage"] = "Appointment already completed.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Check if the appointment can be completed
             if (appointment.Status != "Approved" && appointment.Status != "Completed")
             {
                 TempData["ErrorMessage"] = "Cannot complete this appointment.";
@@ -573,6 +675,7 @@ namespace HealthApp.MVC.Controllers
 
             appointment.Status = "Completed";
 
+            // Create a new medical history
             var mhId = _context.MedicalHistories.Max(mh => mh.Id) + 1;
             var medicalHistory = new MedicalHistory
             {
@@ -588,6 +691,7 @@ namespace HealthApp.MVC.Controllers
                 Location = appointment.Location
             };
 
+            // Create a new notification for the patient
             var patientNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -599,6 +703,7 @@ namespace HealthApp.MVC.Controllers
                 IsRead = false
             };
 
+            // Add the medical history and notification to the database
             _context.MedicalHistories.Add(medicalHistory);
             _context.Notifications.Add(patientNotification);
 
@@ -609,9 +714,14 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = patientId });
         }
 
+        /*
+         * This method is used to cancel an appointment.
+         * id: The id of the appointment.
+         */
         [HttpPost]
         public async Task<IActionResult> patient_cancel_appointment(int id)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
 
             if (appointment == null)
@@ -624,26 +734,32 @@ namespace HealthApp.MVC.Controllers
 
             var today = DateTime.Today.ToString("yyyy-MM-dd");
 
+            // Check if the appointment is in the past
             if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
             {
                 TempData["ErrorMessage"] = "Cannot cancel past appointments.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Check if the appointment is already cancelled
             if (appointment.Status == "Cancelled")
             {
                 TempData["ErrorMessage"] = "Appointment already cancelled.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Check if the appointment is already completed
             if (appointment.Status == "Completed")
             {
                 TempData["ErrorMessage"] = "Cannot cancel completed appointments.";
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Check if the appointment can be cancelled
             var appointmentDate = DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            // Calculate the difference in days from today to the appointment date
             var daysDifference = (appointmentDate - DateTime.Today).TotalDays;
+            // Check if the appointment is within the cancellation period
             if (daysDifference < 1)
             {
                 _context.Appointments.Remove(appointment);
@@ -653,6 +769,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("patient", "care", new { id = patientId });
             }
 
+            // Create a new notification for the patient and doctor
             var patientNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -686,21 +803,31 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = patientId });
         }
 
+        /*****************************************/
+
+        /*
+         * This method is used to create a new medical history.
+         * model: The input model for the medical history.
+         */
         [HttpPost]
         public async Task<IActionResult> edit_medical_history(MedicalHistoryInputModel model, int id)
         {
+            // Get the medical history
             var medicalHistory = _context.MedicalHistories.Find(id);
 
-            if (medicalHistory == null ) 
+            if (medicalHistory == null) 
             {
                 TempData["ErrorMessage"] = "Medical history not found.";
                 return RedirectToAction("patients", "care");
             }
 
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
+                // Get the diagnosis from the model
                 medicalHistory.Diagnosis = model.Diagnosis;
 
+                // Update the diagnosis in the database
                 _context.MedicalHistories.Update(medicalHistory);
                 await _context.SaveChangesAsync();
 
@@ -713,7 +840,13 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = medicalHistory.PatientId });
         }
 
-        // care/doctors.cshtml
+        /*****************************************/
+
+        /*
+         * This method is used to display the doctors page.
+         * searchInput: The input to search for.
+         * searchField: The field to search in.
+         */
         public async Task<IActionResult> doctors([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _userManager.GetUserAsync(User);
@@ -741,6 +874,7 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
+            // Search for doctors with the given input and field
             var doctors = searchDoctors(searchInput, searchField);
             var doctorUsers = new Dictionary<string, User>();
 
@@ -759,7 +893,7 @@ namespace HealthApp.MVC.Controllers
                 _logger.LogError($"******************************\nNo doctors found while searching for doctors with {searchField} containing {searchInput}.\n******************************\n");
             }
 
-            _logger.BeginScope($"******************************\nUser {user.UserName} has searched for doctors with {searchField} containing {searchInput}.\n******************************\n");
+            _logger.LogInformation($"******************************\nUser {user.UserName} has searched for doctors with {searchField} containing {searchInput}.\n******************************\n");
 
             ViewBag.Doctors = doctors;
             ViewBag.DoctorUsers = doctorUsers;
@@ -767,6 +901,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to search for doctors.
+         * searchInput: The input to search for.
+         * searchField: The field to search in.
+         */
         public List<Doctor> searchDoctors(string searchInput, string searchField)
         {
             var doctors = _context.Doctors.ToList();
@@ -792,7 +931,13 @@ namespace HealthApp.MVC.Controllers
             return doctors;
         }
 
-        // care/appointments.cshtml
+        /*****************************************/
+
+        /*
+         * This method is used to display the appointments page.
+         * sunday: The date of the week.
+         * doctorId: The id of the doctor.
+         */
         public async Task<IActionResult> appointments(DateTime? sunday, string doctorId)
         {
             //////////////////
@@ -817,34 +962,32 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsAdmin = await _userManager.IsInRoleAsync(user, "administrator");
             //////////////////
 
-            // List of appointments for the logged-in user
+            // Get the appointments for the logged-in user
             var appointments = _context.Appointments
                 .Where(a => a.PatientId == user.Id.ToString())
+                .OrderByDescending(a => a.Date)
+                .ThenBy(a => a.Time)
                 .ToList();
 
+            // Get the appointments for the logged-in doctor's patients
             var doctorAppointments = _context.Appointments
                 .Where(a => a.DoctorId == user.Id.ToString())
-                .ToList();
-
-            var sortedAppointments = appointments
                 .OrderByDescending(a => a.Date)
                 .ThenBy(a => a.Time)
                 .ToList();
-            ViewBag.Appointments = sortedAppointments;
 
-            var sortedDoctorAppointments = doctorAppointments
-                .OrderByDescending(a => a.Date)
-                .ThenBy(a => a.Time)
-                .ToList();
-            ViewBag.DoctorAppointments = sortedDoctorAppointments;
+            ViewBag.Appointments = appointments;
+            ViewBag.DoctorAppointments = doctorAppointments;
 
-            // List of appointments for all patients
+            // Get all appointments for the other patients
             var allAppointments = _context.Appointments
                 .Where(a => a.PatientId != user.Id.ToString())
+                .OrderByDescending(a => a.Date)
+                .ThenBy(a => a.Time)
                 .ToList();
             ViewBag.AllAppointments = allAppointments;
 
-            // Dates
+            // Get the date of the week
             if (sunday == null)
             {
                 sunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
@@ -852,19 +995,21 @@ namespace HealthApp.MVC.Controllers
             ViewBag.Sunday = sunday;
             ViewBag.Saturday = sunday.Value.AddDays(6);
 
-            // Patient's information
             ViewBag.Patient = user;
 
-            // List of doctors
+            // Get the list of doctors
             var doctors = _context.Doctors.ToList();
             ViewBag.Doctors = doctors;
-
-            // To select the doctor
+            
             ViewBag.DoctorId = doctorId;
 
             return View();
         }
 
+        /*
+         * This method is used to book an appointment.
+         * model: The input model for the appointment.
+         */
         [HttpPost]
         public async Task<IActionResult> book_appointment(BookAppointmentInputModel model)
         {
@@ -880,26 +1025,20 @@ namespace HealthApp.MVC.Controllers
 
             if (model.appointmentDate == null || model.appointmentHour == null || model.DoctorId == null)
             {
-                _logger.LogError($"******************************\n"
-                   + $"Date: {model.appointmentDate}\n" +
-                   $"Hour: {model.appointmentHour}\n" +
-                   $"Doctor: {model.DoctorId} ()\n" +
-                   $"Patient: {model.PatientId} ()\n" +
-                   $"Specialization: {model.Specialization}\n" +
-                   $"Location: {model.Location}\n" +
-                   $"Status: {model.Status}\n" +
-                   $"*******************************\n");
-
                 TempData["ErrorMessage"] = "Please fill in all fields.";
                 var sunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
                 return RedirectToAction("appointments", "care", new { doctorId = "" });
             }
             else
             {
+                // Get the appointments for the doctor
                 List<Appointment> doctorAppointments = _context.Appointments
-                .Where(a => a.DoctorId == model.DoctorId)
-                .ToList();
+                    .Where(a => a.DoctorId == model.DoctorId)
+                    .OrderByDescending(a => a.Date)
+                    .ThenBy(a => a.Time)
+                    .ToList();
 
+                // Check if the doctor is available
                 if (doctorAppointments != null)
                 {
                     foreach (var a in doctorAppointments)
@@ -913,6 +1052,7 @@ namespace HealthApp.MVC.Controllers
                     }
                 }
 
+                // Create a new appointment
                 var appointment = new Appointment
                 {
                     Id = id,
@@ -929,6 +1069,7 @@ namespace HealthApp.MVC.Controllers
                     PatientFirstName = patient.FirstName
                 };
 
+                // Create notifications for the doctor and patient
                 var doctorNotification = new Notification
                 {
                     Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -962,37 +1103,34 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*
+         * This method is used to edit an appointment.
+         * model: The input model for the appointment.
+         * Id: The id of the appointment.
+         * sunday: The date of the week.
+         * doctorId: The id of the doctor.
+         */
         [HttpPost]
         public async Task<IActionResult> edit_appointment(EditAppointmentInputModel model, int Id, string sunday, string doctorId)
         {
             var today = DateTime.Today.ToString("yyyy-MM-dd");
 
+            // Get the appointment
             var appointment = _context.Appointments.Find(model.Id);
 
+            // Check if the appointment is in the past
             if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
             {
                 TempData["ErrorMessage"] = "Cannot reschedule past appointments.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
             }
 
+            // Check if the appointment is already approved
             if (appointment.Status != "Pending")
             {
                 TempData["ErrorMessage"] = "Cannot reschedule this appointments.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
             }
-
-            _logger.LogInformation($"******************************\n");
-            _logger.LogInformation($"Id = {Id}\n");
-            _logger.LogInformation($"Date = {model.Date}\n");
-            _logger.LogInformation($"Time = {model.Hour}\n");
-            _logger.LogInformation($"DoctorId = {model.DId}\n");
-            _logger.LogInformation($"PatientId = {model.PId}\n");
-            _logger.LogInformation($"Specialization = {model.Spe}\n");
-            _logger.LogInformation($"Location = {model.Loc}\n");
-            _logger.LogInformation($"Status = {model.Stat}\n");
-            _logger.LogInformation($"PatientLastName = {model.PLastName}\n");
-            _logger.LogInformation($"PatientFirstName = {model.PFirstName}\n");
-            _logger.LogInformation($"******************************\n");
 
             if (model.Date == null || model.Hour == null || model.DId == null)
             {
@@ -1005,6 +1143,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
             }
 
+            // Check if the doctor is available
             List<Appointment> doctorAppointments = _context.Appointments
                 .Where(a => a.DoctorId == model.DId)
                 .ToList();
@@ -1022,6 +1161,7 @@ namespace HealthApp.MVC.Controllers
                 }
             }
 
+            // Edit the appointment
             appointment.Date = model.Date;
             appointment.Time = model.Hour;
             appointment.DoctorId = model.DId;
@@ -1034,6 +1174,7 @@ namespace HealthApp.MVC.Controllers
 
             _context.Appointments.Update(appointment);
 
+            // Create notifications for the doctor and patient
             var doctorNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -1067,10 +1208,18 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
         }
 
+        /*
+         * This method is used to approve an appointment.
+         * id: The id of the appointment.
+         * sunday: The date of the week.
+         */
         [HttpPost]
         public async Task<IActionResult> approve_appointment(int id, string sunday)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
+
+            var today = DateTime.Today.ToString("yyyy-MM-dd");
 
             if (appointment == null)
             {
@@ -1078,18 +1227,28 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care");
             }
 
+            // Check if the appointment is in the past
+            if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
+            {
+                TempData["ErrorMessage"] = "Cannot approve past appointments.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            // Check if the appointment is already approved
             if (appointment.Status == "Approved")
             {
                 TempData["ErrorMessage"] = "Appointment already approved.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday });
             }
 
+            // Check if the appointment can be approved
             if (appointment.Status != "Pending" && appointment.Status != "Approved")
             {
                 TempData["ErrorMessage"] = "Cannot approve this appointment.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday });
             }
 
+            // Create a new notification for the patient
             var patientNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -1112,10 +1271,18 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("appointments", "care", new { sunday = sunday });
         }
 
+        /*
+         * This method is used to reject an appointment.
+         * id: The id of the appointment.
+         * sunday: The date of the week.
+         */
         [HttpPost]
         public async Task<IActionResult> reject_appointment(int id, string sunday)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
+
+            var today = DateTime.Today.ToString("yyyy-MM-dd");
 
             if (appointment == null)
             {
@@ -1123,12 +1290,28 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care");
             }
 
+            // Check if the appointment is in the past
+            if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
+            {
+                TempData["ErrorMessage"] = "Cannot reject past appointments.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            // Check if the appointment is already approved
             if (appointment.Status == "Approved")
             {
                 TempData["ErrorMessage"] = "Approved appointments cannot be rejected.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday });
             }
 
+            // Check if the appointment is already rejected
+            if (appointment.Status == "Rejected")
+            {
+                TempData["ErrorMessage"] = "Appointment already rejected.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            // Check if the appointment can be rejected
             if (appointment.Status != "Pending" && appointment.Status != "Rejected")
             {
                 TempData["ErrorMessage"] = "Cannot reject this appointment.";
@@ -1137,6 +1320,7 @@ namespace HealthApp.MVC.Controllers
 
             appointment.Status = "Rejected";
 
+            // Create a new notification for the patient
             var patientNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -1157,9 +1341,15 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("appointments", "care", new { sunday = sunday });
         }
 
+        /*
+         * This method is used to complete an appointment.
+         * id: The id of the appointment.
+         * sunday: The date of the week.
+         */
         [HttpPost]
         public async Task<IActionResult> complete_appointment(int id, string sunday)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
 
             if (appointment == null)
@@ -1168,12 +1358,14 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care");
             }
 
+            // Check if the appointment is already completed
             if (appointment.Status == "Completed")
             {
                 TempData["ErrorMessage"] = "Appointment already completed.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday });
             }
 
+            // Check if the appointment can be completed
             if (appointment.Status != "Approved" && appointment.Status != "Completed")
             {
                 TempData["ErrorMessage"] = "Cannot complete this appointment.";
@@ -1182,6 +1374,7 @@ namespace HealthApp.MVC.Controllers
 
             appointment.Status = "Completed";
 
+            // Create a new medical history
             var mhId = _context.MedicalHistories.Max(mh => mh.Id) + 1;
             var medicalHistory = new MedicalHistory
             {
@@ -1198,6 +1391,7 @@ namespace HealthApp.MVC.Controllers
                 Location = appointment.Location
             };
 
+            // Create a new notification for the patient
             var patientNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -1209,6 +1403,7 @@ namespace HealthApp.MVC.Controllers
                 IsRead = false
             };
 
+            // Add the medical history and notification to the database
             _context.MedicalHistories.Add(medicalHistory);
             _context.Notifications.Add(patientNotification);
 
@@ -1219,25 +1414,35 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("appointments", "care", new { sunday = sunday });
         }
 
+        /*
+         * This method is used to cancel an appointment.
+         * id: The id of the appointment.
+         * sunday: The date of the week.
+         * doctorId: The id of the doctor.
+         */
         [HttpPost]
         public async Task<IActionResult> cancel_appointment(int id, string sunday, string doctorId)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
 
             var today = DateTime.Today.ToString("yyyy-MM-dd");
 
+            // Check if the appointment is in the past
             if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
             {
                 TempData["ErrorMessage"] = "Cannot cancel past appointments.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
             }
 
+            // Check if the appointment is already cancelled
             if (appointment.Status == "Cancelled")
             {
                 TempData["ErrorMessage"] = "Appointment already cancelled.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
             }
 
+            // Check if the appointment is already completed
             if (appointment.Status == "Completed")
             {
                 TempData["ErrorMessage"] = "Cannot cancel completed appointments.";
@@ -1245,7 +1450,9 @@ namespace HealthApp.MVC.Controllers
             }
 
             var appointmentDate = DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            // Calculate the difference in days from today to the appointment date
             var daysDifference = (appointmentDate - DateTime.Today).TotalDays;
+            // Check if the appointment is within the cancellation period
             if (daysDifference < 1)
             {
                 _context.Appointments.Remove(appointment);
@@ -1261,6 +1468,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care");
             }
 
+            // Create a new notification for the patient and doctor
             var patientNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -1283,6 +1491,7 @@ namespace HealthApp.MVC.Controllers
                 IsRead = false
             };
 
+            // Add the notifications to the database
             _context.Notifications.Add(patientNotification);
             _context.Notifications.Add(doctorNotification);
 
@@ -1294,6 +1503,10 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("appointments", "care", new { sunday = sunday, doctorId = doctorId });
         }
 
+        /*
+         * This method is used to declare unavailability.
+         * model: The input model for the appointment.
+         */
         [HttpPost]
         public async Task<IActionResult> declare_unavailability(BookAppointmentInputModel model)
         {
@@ -1306,7 +1519,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("login_or_register", "account");
             }
 
-            var doctorId = doctor.Id.ToString();
+            var doctorId = doctor.Id;
 
             if (doctor == null)
             {
@@ -1314,10 +1527,12 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care");
             }
 
+            // Get the appointments for the doctor
             var appointments = _context.Appointments
                 .Where(a => a.DoctorId == doctorId)
                 .ToList();
 
+            // Check if the doctor is available
             if (appointments != null)
             {
                 foreach (var a in appointments)
@@ -1333,22 +1548,13 @@ namespace HealthApp.MVC.Controllers
 
             if (model.appointmentDate == null || model.appointmentHour == null || doctorId == null || doctorId == "")
             {
-                _logger.LogError($"******************************\n"
-                   + $"Date: {model.appointmentDate}\n" +
-                   $"Hour: {model.appointmentHour}\n" +
-                   $"Doctor: {doctorId} ({doctor.FirstName} {doctor.LastName})\n" +
-                   $"Patient: {model.PatientId} ()\n" +
-                   $"Specialization: {model.Specialization}\n" +
-                   $"Location: {model.Location}\n" +
-                   $"Status: {model.Status}\n" +
-                   $"*******************************\n");
-
                 TempData["ErrorMessage"] = "Please fill in all fields.";
                 var sunday = DateTime.Today.AddDays(-(int)DateTime.Today.DayOfWeek);
                 return RedirectToAction("appointments", "care");
             }
             else
             {
+                // Create a new appointment for unavailability
                 var appointment = new Appointment
                 {
                     Id = id,
@@ -1365,6 +1571,7 @@ namespace HealthApp.MVC.Controllers
                     PatientFirstName = patient.FirstName
                 };
 
+                // Create a new notification for the doctor
                 var doctorNotification = new Notification
                 {
                     Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -1376,6 +1583,7 @@ namespace HealthApp.MVC.Controllers
                     IsRead = false
                 };
 
+                // Add the appointment and notification to the database
                 _context.Notifications.Add(doctorNotification);
                 _context.Appointments.Add(appointment);
                 await _context.SaveChangesAsync();
@@ -1386,9 +1594,15 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*
+         * This method is used to cancel unavailability.
+         * id: The id of the appointment.
+         * sunday: The date of the week.
+         */
         [HttpPost]
         public async Task<IActionResult> cancel_unavailability(int id, string sunday)
         {
+            // Get the appointment
             var appointment = _context.Appointments.Find(id);
 
             if (appointment == null)
@@ -1397,12 +1611,29 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "care");
             }
 
+            var today = DateTime.Today.ToString("yyyy-MM-dd");
+            // Check if the appointment is in the past
+            if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
+            {
+                TempData["ErrorMessage"] = "Cannot cancel past unavailability.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            // Check if the availability can be cancelled
             if (appointment.Status != "Unavailable")
             {
                 TempData["ErrorMessage"] = "Cannot cancel this unavailability.";
                 return RedirectToAction("appointments", "care", new { sunday = sunday });
             }
 
+            // Check if the appointment is already cancelled
+            if (appointment.Status == "Cancelled")
+            {
+                TempData["ErrorMessage"] = "Unavailability already cancelled.";
+                return RedirectToAction("appointments", "care", new { sunday = sunday });
+            }
+
+            // Create a new notification for the doctor
             var doctorNotification = new Notification
             {
                 Id = _context.Notifications.Max(n => n.Id) + 1,
@@ -1414,6 +1645,7 @@ namespace HealthApp.MVC.Controllers
                 IsRead = false
             };
 
+            // Add the notification and remove the appointment from the database
             _context.Notifications.Add(doctorNotification);
             _context.Appointments.Remove(appointment);
             _logger.LogInformation($"******************************\nUnavailability with id {id} cancelled.\n******************************\n");

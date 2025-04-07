@@ -27,7 +27,9 @@ namespace HealthApp.MVC.Controllers
             _sendEmailModel = sendEmailModel;
         }
 
-        // ERROR
+        /*
+         * This method is used to display the error page.
+         */
         public IActionResult error()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -45,8 +47,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*****************************************/
 
-        // admin/panel.cshtml
+        /*
+         * This method is used to display the admin panel.
+         */
         public IActionResult panel()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -72,8 +77,13 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*****************************************/
 
-        // admin/appointments.cshtml
+        /*
+         * This method is used to display the appointments page.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public IActionResult appointments([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
@@ -112,11 +122,13 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
+            // Get all appointments
             var appointments = _context.Appointments
                 .OrderByDescending(a => a.Date)
                 .ThenByDescending(a => a.Time)
                 .ToList();
 
+            // Search among appointments with the searchInput and searchField
             appointments = searchAppointments(searchInput, searchField);
 
             ViewBag.Appointments = appointments;
@@ -124,6 +136,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to search for appointments.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public List<Appointment> searchAppointments(string searchInput, string searchField)
         {
             var appointments = _context.Appointments
@@ -158,17 +175,23 @@ namespace HealthApp.MVC.Controllers
             return appointments;
         }
 
+        /*
+         * This method is used to create an appointment.
+         * model: the input from the form
+         */
         public async Task<IActionResult> create_appointment(BookAppointmentInputModel model)
         {
             var user = await _userManager.GetUserAsync(User);
 
             var id = _context.Appointments.Max(a => a.Id) + 1;
 
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
                 var doctor = await _userManager.FindByIdAsync(model.DoctorId);
                 var patient = await _userManager.FindByIdAsync(model.PatientId);
 
+                // Create the appointment
                 var appointment = new Appointment
                 {
                     Id = id,
@@ -186,8 +209,10 @@ namespace HealthApp.MVC.Controllers
                 };
                 try
                 {
+                    // Add the appointment to the database
                     _context.Appointments.Add(appointment);
 
+                    // Create notifications for the patient and doctor
                     var patientNotification = new Notification
                     {
                         Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
@@ -206,6 +231,8 @@ namespace HealthApp.MVC.Controllers
                         Content = $"Your appointment has been created for {model.appointmentDate} at {model.appointmentHour} by an administrator.",
                         IsRead = false
                     };
+
+                    // Add the notifications to the database
                     _context.Notifications.Add(patientNotification);
                     _context.Notifications.Add(doctorNotification);
                     await _context.SaveChangesAsync();
@@ -232,10 +259,16 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*
+         * This method is used to edit an appointment.
+         * model: the input from the form
+         * id: the id of the appointment
+         */
         public async Task<IActionResult> edit_appointment(EditAppointmentInputModel model, int id)
         {
             var user = await _userManager.GetUserAsync(User);
 
+            // Get the appointment
             var appointment = await _context.Appointments.FindAsync(id);
 
             if (appointment == null)
@@ -244,8 +277,10 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("appointments", "admin");
             }
 
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
+                // Edit the appointment
                 appointment.Date = model.Date;
                 appointment.Time = model.Hour;
                 appointment.Status = model.Stat;
@@ -255,6 +290,7 @@ namespace HealthApp.MVC.Controllers
                     _context.Appointments.Update(appointment);
                     await _context.SaveChangesAsync();
 
+                    // Create notifications for the patient and doctor
                     var patientNotification = new Notification
                     {
                         Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
@@ -294,6 +330,10 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("appointments", "admin");
         }
 
+        /*
+         * This method is used to delete an appointment.
+         * id: the id of the appointment
+         */
         public async Task<IActionResult> delete_appointment(int id)
         {
             if (id == 0)
@@ -304,6 +344,7 @@ namespace HealthApp.MVC.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
+            // Get the appointment
             var appointment = await _context.Appointments.FindAsync(id);
 
             if (appointment == null)
@@ -314,10 +355,12 @@ namespace HealthApp.MVC.Controllers
 
             try
             {
+                // Delete the appointment
                 _context.Appointments.Remove(appointment);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Appointment deleted successfully.";
 
+                // Create notifications for the patient and doctor
                 var doctorNotification = new Notification
                 {
                     Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
@@ -352,8 +395,13 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*****************************************/
 
-        // admin/users.cshtml
+        /*
+         * This method is used to display the users page.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public async Task<IActionResult> users([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
@@ -377,17 +425,18 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
-            // USERS
+            // Get all users
             var users = _context.Users.OfType<User>().ToList();
             var roles = new Dictionary<string, IList<string>>();
 
+            // Get all roles for each user
             foreach (var u in users)
             {
                 var r = await _userManager.GetRolesAsync(u);
                 roles[u.Id] = r;
             }
 
-            // SEARCH
+            // Search among users with the searchInput and searchField
             if (!string.IsNullOrEmpty(searchInput) && !string.IsNullOrEmpty(searchField))
             {
                 searchInput = searchInput.ToLower();
@@ -413,17 +462,22 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
-            // END
             ViewBag.Users = users;
             ViewBag.UserRoles = roles;
 
             return View();
         }
 
+        /*
+         * This method is used to create a new user.
+         * model: the input from the form
+         */
         public async Task<IActionResult> create_user(CreateUserInputModel model)
         {
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
+                // Check if the user already exists
                 var users = _userManager.Users.ToList();
 
                 foreach (var u in users)
@@ -436,6 +490,7 @@ namespace HealthApp.MVC.Controllers
                     }
                 }
 
+                // Create the user
                 var user = new User
                 {
                     FirstName = model.FirstName,
@@ -447,21 +502,22 @@ namespace HealthApp.MVC.Controllers
                     Password = model.Password
                 };
 
+                // Check if the user can be created
                 var result = await _userManager.CreateAsync(user, model.Password);
                 var roleName = model.Role.ToString();
 
                 if (result.Succeeded)
                 {
-                    //_logger.LogInformation($"******************************\nNew user with Email {model.Email} and role {roleName} has been created.\n******************************\n");
-
                     await _userManager.AddToRoleAsync(user, roleName);
 
+                    // Send a confirmation email
                     _sendEmailModel.SendCreateConfirmation(model.FirstName, model.LastName, model.Email, "admin");
 
                     TempData["SuccessMessage"] = $"New user with Email {model.Email} and role {roleName} has been created.\n";
 
                     try
                     {
+                        // Create a new doctor depending on the chosen role
                         if (roleName == "Doctor")
                         {
                             var doctor = new Doctor
@@ -531,8 +587,14 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*
+         * This method is used to edit a user.
+         * model: the input from the form
+         * userId: the id of the user
+         */
         public async Task<IActionResult> edit_user(EditUserInputModel model, string userId)
         {
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByIdAsync(userId);
@@ -540,6 +602,7 @@ namespace HealthApp.MVC.Controllers
 
                 if (user != null)
                 {
+                    // Edit the user
                     user.FirstName = model.FirstName;
                     user.LastName = model.LastName;
                     user.UserName = model.Email;
@@ -549,6 +612,7 @@ namespace HealthApp.MVC.Controllers
 
                     try
                     {
+                        // If the user is a doctor or a patient, remove them from the database
                         if (userRole.Contains("doctor"))
                         {
                             var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
@@ -582,14 +646,17 @@ namespace HealthApp.MVC.Controllers
                     await _userManager.RemoveFromRolesAsync(user, await _userManager.GetRolesAsync(user));
                     await _userManager.AddToRoleAsync(user, roleName);
 
+                    // Update the user in the database
                     var result = await _userManager.UpdateAsync(user);
 
                     if (result.Succeeded)
                     {
+                        // Send a confirmation email
                         _sendEmailModel.SendEditConfirmation(user.FirstName, user.LastName, user.UserName, "admin", "information");
 
                         try
                         {
+                            // Create a new doctor or patient depending on the chosen role
                             if (roleName == "Doctor")
                             {
                                 var doctor = new Doctor
@@ -665,35 +732,48 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*
+         * This method is used to disable or enable a user depending on their current status.
+         * userId: the id of the user
+         */
         public async Task<IActionResult> disable_enable(string userId)
         {
+            // Get the user
             var user = await _userManager.FindByIdAsync(userId);
 
+            // Check if the user is an admin
             if (user.UserName == "admin@test.fr")
             {
                 TempData["ErrorMessage"] = $"You cannot disable this admin user.\n";
                 return RedirectToAction("users", "admin");
             }
 
+            // Check if the user is found
             if (user != null)
             {
+                // Check if the user is active
                 if (user.IsActive)
                 {
+                    // Disable the user
                     user.IsActive = false;
                 }
                 else
                 {
+                    // Enable the user
                     user.IsActive = true;
                 }
 
                 try
                 {
+                    // Update the user in the database
                     if (!user.IsActive)
                     {
+                        // Send a confirmation email
                         _sendEmailModel.SendDisableAccount(user.FirstName, user.LastName, user.UserName);
                     }
                     else
                     {
+                        // Send a confirmation email
                         _sendEmailModel.SendEnableAccount(user.FirstName, user.LastName, user.UserName);
                     }
                     _context.Users.Update(user);
@@ -723,16 +803,24 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*
+         * This method is used to delete a user.
+         * userId: the id of the user
+         */
         public async Task<IActionResult> delete_user(string userId)
         {
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
+                // Get the current user
                 var currentUser = await _signInManager.UserManager.GetUserAsync(User);
 
+                // Get the user to delete 
                 var user = await _userManager.FindByIdAsync(userId);
 
                 if (user != null)
                 {
+                    // Check if the user is an admin
                     var admin = user.UserName == "admin@test.fr";
                     if (admin)
                     {
@@ -746,12 +834,15 @@ namespace HealthApp.MVC.Controllers
                     var userLastName = user.LastName;
                     var userRole = await _userManager.GetRolesAsync(user);
 
+                    // Check if the user can be deleted
                     var result = await _userManager.DeleteAsync(user);
 
                     if (result.Succeeded)
                     {
+                        // Send a confirmation email
                         _sendEmailModel.SendDeleteConfirmation(userFirstName, userLastName, userEmail, "admin");
 
+                        // Remove the user from the database depending on their role
                         if (userRole.Contains("doctor"))
                         {
                             var doctor = _context.Doctors.FirstOrDefault(d => d.UserId == user.Id);
@@ -807,8 +898,13 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*****************************************/
 
-        // admin/messages.cshtml
+        /*
+         * This method is used to display the messages page.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public async Task<IActionResult> messages([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
@@ -843,8 +939,10 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
+            // Get all messages
             var messages = search_messages(searchInput, searchField);
 
+            // Get all messages sent from the contact page
             var adminMessages = _context.Messages
                 .Where(m => m.ReceiverId == user.Id)
                 .ToList();
@@ -860,39 +958,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        public IActionResult message(int id)
-        {
-            var user = _signInManager.UserManager.GetUserAsync(User).Result;
-            if (user == null)
-            {
-                TempData["ErrorMessage"] = "User not found.";
-                return RedirectToAction("login_or_register", "account");
-            }
-
-            if (user.IsActive == false)
-            {
-                _signInManager.SignOutAsync();
-                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
-                return RedirectToAction("login", "account");
-            }
-
-            var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
-            ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("doctor");
-            ViewBag.IsPatient = userRoles.Contains("patient");
-            ViewBag.IsAdmin = userRoles.Contains("administrator");
-
-            var message = _context.Messages.FirstOrDefault(m => m.Id == id);
-            if (message == null)
-            {
-                TempData["ErrorMessage"] = "Message not found.";
-                return RedirectToAction("messages", "admin");
-            }
-            ViewBag.Message = message;
-
-            return View();
-        }
-
+        /*
+         * This method is used to search for messages.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public List<Message> search_messages(string searchInput, string searchField)
         {
             var messages = _context.Messages
@@ -937,6 +1007,48 @@ namespace HealthApp.MVC.Controllers
             return messages;
         }
 
+        /*
+         * This method is used to display a message.
+         * id: the id of the message
+         */
+        public IActionResult message(int id)
+        {
+            var user = _signInManager.UserManager.GetUserAsync(User).Result;
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
+            var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            // Get the message
+            var message = _context.Messages.FirstOrDefault(m => m.Id == id);
+            if (message == null)
+            {
+                TempData["ErrorMessage"] = "Message not found.";
+                return RedirectToAction("messages", "admin");
+            }
+            ViewBag.Message = message;
+
+            return View();
+        }
+
+        /*
+         * This method is used to send a message.
+         * model: the input from the form
+         */
         public async Task<IActionResult> send_message(NewMessageInputModel model)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
@@ -947,10 +1059,12 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("login_or_register", "account");
             }
 
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
                 var receiver = await _userManager.FindByIdAsync(model.ReceiverId);
 
+                // Create the message
                 var message = new Message
                 {
                     Id = _context.Messages.Max(m => m.Id) + 1,
@@ -971,6 +1085,7 @@ namespace HealthApp.MVC.Controllers
 
                 try
                 {
+                    // Add the message to the database
                     _context.Messages.Add(message);
                     _context.SaveChanges();
                     TempData["SuccessMessage"] = "Message sent successfully to all users.";
@@ -996,6 +1111,10 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*
+         * This method is used to send a system message to all users.
+         * model: the input from the form
+         */
         public async Task<IActionResult> system_message(NewMessageInputModel model)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
@@ -1006,10 +1125,12 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("login_or_register", "account");
             }
 
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
                 var users = _userManager.Users.ToList();
 
+                // For each user, create a message
                 foreach (var u in users)
                 {
                     var message = new Message
@@ -1032,6 +1153,7 @@ namespace HealthApp.MVC.Controllers
 
                     try
                     {
+                        // Add the message to the database
                         _context.Messages.Add(message);
                         _context.SaveChanges();
                     }
@@ -1059,6 +1181,10 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*
+         * This method is used to delete a message.
+         * id: the id of the message
+         */
         public async Task<IActionResult> delete_message(int id)
         {
             if (id == 0)
@@ -1067,6 +1193,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("messages", "admin");
             }
 
+            // Get the message by id
             var message = await _context.Messages.FindAsync(id);
 
             if (message == null)
@@ -1076,6 +1203,7 @@ namespace HealthApp.MVC.Controllers
             }
             try
             {
+                // Delete the message
                 _context.Messages.Remove(message);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Message deleted successfully.";
@@ -1089,12 +1217,18 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*****************************************/
 
-        // admin/medical_histories.cshtml
+        /*
+         * This method is used to display the medical histories page.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public async Task<IActionResult> medical_histories([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
 
+            // Get all doctors
             var doctors = _context.Doctors.ToList();
             ViewBag.Doctors = doctors;
 
@@ -1117,6 +1251,7 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
+            // Get all medical histories
             var medicalHistories = _context.MedicalHistories
                 .OrderByDescending(m => m.Date)
                 .ToList();
@@ -1130,6 +1265,7 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
+            // Search among medical histories with the searchInput and searchField
             medicalHistories = search_medical_histories(searchInput, searchField);
 
             ViewBag.MedicalHistories = medicalHistories;
@@ -1137,6 +1273,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to search for medical histories.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public List<MedicalHistory> search_medical_histories(string searchInput, string searchField)
         {
             var medicalHistories = _context.MedicalHistories
@@ -1170,10 +1311,16 @@ namespace HealthApp.MVC.Controllers
             return medicalHistories;
         }
 
+        /*
+         * This method is used to edit a medical history.
+         * model: the input from the form
+         * id: the id of the medical history
+         */
         public async Task<IActionResult> edit_medical_history(EditMedicalHistoryInputModel model, int id)
         {
             var user = await _userManager.GetUserAsync(User);
 
+            // Get the medical history by id
             var medical_history = await _context.MedicalHistories.FindAsync(id);
 
             if (medical_history == null)
@@ -1182,8 +1329,10 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("medical_histories", "admin");
             }
 
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
+                // Edit the medical history
                 medical_history.Date = model.Date;
                 medical_history.Diagnosis = model.Diagnosis;
                 medical_history.DoctorId = model.DoctorId;
@@ -1193,6 +1342,7 @@ namespace HealthApp.MVC.Controllers
 
                 try
                 {
+                    // Update the medical history in the database
                     _context.MedicalHistories.Update(medical_history);
                     await _context.SaveChangesAsync();
 
@@ -1211,6 +1361,10 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("medical_histories", "admin");
         }
 
+        /*
+         * This method is used to delete a medical history.
+         * id: the id of the medical history
+         */
         public async Task<IActionResult> delete_medical_history(int id)
         {
             if (id == 0)
@@ -1219,6 +1373,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("medical_histories", "admin");
             }
 
+            // Get the medical history by id
             var medicalHistory = await _context.MedicalHistories.FindAsync(id);
 
             if (medicalHistory == null)
@@ -1228,6 +1383,7 @@ namespace HealthApp.MVC.Controllers
             }
             try
             {
+                // Delete the medical history
                 _context.MedicalHistories.Remove(medicalHistory);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Medical history deleted successfully.";
@@ -1241,12 +1397,18 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*****************************************/
 
-        // admin/prescriptions.cshtml
+        /*
+         * This method is used to display the prescriptions page.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public async Task<IActionResult> prescriptions([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
 
+            // Get all doctors
             var doctors = _context.Doctors.ToList();
             ViewBag.Doctors = doctors;
 
@@ -1269,6 +1431,7 @@ namespace HealthApp.MVC.Controllers
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
+            // Get all prescriptions
             var prescriptions = _context.Prescriptions
                 .OrderByDescending(m => m.Date)
                 .ToList();
@@ -1282,6 +1445,7 @@ namespace HealthApp.MVC.Controllers
                 searchField = "";
             }
 
+            // Search among prescriptions with the searchInput and searchField
             prescriptions = search_prescriptions(searchInput, searchField);
 
             ViewBag.Prescriptions = prescriptions;
@@ -1289,6 +1453,11 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+        /*
+         * This method is used to search for prescriptions.
+         * searchInput: the input from the search bar
+         * searchField: the field to search in
+         */
         public List<Prescription> search_prescriptions(string searchInput, string searchField)
         {
             var prescriptions = _context.Prescriptions
@@ -1318,10 +1487,16 @@ namespace HealthApp.MVC.Controllers
             return prescriptions;
         }
 
+        /*
+         * This method is used to edit a prescription.
+         * model: the input from the form
+         * id: the id of the prescription
+         */
         public async Task<IActionResult> edit_prescription(EditPrescriptionInputModel model, int id)
         {
             var user = await _userManager.GetUserAsync(User);
 
+            // Get the prescription by id
             var prescription = await _context.Prescriptions.FindAsync(id);
 
             if (prescription == null)
@@ -1330,8 +1505,10 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("prescriptions", "admin");
             }
 
+            // Check if all fields are filled
             if (ModelState.IsValid)
             {
+                // Edit the prescription
                 prescription.Date = model.Date;
                 prescription.DoctorId = model.DoctorId;
                 prescription.PatientId = model.PatientId;
@@ -1343,6 +1520,7 @@ namespace HealthApp.MVC.Controllers
 
                 try
                 {
+                    // Update the prescription in the database
                     _context.Prescriptions.Update(prescription);
                     await _context.SaveChangesAsync();
 
@@ -1361,6 +1539,10 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("prescriptions", "admin");
         }
 
+        /*
+         * This method is used to delete a prescription.
+         * id: the id of the prescription
+         */
         public async Task<IActionResult> delete_prescription(int id)
         {
             if (id == 0)
@@ -1369,6 +1551,7 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("prescriptions", "admin");
             }
 
+            // Get the prescription by id
             var prescription = await _context.Prescriptions.FindAsync(id);
 
             if (prescription == null)
@@ -1378,6 +1561,7 @@ namespace HealthApp.MVC.Controllers
             }
             try
             {
+                // Delete the prescription
                 _context.Prescriptions.Remove(prescription);
                 await _context.SaveChangesAsync();
                 TempData["SuccessMessage"] = "Prescription deleted successfully.";
@@ -1391,8 +1575,11 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        /*****************************************/
 
-        // admin/logs.cshtml
+        /*
+         * This method is used to display the logs page.
+         */
         public IActionResult logs()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
