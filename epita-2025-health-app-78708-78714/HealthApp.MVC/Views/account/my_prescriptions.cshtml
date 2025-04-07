@@ -22,50 +22,75 @@
                 </div>
                 <section>
                     <hr />
-                    <div class="col-md-4" style="border-right: 1px solid #dee2e6;">
-                        <div>
-                            <h3 class="text-center">My Prescriptions</h3>
-                            <hr />
-                        </div>
-                        <div class="list-group">
-                            <!-- FILTER BY NAME, DOCTOR -->
-                            <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
-                                <input type="text" id="prescriptionsSearchInput" name="prescriptionsSearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
-                                <select id="prescriptionsSearchField" name="prescriptionsSearchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
-                                    <option value="Name">Name</option>
-                                    <option value="DoctorLastName">Doctor</option>
-                                </select>
-                                <button class="btn little-white-button" id="mhSearchButton" onclick="location.href='@Url.Action("patients", "care")?searchInput=' + document.getElementById('prescriptionsSearchInput').value + '&searchField=' + document.getElementById('prescriptionsSearchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
-                            </section>
-                            <!-- PRESCRIPTIONS LIST -->
-                            @if (ViewBag.Prescriptions != null)
+                    <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                        <input type="text" id="prescriptionsSearchInput" name="prescriptionsSearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                        <select id="prescriptionsSearchField" name="prescriptionsSearchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                            <option value="Name">Name</option>
+                            <option value="DoctorLastName">Doctor</option>
+                        </select>
+                        <button class="btn little-white-button" id="mhSearchButton" onclick="location.href='@Url.Action("my_prescriptions", "account")?searchInput=' + document.getElementById('prescriptionsSearchInput').value + '&searchField=' + document.getElementById('prescriptionsSearchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                    </section>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Date</th>
+                                <th>Duration</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.Prescriptions == null || ViewBag.Prescriptions.Count == 0)
                             {
-                                @foreach (var mh in ViewBag.Prescriptions)
+                                <tr>
+                                    <td colspan="4" style="text-align: center">No prescription found.</td>
+                                </tr>
+                            }                           
+                            else
+                            {
+                                <!-- PRESCRIPTIONS LIST -->
+                                @foreach (var p in ViewBag.Prescriptions)
                                 {
-                                    <tr>
-                                        <td>
-                                            <div class="list-group-item list-group-item-action">
-                                                <div class="d-flex w-100 justify-content-between">
-                                                    <h5 class="mb-1">Name: @mh.Nale</h5>
-                                                    <small>Date: @mh.Date</small>
-                                                    <small>Dosage: @mh.Dosage</small>
-                                                    <small>Frequency: @mh.Frequency</small>
-                                                    <small>Duration: @mh.Duration</small>
-                                                    <small>Pharmacy: @mh.Pharmacy</small>
-                                                    <small>Expiration Date: @mh.ExpirationDate</small>
+                                    <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#viewPrescriptionModal-@p.Id" style="cursor: pointer;">
+                                        <td style="vertical-align: middle;">@p.Name</td>
+                                        <td style="vertical-align: middle;">@p.Date</td>
+                                        <td style="vertical-align: middle;">@p.Duration days</td>
+                                    </tr>
+
+                                    <!-- VIEW PRESCRIPTION MODAL -->
+                                    <div class="modal fade" id="viewPrescriptionModal-@p.Id" tabindex="-1" aria-labelledby="viewPrescriptionModalLabel-@p.Id" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="viewPrescriptionModalLabel-@p.Id" style="margin-left: 8px">Prescription</h5>
+                                                    <button type="button" class="btn-close" onclick="location.href='@Url.Action("my_prescriptions", "account")';" aria-label="Close" style="margin-right: 6px"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h5 class="modal-title" style="margin-left: 8px"><strong>@p.Name</strong></h5>
+                                                    <div class="d-flex justify-content-between" style="margin-left: 8px; margin-top: 8px">
+                                                        <div>
+                                                            <p class="mb-2"><strong>Issued Date:</strong> @p.Date</p>
+                                                            <p class="mb-2"><strong>Dosage:</strong> @p.Dosage mg</p>
+                                                            <p class="mb-2"><strong>Frequency:</strong> @p.Frequency per day</p>
+                                                            <p class="mb-2"><strong>Duration:</strong> @p.Duration days</p>
+                                                            <p class="mb-2"><strong>Pharmacy:</strong> @p.Pharmacy</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        </div>
+                                    </div>
                                 }
                             }
-                        </div>
-                    </div>
+                        </tbody>
+                    </table>
                 </section>
             </div>
         </div>
     </div>
-	@section scripts {
+
+	@section scripts 
+    {
         <script>
             function searchPrescriptions()
             {
@@ -87,8 +112,13 @@
             {
                 window.history.go(-1);
             }
+
+            function close()
+            {
+			    window.history.go(0);
+            }
         </script>
-        }
+    }
 }
 else
 {

@@ -21,6 +21,5 @@ namespace HealthApp.Domain.Models
         public string Frequency { get; set; }
         public string Duration { get; set; }
         public string Pharmacy { get; set; }
-        public string ExpirationDate { get; set; }
     }
 }

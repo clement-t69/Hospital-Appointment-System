@@ -107,11 +107,8 @@
 
 
 
-[⏯️]	Views/account/my_prescriptions.cshtml (as a patient, if not the case, redirect to Error page): NEED TO FIX SEARCH AND SEE IF PRESCRIPTIONS ARE DISPLAYED CORRECTLY
-		List of prescriptions (can be filtered by doctor name, name, dosage, frequency, duration, pharmacy, expiration date)
-		Can request a prescription renewal (button with a form to enter the reason)
-		Reminder to Account/Messages when a prescription is about to expire (48 hours before expiration)
-		Button to share the prescription with a pharmacy (opens a form with pharmacy name)
+[✅]	Views/account/my_prescriptions.cshtml (as a patient, if not the case, redirect to Error page)
+		List of prescriptions (can be filtered by doctor name, name, dosage, frequency, duration, pharmacy)
 
 //////////////////////// Views/care ////////////////////////
 
@@ -119,17 +116,14 @@
 		List of patients (can be filtered by name, email)
 		Button to edit a patient, redirect to care/patient/{id}
 
-[⏯️]	Views/care/patient/{id}.cshtml : NEED TO IMPLEMENT BUTTONS TO CREATE PRESCRIPTIONS, AND OTHER FEATURES
-		✅Patient's profile (First name, Last name)
-		✅3 fields: Appointments, Medical history, Prescriptions
-		✅Appointments: List of appointments (can be filtered by date, doctor name, status)
-		✅Medical history: List of medical history (can be filtered by date, doctor name, specialty, location)
-		✅Prescriptions: List of prescriptions (can be filtered by doctor name, name, dosage, frequency, duration, pharmacy, expiration date)
-		--> Button to print or download a prescription (opens a form with Print or Download)
-		--> Button to share the prescription with a pharmacy (opens a form with pharmacy name)
-		--> Button to request a prescription renewal (opens a form with the reason)
-		✅--> Button to send a message to the patient (opens a form with Title, Content, Send button)
-		✅Send a message when a prescription is issued, updated, or cancelled
+[✅]	Views/care/patient/{id}.cshtml (only as a doctor, if not the case redirect to Error page):
+		Patient's profile (First name, Last name)
+		3 fields: Appointments, Medical history, Prescriptions
+		Appointments: List of appointments (can be filtered by date, doctor name, status)
+		Medical history: List of medical history (can be filtered by date, doctor name, specialty, location)
+		Prescriptions: List of prescriptions (can be filtered by doctor name, name, dosage, frequency, duration, pharmacy, expiration date)
+		--> Button to send a message to the patient (opens a form with Title, Content, Send button)
+		Send a message when a prescription is issued, updated, or cancelled
 
 [✅]	Views/care/doctors.cshtml (only as a patient, if not the case redirect to Error page): TODO: SEND MESSAGE (just copy the doctor email to the message form)
 		List of doctors (can be filtered by name, specialty, location)
