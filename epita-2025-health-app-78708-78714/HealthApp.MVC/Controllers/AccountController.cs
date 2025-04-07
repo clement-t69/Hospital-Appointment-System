@@ -133,6 +133,12 @@ namespace HealthApp.MVC.Controllers
         {
             var notification = _context.Notifications.FirstOrDefault(n => n.Id == id);
 
+            if (id == 0)
+            {
+                TempData["ErrorMessage"] = "You cannot delete this notification.";
+                return RedirectToAction("my_notifications", "account");
+            }
+
             if (notification == null)
             {
                 TempData["ErrorMessage"] = "Notification not found.";

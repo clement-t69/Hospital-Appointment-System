@@ -17,6 +17,7 @@ namespace HealthApp.Domain.Models
         [ForeignKey("PatientId")]
         public string PatientId { get; set; }
         public Patient Patient { get; set; }
+        public string PatientFirstName { get; set; }
         public string PatientLastName { get; set; }
 
         public string Specialization { get; set; }
