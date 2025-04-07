@@ -52,10 +52,20 @@ namespace HealthApp.MVC.Controllers
         public async Task<IActionResult> patients([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
+
             if (user == null)
             {
-                return View();
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
             }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = await _signInManager.UserManager.GetRolesAsync(user);
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
@@ -123,10 +133,20 @@ namespace HealthApp.MVC.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var userRoles = await _userManager.GetRolesAsync(user);
+
             if (user == null)
             {
-                return RedirectToAction("Login", "Account");
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
             }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
@@ -303,10 +323,12 @@ namespace HealthApp.MVC.Controllers
                     Date = model.Date
                 };
 
+                var doctor = await _userManager.FindByIdAsync(model.DoctorId);
+
                 var notification = new Notification
                 {
                     Id = _context.Notifications.Max(n => n.Id) + 1,
-                    Content = $"You have a new prescription for {model.Name} from doctor {model.DoctorId}.",
+                    Content = $"You have a new prescription for {model.Name} from doctor {doctor.FirstName} {doctor.LastName}.",
                     Title = "New Prescription",
                     Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
                     SenderId = model.DoctorId,
@@ -708,16 +730,23 @@ namespace HealthApp.MVC.Controllers
             return RedirectToAction("patient", "care", new { id = medicalHistory.PatientId });
         }
 
-
-
         // care/doctors.cshtml
         public async Task<IActionResult> doctors([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _userManager.GetUserAsync(User);
+            
             if (user == null)
             {
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
                 return RedirectToAction("login", "account");
             }
+
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = await _userManager.IsInRoleAsync(user, "doctor");
             ViewBag.IsPatient = await _userManager.IsInRoleAsync(user, "patient");
@@ -785,10 +814,20 @@ namespace HealthApp.MVC.Controllers
         {
             //////////////////
             var user = await _userManager.GetUserAsync(User);
+
             if (user == null)
             {
+                TempData["ErrorMessage"] = "User not found.";
                 return RedirectToAction("login_or_register", "account");
             }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = await _userManager.IsInRoleAsync(user, "doctor");
             ViewBag.IsPatient = await _userManager.IsInRoleAsync(user, "patient");
@@ -848,6 +887,7 @@ namespace HealthApp.MVC.Controllers
         {
             var id = _context.Appointments.Max(a => a.Id) + 1;
             var doctor = await _userManager.FindByIdAsync(model.DoctorId);
+            var patient = await _userManager.FindByIdAsync(model.PatientId);
 
             if (doctor == null)
             {
@@ -861,7 +901,7 @@ namespace HealthApp.MVC.Controllers
                    + $"Date: {model.appointmentDate}\n" +
                    $"Hour: {model.appointmentHour}\n" +
                    $"Doctor: {model.DoctorId} ()\n" +
-                   $"Patient: {model.PatientId} ({model.PatientFirstName} {model.PatientLastName})\n" +
+                   $"Patient: {model.PatientId} ()\n" +
                    $"Specialization: {model.Specialization}\n" +
                    $"Location: {model.Location}\n" +
                    $"Status: {model.Status}\n" +
@@ -902,14 +942,14 @@ namespace HealthApp.MVC.Controllers
                     Status = "Pending",
                     DoctorLastName = doctor.LastName,
                     DoctorFirstName = doctor.FirstName,
-                    PatientLastName = model.PatientLastName,
-                    PatientFirstName = model.PatientFirstName
+                    PatientLastName = patient.LastName,
+                    PatientFirstName = patient.FirstName
                 };
 
                 var doctorNotification = new Notification
                 {
                     Id = _context.Notifications.Max(n => n.Id) + 1,
-                    Content = $"You have a new appointment request from patient {model.PatientFirstName} {model.PatientLastName}.",
+                    Content = $"You have a new appointment request from patient {patient.FirstName} {patient.LastName}.",
                     Title = "New Appointment Request",
                     Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
                     SenderId = model.PatientId,
@@ -1275,6 +1315,8 @@ namespace HealthApp.MVC.Controllers
         {
             var id = _context.Appointments.Max(a => a.Id) + 1;
             var doctor = await _userManager.GetUserAsync(User);
+            var patient = await _userManager.FindByIdAsync(model.PatientId);
+
             if (doctor == null)
             {
                 return RedirectToAction("login_or_register", "account");
@@ -1311,7 +1353,7 @@ namespace HealthApp.MVC.Controllers
                    + $"Date: {model.appointmentDate}\n" +
                    $"Hour: {model.appointmentHour}\n" +
                    $"Doctor: {doctorId} ({doctor.FirstName} {doctor.LastName})\n" +
-                   $"Patient: {model.PatientId} ({model.PatientFirstName} {model.PatientLastName})\n" +
+                   $"Patient: {model.PatientId} ()\n" +
                    $"Specialization: {model.Specialization}\n" +
                    $"Location: {model.Location}\n" +
                    $"Status: {model.Status}\n" +
@@ -1335,8 +1377,8 @@ namespace HealthApp.MVC.Controllers
                     Status = "Unavailable",
                     DoctorLastName = doctor.LastName,
                     DoctorFirstName = doctor.FirstName,
-                    PatientLastName = model.PatientLastName,
-                    PatientFirstName = model.PatientFirstName
+                    PatientLastName = patient.LastName,
+                    PatientFirstName = patient.FirstName
                 };
 
                 var doctorNotification = new Notification

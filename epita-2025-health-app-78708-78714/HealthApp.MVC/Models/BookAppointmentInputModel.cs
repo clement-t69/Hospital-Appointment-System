@@ -24,10 +24,10 @@ namespace HealthApp.MVC.Models
         public string PatientId { get; set; }
 
         //[Required]
-        public string PatientLastName { get; set; }
+        //public string PatientLastName { get; set; }
 
         //[Required]
-        public string PatientFirstName { get; set; }
+        //public string PatientFirstName { get; set; }
 
         //[Required]
         public string Specialization { get; set; }

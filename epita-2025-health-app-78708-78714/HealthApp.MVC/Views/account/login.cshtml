@@ -4,6 +4,13 @@
     ViewData["Title"] = "Login";
 }
 
+@if (ViewBag.IsLogged == true)
+{
+	<script>
+		window.location.href = '@Url.Action("edit", "account")';
+	</script>
+}
+
 <div class="container d-flex justify-content-center" style="min-height: 60vh;">
     <div class="row justify-content-center">
         <div>

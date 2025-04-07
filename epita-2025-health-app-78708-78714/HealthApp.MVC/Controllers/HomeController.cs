@@ -194,13 +194,18 @@ namespace HealthApp.MVC.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Please fill in all required fields.");
+                    TempData["ErrorMessage"] = "Please fill in all required fields.";
                     return View(model);
                 }
             }
             else
             {
                 ViewBag.User = user;
+                var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
+                ViewBag.IsLogged = user != null;
+                ViewBag.IsDoctor = userRoles.Contains("doctor");
+                ViewBag.IsPatient = userRoles.Contains("patient");
+                ViewBag.IsAdmin = userRoles.Contains("administrator");
 
                 if (ModelState.IsValid)
                 {
@@ -232,7 +237,7 @@ namespace HealthApp.MVC.Controllers
                         catch (Exception ex)
                         {
                             _logger.LogError($"Error adding message: {ex.Message}");
-                            ModelState.AddModelError("", "An error occurred while sending your message. Please try again later.");
+                            TempData["ErrorMessage"] = "An error occurred while sending your message. Please try again later.";
                             return View(model);
                         }
                     }
@@ -244,7 +249,7 @@ namespace HealthApp.MVC.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError("", "Please fill in all required fields.");
+                    TempData["ErrorMessage"] = "Please fill in all required fields.";
                     return View(model);
                 }
             }

@@ -59,6 +59,13 @@ namespace HealthApp.MVC.Controllers
         // IF NOT LOGGED IN
         public IActionResult login_or_register()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+
+            if (user != null)
+            {
+                ViewBag.IsLogged = true;
+            }
+
             return View();
         }
 
@@ -66,6 +73,20 @@ namespace HealthApp.MVC.Controllers
         public IActionResult my_notifications()
         {
             var user = _userManager.GetUserAsync(User).Result;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
@@ -138,11 +159,20 @@ namespace HealthApp.MVC.Controllers
         {
             var user = _userManager.GetUserAsync(User).Result;
             var userRoles = _userManager.GetRolesAsync(user).Result;
+
             if (user == null)
             {
                 TempData["ErrorMessage"] = "User not found.";
                 return RedirectToAction("login_or_register", "account");
             }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
@@ -238,6 +268,20 @@ namespace HealthApp.MVC.Controllers
         public async Task<IActionResult> message(int id)
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
@@ -273,6 +317,20 @@ namespace HealthApp.MVC.Controllers
         public async Task<IActionResult> send_message()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
@@ -305,6 +363,13 @@ namespace HealthApp.MVC.Controllers
         public async Task<IActionResult> new_message(NewMessageInputModel model)
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
 
             if (user == null)
@@ -367,6 +432,7 @@ namespace HealthApp.MVC.Controllers
                     {
                         _context.Messages.Add(message);
                         _context.Notifications.Add(notification);
+                        _sendEmailModel.SendMessageEmail(receiver.FirstName, receiver.LastName, receiver.UserName);
                         _context.SaveChanges();
                         TempData["SuccessMessage"] = "Message sent successfully.";
                         _logger.LogInformation($"******************************\nDoctor {user.UserName} has sent a message to {receiver.UserName}.\n******************************\n");
@@ -435,6 +501,13 @@ namespace HealthApp.MVC.Controllers
         public async Task<IActionResult> reply_message(ReplyMessageInputModel model)
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
 
             if (user == null)
@@ -502,6 +575,7 @@ namespace HealthApp.MVC.Controllers
                         _context.Messages.Add(message);
                         _context.Notifications.Add(notification);
                         _context.SaveChanges();
+                        _sendEmailModel.SendMessageEmail(receiver.FirstName, receiver.LastName, receiver.UserName);
                         TempData["SuccessMessage"] = "Message sent successfully.";
                         _logger.LogInformation($"******************************\nDoctor {user.UserName} has sent a message to {receiver.UserName}.\n******************************\n");
                     }
@@ -569,6 +643,20 @@ namespace HealthApp.MVC.Controllers
         public IActionResult edit()
         {
             var user = _userManager.GetUserAsync(User).Result;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
@@ -605,12 +693,28 @@ namespace HealthApp.MVC.Controllers
         // account/login.cshtml
         public IActionResult login()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+
+            if (user != null)
+            {
+                ViewBag.IsLogged = true;
+            }
+
             return View();
         }
         
         [HttpPost]
         public async Task<IActionResult> login(LoginInputModel model)
         {
+            var user = await _userManager.FindByEmailAsync(model.Email.ToLower());
+
+            /*if (user == null) 
+            {
+                _logger.LogError($"******************************\nUser {model.Email} has failed to log in.\n******************************\n");
+                TempData["ErrorMessage"] = "Wrong credentials.\n";
+                return View(model);
+            }*/
+
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(
@@ -641,6 +745,13 @@ namespace HealthApp.MVC.Controllers
         // account/register.cshtml
         public IActionResult register()
         {
+            var user = _userManager.GetUserAsync(User).Result;
+
+            if (user != null)
+            {
+                ViewBag.IsLogged = true;
+            }
+
             return View();
         }
 
@@ -725,11 +836,18 @@ namespace HealthApp.MVC.Controllers
                 string emailToLower = model.Email.ToLower();
 
                 var user = await _userManager.FindByEmailAsync(emailToLower);
+
                 if (user == null)
                 {
-                    _logger.LogError($"******************************\nUser {model.Email} has failed to reset their Password: Email not found.\n******************************\n");
-                    TempData["ErrorMessage"] = "Email not found.\n";
-                    return View(model);
+                    TempData["ErrorMessage"] = "User not found.";
+                    return RedirectToAction("login_or_register", "account");
+                }
+
+                if (user.IsActive == false)
+                {
+                    _signInManager.SignOutAsync();
+                    TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                    return RedirectToAction("login", "account");
                 }
 
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
@@ -849,6 +967,14 @@ namespace HealthApp.MVC.Controllers
 
             if (user == null)
             {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
                 return RedirectToAction("login", "account");
             }
 
@@ -876,6 +1002,20 @@ namespace HealthApp.MVC.Controllers
         public async Task<IActionResult> my_profile()
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
 
             ViewBag.IsLogged = user != null;
@@ -959,6 +1099,20 @@ namespace HealthApp.MVC.Controllers
         public async Task<IActionResult> my_medical_history([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = await _userManager.GetRolesAsync(user);
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
@@ -1021,6 +1175,20 @@ namespace HealthApp.MVC.Controllers
         public IActionResult my_prescriptions()
         {
             var user = _userManager.GetUserAsync(User).Result;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = _userManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
@@ -1030,7 +1198,10 @@ namespace HealthApp.MVC.Controllers
             var patient = _context.Patients.FirstOrDefault(p => p.UserId == user.Id);
             if (patient != null)
             {
-                var prescriptions = _context.Prescriptions.Where(p => p.PatientId == patient.UserId).ToList();
+                var prescriptions = _context.Prescriptions
+                    .Where(p => p.PatientId == patient.UserId)
+                    .OrderByDescending(p => p.Date)
+                    .ToList();
                 ViewBag.Prescriptions = prescriptions;
             }
 
@@ -1182,6 +1353,30 @@ namespace HealthApp.MVC.Controllers
             await _userManager.UpdateAsync(user);
             await _signInManager.RefreshSignInAsync(user);
             TempData["SuccessMessage"] = "Your Password has been updated.\n";
+            return RedirectToAction("edit", "account");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> disable()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login", "account");
+            }
+            if (user.IsActive)
+            {
+                user.IsActive = false;
+                _sendEmailModel.SendDisableAccount(user.FirstName, user.LastName, user.UserName);
+                _logger.LogInformation($"******************************\nUser {user.Email} has disabled their account.\n******************************\n");
+
+                await _userManager.UpdateAsync(user);
+                await _signInManager.SignOutAsync();
+                TempData["SuccessMessage"] = "Your account has been disabled.\n";
+                return RedirectToAction("login", "account");
+            }
             return RedirectToAction("edit", "account");
         }
 

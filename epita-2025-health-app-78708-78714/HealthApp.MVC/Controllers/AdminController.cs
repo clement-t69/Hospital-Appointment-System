@@ -5,10 +5,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using HealthApp.MVC.Models;
 using HealthApp.Domain.Data;
-using Microsoft.EntityFrameworkCore;
-using System.Data.Entity;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace HealthApp.MVC.Controllers
 {
@@ -48,13 +44,25 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
+
+        // admin/panel.cshtml
         public IActionResult panel()
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
+
             if (user == null)
             {
-                return View();
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
             }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
@@ -63,28 +71,297 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        public IActionResult appointments()
+
+        // admin/appointments.cshtml
+        public IActionResult appointments([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = _signInManager.UserManager.GetUserAsync(User).Result;
+
+            var patients = _context.Patients.ToList();
+            var doctors = _context.Doctors.ToList();
+
+            ViewBag.Patients = patients;
+            ViewBag.Doctors = doctors;
+
             if (user == null)
             {
-                return View();
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
             }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
             var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
             ViewBag.IsLogged = user != null;
             ViewBag.IsDoctor = userRoles.Contains("doctor");
             ViewBag.IsPatient = userRoles.Contains("patient");
             ViewBag.IsAdmin = userRoles.Contains("administrator");
 
+            if (searchInput == null) 
+            {
+                searchInput = "";
+            }
+            if (searchField == null)
+            {
+                searchField = "";
+            }
+
+            var appointments = _context.Appointments
+                .OrderByDescending(a => a.Date)
+                .ThenByDescending(a => a.Time)
+                .ToList();
+
+            appointments = searchAppointments(searchInput, searchField);
+
+            ViewBag.Appointments = appointments;
+
             return View();
         }
 
+        public List<Appointment> searchAppointments(string searchInput, string searchField)
+        {
+            var appointments = _context.Appointments
+                .OrderByDescending(a => a.Date)
+                .ThenByDescending(a => a.Time)
+                .ToList();
+
+            searchInput = searchInput.ToLower();
+
+            if (searchField == "Doctor")
+            {
+                appointments = appointments.Where(a => a.DoctorFirstName.ToLower().Contains(searchInput) || a.DoctorLastName.ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Patient")
+            {
+                appointments = appointments.Where(a => a.PatientFirstName.ToLower().Contains(searchInput) || a.PatientLastName.ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Date")
+            {
+                appointments = appointments.Where(a => a.Date.ToLower().Contains(searchInput)).ToList();
+            }
+            else if (searchField == "Status")
+            {
+                appointments = appointments.Where(a => a.Status.ToLower().Contains(searchInput)).ToList();
+            }
+            else
+            {
+                searchInput = "";
+                searchField = "";
+            }
+
+            return appointments;
+        }
+
+        public async Task<IActionResult> create_appointment(BookAppointmentInputModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var id = _context.Appointments.Max(a => a.Id) + 1;
+
+            if (ModelState.IsValid)
+            {
+                var doctor = await _userManager.FindByIdAsync(model.DoctorId);
+                var patient = await _userManager.FindByIdAsync(model.PatientId);
+
+                var appointment = new Appointment
+                {
+                    Id = id,
+                    Date = model.appointmentDate,
+                    Time = model.appointmentHour,
+                    Status = model.Status,
+                    DoctorId = model.DoctorId,
+                    PatientId = model.PatientId,
+                    DoctorFirstName = doctor.FirstName,
+                    DoctorLastName = doctor.LastName,
+                    PatientFirstName = patient.FirstName,
+                    PatientLastName = patient.LastName,
+                    Specialization = model.Specialization,
+                    Location = model.Location
+                };
+                try
+                {
+                    _context.Appointments.Add(appointment);
+
+                    var patientNotification = new Notification
+                    {
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        SenderId = user.Id,
+                        ReceiverId = model.PatientId,
+                        Title = "Appointment Created",
+                        Content = $"Your appointment has been created for {model.appointmentDate} at {model.appointmentHour} by an administrator.",
+                        IsRead = false
+                    };
+                    var doctorNotification = new Notification
+                    {
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        SenderId = user.Id,
+                        ReceiverId = model.DoctorId,
+                        Title = "Appointment Created",
+                        Content = $"Your appointment has been created for {model.appointmentDate} at {model.appointmentHour} by an administrator.",
+                        IsRead = false
+                    };
+                    _context.Notifications.Add(patientNotification);
+                    _context.Notifications.Add(doctorNotification);
+                    await _context.SaveChangesAsync();
+                    TempData["SuccessMessage"] = "Appointment created successfully.";
+                    return RedirectToAction("appointments", "admin");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError($"******************************\nError when creating appointment: {e.Message}\n******************************\n");
+                    TempData["ErrorMessage"] = $"Error when creating appointment: {e.Message}\n";
+                    return RedirectToAction("appointments", "admin");
+                }
+            }
+            else
+            {
+                _logger.LogError($"******************************\n");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError($"Error when creating appointment: {error.ErrorMessage}\n");
+                    TempData["ErrorMessage"] = $"{error.ErrorMessage}\n";
+                }
+                _logger.LogError($"******************************\n");
+                return RedirectToAction("appointments", "admin");
+            }
+        }
+
+        public async Task<IActionResult> edit_appointment(EditAppointmentInputModel model, int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var appointment = await _context.Appointments.FindAsync(id);
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("appointments", "admin");
+            }
+
+            if (ModelState.IsValid)
+            {
+                appointment.Date = model.Date;
+                appointment.Time = model.Hour;
+                appointment.Status = model.Stat;
+
+                try
+                {
+                    _context.Appointments.Update(appointment);
+                    await _context.SaveChangesAsync();
+
+                    var patientNotification = new Notification
+                    {
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        SenderId = user.Id,
+                        ReceiverId = model.PId,
+                        Title = "Appointment Updated",
+                        Content = $"Your appointment has been updated to {model.Date} at {model.Hour} by an administrator.",
+                        IsRead = false
+                    };
+
+                    var doctorNotification = new Notification
+                    {
+                        Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                        SenderId = user.Id,
+                        ReceiverId = model.DId,
+                        Title = "Appointment Updated",
+                        Content = $"Your appointment has been updated to {model.Date} at {model.Hour} by an administrator.",
+                        IsRead = false
+                    };
+
+                    _context.Notifications.Add(patientNotification);
+                    _context.Notifications.Add(doctorNotification);
+                    await _context.SaveChangesAsync();
+
+                    TempData["SuccessMessage"] = "Appointment updated successfully.";
+                    return RedirectToAction("appointments", "admin");
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError($"******************************\nError when updating appointment: {e.Message}\n******************************\n");
+                    TempData["ErrorMessage"] = $"Error when updating appointment: {e.Message}\n";
+                    return RedirectToAction("appointments", "admin");
+                }
+            }
+
+            TempData["ErrorMessage"] = "Fill in all the fields.";
+            return RedirectToAction("appointments", "admin");
+        }
+
+        public async Task<IActionResult> delete_appointment(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            var appointment = await _context.Appointments.FindAsync(id);
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("appointments", "admin");
+            }
+
+            try
+            {
+                _context.Appointments.Remove(appointment);
+                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Appointment deleted successfully.";
+
+                var doctorNotification = new Notification
+                {
+                    Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                    SenderId = user.Id,
+                    ReceiverId = appointment.DoctorId,
+                    Title = "Appointment Cancelled",
+                    Content = $"Your appointment on {appointment.Date} at {appointment.Time} has been cancelled by an administrator.",
+                    IsRead = false
+                };
+
+                var patientNotification = new Notification
+                {
+                    Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                    SenderId = user.Id,
+                    ReceiverId = appointment.PatientId,
+                    Title = "Appointment Cancelled",
+                    Content = $"Your appointment on {appointment.Date} at {appointment.Time} has been cancelled by an administrator.",
+                    IsRead = false
+                };
+
+                _context.Notifications.Add(patientNotification);
+                _context.Notifications.Add(doctorNotification);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("appointments", "admin");
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"******************************\nError when deleting appointment: {e.Message}\n******************************\n");
+                TempData["ErrorMessage"] = $"Error when deleting appointment: {e.Message}\n";
+                return RedirectToAction("appointments", "admin");
+            }
+        }
+
+
+        // admin/users.cshtml
         public async Task<IActionResult> users([FromQuery] string searchInput, [FromQuery] string searchField)
         {
             var user = await _signInManager.UserManager.GetUserAsync(User);
+
             if (user == null)
             {
-                return View();
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
             }
 
             var userRoles = await _signInManager.UserManager.GetRolesAsync(user);
@@ -136,42 +413,22 @@ namespace HealthApp.MVC.Controllers
             return View();
         }
 
-        public IActionResult messages()
-        {
-            var user = _signInManager.UserManager.GetUserAsync(User).Result;
-            if (user == null)
-            {
-                return View();
-            }
-            var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
-            ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("doctor");
-            ViewBag.IsPatient = userRoles.Contains("patient");
-            ViewBag.IsAdmin = userRoles.Contains("administrator");
-            return View();
-        }
-
-        public IActionResult logs()
-        {
-            var user = _signInManager.UserManager.GetUserAsync(User).Result;
-            if (user == null)
-            {
-                return View();
-            }
-            var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
-            ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = userRoles.Contains("doctor");
-            ViewBag.IsPatient = userRoles.Contains("patient");
-            ViewBag.IsAdmin = userRoles.Contains("administrator");
-
-            _logger.LogInformation($"******************************\nAdmin {user.Email} has accessed the logs page.\n******************************\n");
-            return View();
-        }
-
         public async Task<IActionResult> create_user(CreateUserInputModel model)
         {
             if (ModelState.IsValid)
             {
+                var users = _userManager.Users.ToList();
+
+                foreach (var u in users)
+                {
+                    if (u.UserName == model.Email)
+                    {
+                        _logger.LogError($"******************************\nUser with email {model.Email} already exists.\n******************************\n");
+                        TempData["ErrorMessage"] = $"User with email {model.Email} already exists.\n";
+                        return RedirectToAction("users", "admin");
+                    }
+                }
+
                 var user = new User
                 {
                     FirstName = model.FirstName,
@@ -187,7 +444,7 @@ namespace HealthApp.MVC.Controllers
                 var roleName = model.Role.ToString();
 
                 if (result.Succeeded)
-                { 
+                {
                     //_logger.LogInformation($"******************************\nNew user with Email {model.Email} and role {roleName} has been created.\n******************************\n");
 
                     await _userManager.AddToRoleAsync(user, roleName);
@@ -401,6 +658,64 @@ namespace HealthApp.MVC.Controllers
             }
         }
 
+        public async Task<IActionResult> disable_enable(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user.UserName == "admin@test.fr")
+            {
+                TempData["ErrorMessage"] = $"You cannot disable this admin user.\n";
+                return RedirectToAction("users", "admin");
+            }
+
+            if (user != null)
+            {
+                if (user.IsActive)
+                {
+                    user.IsActive = false;
+                }
+                else
+                {
+                    user.IsActive = true;
+                }
+
+                try
+                {
+                    if (!user.IsActive)
+                    {
+                        _sendEmailModel.SendDisableAccount(user.FirstName, user.LastName, user.UserName);
+                    }
+                    else
+                    {
+                        _sendEmailModel.SendEnableAccount(user.FirstName, user.LastName, user.UserName);
+                    }
+                    _context.Users.Update(user);
+                    _context.SaveChanges();
+                }
+                catch
+                {
+                    _logger.LogError($"******************************\nError when updating user: {user.UserName}\n******************************\n");
+                    TempData["ErrorMessage"] = $"Error when updating user: {user.UserName}\n";
+                    return RedirectToAction("users", "admin");
+                }
+
+                _logger.LogInformation($"******************************\nUser {user.UserName} has been {(user.IsActive ? "enabled" : "disabled")}.\n******************************\n");
+                TempData["SuccessMessage"] = $"User {user.UserName} has been {(user.IsActive ? "enabled" : "disabled")}.\n";
+                return RedirectToAction("users", "admin");
+            }
+            else
+            {
+                _logger.LogError($"******************************\n");
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError($"Error when updating user: {error.ErrorMessage}\n");
+                    TempData["ErrorMessage"] = $"{error.ErrorMessage}\n";
+                }
+                _logger.LogError($"******************************\n");
+                return RedirectToAction("users", "admin");
+            }
+        }
+
         public async Task<IActionResult> delete_user(string userId)
         {
             if (ModelState.IsValid)
@@ -484,5 +799,61 @@ namespace HealthApp.MVC.Controllers
                 return RedirectToAction("users", "admin");
             }
         }
+
+
+        // admin/messages.cshtml
+        public IActionResult messages()
+        {
+            var user = _signInManager.UserManager.GetUserAsync(User).Result;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
+            var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+            return View();
+        }
+
+
+        // admin/logs.cshtml
+        public IActionResult logs()
+        {
+            var user = _signInManager.UserManager.GetUserAsync(User).Result;
+
+            if (user == null)
+            {
+                TempData["ErrorMessage"] = "User not found.";
+                return RedirectToAction("login_or_register", "account");
+            }
+
+            if (user.IsActive == false)
+            {
+                _signInManager.SignOutAsync();
+                TempData["ErrorMessage"] = "Your account has been disabled. To reactive it, please contact us.";
+                return RedirectToAction("login", "account");
+            }
+
+            var userRoles = _signInManager.UserManager.GetRolesAsync(user).Result;
+            ViewBag.IsLogged = user != null;
+            ViewBag.IsDoctor = userRoles.Contains("doctor");
+            ViewBag.IsPatient = userRoles.Contains("patient");
+            ViewBag.IsAdmin = userRoles.Contains("administrator");
+
+            _logger.LogInformation($"******************************\nAdmin {user.Email} has accessed the logs page.\n******************************\n");
+            return View();
+        }       
     }
 }

@@ -399,7 +399,7 @@ namespace HealthApp.MVC.Models
             }
         }
 
-        public void SendNotificaEmail(string firstname, string lastname, string email) 
+        public void SendMessageEmail(string firstname, string lastname, string email) 
         {
             try
             {
@@ -417,6 +417,86 @@ namespace HealthApp.MVC.Models
                         <body>
                             <p>Dear {firstname} {lastname},</p>
                             <p>You just received a new message on the Hospital Appointment System. To read it, log in to your account by clicking <a href='https://localhost:44368/account/login' target=''_blank"" rel='noopener noreferrer'>here</a>.</p>                       
+                            <p>Regards,</p>
+                            <p>The Hospital Appointment System team.</p>
+                        </body>
+                        </html>
+                    ";
+                message.IsBodyHtml = true;
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential("hospital.dorset@gmail.com", "mksw hfnp ykal htcr"),
+                    EnableSsl = true
+                };
+
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+    
+        public void SendDisableAccount(string firstname, string lastname, string email)
+        {
+            try
+            {
+                MailMessage message = new MailMessage();
+                message.From = new MailAddress("hospital.dorset@gmail.com");
+                message.To.Add(email);
+                message.Subject = "Account Disabled - Hospital Appointment System";
+                message.Body =
+                    $@"
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <h3>Account Disabled - Hospital Appointment System</h3>
+                        </head>
+                        <body>
+                            <p>Dear {firstname} {lastname},</p>
+                            <p>Your account has been disabled. To reactivate it, please <a href='https://localhost:44368/home/contact' target=''_blank"" rel='noopener noreferrer'>contact us</a>.</p>
+                            <p>Regards,</p>
+                            <p>The Hospital Appointment System team.</p>
+                        </body>
+                        </html>
+                    ";
+                message.IsBodyHtml = true;
+
+                SmtpClient smtp = new SmtpClient("smtp.gmail.com")
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential("hospital.dorset@gmail.com", "mksw hfnp ykal htcr"),
+                    EnableSsl = true
+                };
+
+                smtp.Send(message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+
+        public void SendEnableAccount(string firstname, string lastname, string email)
+        {
+            try
+            {
+                MailMessage message = new MailMessage();
+                message.From = new MailAddress("hospital.dorset@gmail.com");
+                message.To.Add(email);
+                message.Subject = "Account Disabled - Hospital Appointment System";
+                message.Body =
+                    $@"
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <h3>Account Disabled - Hospital Appointment System</h3>
+                        </head>
+                        <body>
+                            <p>Dear {firstname} {lastname},</p>
+                            <p>Your account has been re-enabled. To reactivate it, please <a href='https://localhost:44368/home/contact' target=''_blank"" rel='noopener noreferrer'>contact us</a>.</p>
                             <p>Regards,</p>
                             <p>The Hospital Appointment System team.</p>
                         </body>
