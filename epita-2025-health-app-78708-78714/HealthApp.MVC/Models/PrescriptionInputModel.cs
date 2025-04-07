@@ -11,15 +11,13 @@ namespace HealthApp.MVC.Models
         [Required]
         public string Name { get; set; }
         [Required]
-        public string Dosage { get; set; }
+        public int Dosage { get; set; }
         [Required]
-        public string Frequency { get; set; }
+        public int Frequency { get; set; }
         [Required]
-        public string Duration { get; set; }
+        public int Duration { get; set; }
         [Required]
         public string Pharmacy { get; set; }
-        [Required]
-        public string ExpirationDate { get; set; }
         [Required]
         public string Date { get; set; }
     }

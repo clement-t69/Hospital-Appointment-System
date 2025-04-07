@@ -144,6 +144,7 @@ namespace HealthApp.MVC.Controllers
 
             var appointments = _context.Appointments
                 .Where(a => a.PatientId == id)
+                .OrderByDescending(a => a.Date)
                 .ToList();
 
             if (appointmentsSearchField != null && appointmentsSearchInput != null)
@@ -153,6 +154,7 @@ namespace HealthApp.MVC.Controllers
 
             var prescriptions = _context.Prescriptions
                 .Where(p => p.PatientId == id)
+                .OrderByDescending(p => p.Date)
                 .ToList();
 
             if (prescriptionsSearchField != null && prescriptionsSearchInput != null)
@@ -162,6 +164,7 @@ namespace HealthApp.MVC.Controllers
 
             var medicalHistories = _context.MedicalHistories
                 .Where(mh => mh.PatientId == id)
+                .OrderByDescending(mh => mh.Date)
                 .ToList();
 
             if (medicalHistoriesSearchField != null && medicalHistoriesSearchInput != null)
@@ -172,6 +175,9 @@ namespace HealthApp.MVC.Controllers
             ViewBag.Appointments = appointments;
             ViewBag.Prescriptions = prescriptions;
             ViewBag.MedicalHistories = medicalHistories;
+
+            ViewBag.DoctorId = user.Id;
+            ViewBag.PatientId = id;
 
             return View();
         }
@@ -201,6 +207,11 @@ namespace HealthApp.MVC.Controllers
                     searchField = "";
                 }
             }
+
+            appointments = appointments
+                .OrderByDescending(a => a.Date)
+                .ThenBy(a => a.Time)
+                .ToList();
 
             return appointments;
         }
@@ -235,6 +246,10 @@ namespace HealthApp.MVC.Controllers
                 }
             }
 
+            medicalHistories = medicalHistories
+                .OrderByDescending(mh => mh.Date)
+                .ToList();
+
             return medicalHistories;
         }
 
@@ -260,24 +275,11 @@ namespace HealthApp.MVC.Controllers
                 }
             }
 
+            prescriptions = prescriptions
+                .OrderByDescending(p => p.Date)
+                .ToList();
+
             return prescriptions;
-        }
-
-        public async Task<IActionResult> create_prescription(string patientId)
-        {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                return RedirectToAction("Login", "Account");
-            }
-            ViewBag.IsLogged = user != null;
-            ViewBag.IsDoctor = await _userManager.IsInRoleAsync(user, "doctor");
-            ViewBag.IsPatient = await _userManager.IsInRoleAsync(user, "patient");
-            ViewBag.IsAdmin = await _userManager.IsInRoleAsync(user, "administrator");
-
-            var patient = await _userManager.FindByIdAsync(patientId);
-            ViewBag.Patient = patient;
-            return View();
         }
 
         [HttpPost]
@@ -286,16 +288,18 @@ namespace HealthApp.MVC.Controllers
             var patient = await _userManager.FindByIdAsync(patientId);
             if (ModelState.IsValid)
             {
+                var id = _context.Prescriptions.Max(p => p.Id) + 1;
+
                 var prescription = new Prescription
                 {
+                    Id = id,
                     DoctorId = model.DoctorId,
                     PatientId = model.PatientId,
                     Name = model.Name,
-                    Dosage = model.Dosage,
-                    Frequency = model.Frequency,
-                    Duration = model.Duration,
+                    Dosage = model.Dosage.ToString(),
+                    Frequency = model.Frequency.ToString(),
+                    Duration = model.Duration.ToString(),
                     Pharmacy = model.Pharmacy,
-                    ExpirationDate = model.ExpirationDate,
                     Date = model.Date
                 };
 
@@ -316,7 +320,7 @@ namespace HealthApp.MVC.Controllers
                 _logger.LogInformation($"******************************\nPrescription created for patient {patient.Email} by doctor {model.DoctorId}.\n******************************\n");
             }
 
-            return RedirectToAction("patient", "care");
+            return RedirectToAction("patient", "care", new { id = model.PatientId });
         }
 
         public async Task<IActionResult> create_medical_history(string patientId)
@@ -335,6 +339,376 @@ namespace HealthApp.MVC.Controllers
             ViewBag.Patient = patient;
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> patient_edit_appointment(EditAppointmentInputModel model, int Id)
+        {
+            var today = DateTime.Today.ToString("yyyy-MM-dd");
+
+            var appointment = _context.Appointments.Find(model.Id);
+
+            var patientId = model.PId;
+
+            if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
+            {
+                TempData["ErrorMessage"] = "Cannot reschedule past appointments.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            if (appointment.Status != "Pending")
+            {
+                TempData["ErrorMessage"] = "Cannot reschedule this appointments.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            _logger.LogInformation($"******************************\n");
+            _logger.LogInformation($"Id = {Id}\n");
+            _logger.LogInformation($"Date = {model.Date}\n");
+            _logger.LogInformation($"Time = {model.Hour}\n");
+            _logger.LogInformation($"DoctorId = {model.DId}\n");
+            _logger.LogInformation($"PatientId = {model.PId}\n");
+            _logger.LogInformation($"Specialization = {model.Spe}\n");
+            _logger.LogInformation($"Location = {model.Loc}\n");
+            _logger.LogInformation($"Status = {model.Stat}\n");
+            _logger.LogInformation($"PatientLastName = {model.PLastName}\n");
+            _logger.LogInformation($"PatientFirstName = {model.PFirstName}\n");
+            _logger.LogInformation($"******************************\n");
+
+            if (model.Date == null || model.Hour == null || model.DId == null)
+            {
+                TempData["ErrorMessage"] = "Please fill in all fields.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("patients", "care");
+            }
+
+            List<Appointment> doctorAppointments = _context.Appointments
+                .Where(a => a.DoctorId == model.DId)
+                .ToList();
+
+            if (doctorAppointments != null)
+            {
+                foreach (var a in doctorAppointments)
+                {
+                    if (a.Date == model.Date && a.Time == model.Hour && a.Status != "Cancelled")
+                    {
+                        TempData["ErrorMessage"] = "Doctor is not available at this time.";
+                        _logger.LogError($"******************************\nPatient {model.PId} tried to book an appointment with doctor {model.DId} at {model.Date} {model.Hour}, but the doctor is not available.\n******************************\n");
+                        return RedirectToAction("patient", "care", new { id = patientId });
+                    }
+                }
+            }
+
+            appointment.Date = model.Date;
+            appointment.Time = model.Hour;
+            appointment.DoctorId = model.DId;
+            appointment.PatientId = model.PId;
+            appointment.Specialization = model.Spe;
+            appointment.Location = model.Loc;
+            appointment.Status = model.Stat;
+            appointment.PatientLastName = model.PLastName;
+            appointment.PatientFirstName = model.PFirstName;
+
+            _context.Appointments.Update(appointment);
+
+            var doctorNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with patient {appointment.PatientFirstName} {appointment.PatientLastName} has been rescheduled to {model.Date} {model.Hour}.",
+                Title = "Appointment Rescheduled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = model.PId,
+                ReceiverId = model.DId,
+                IsRead = false
+            };
+
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 2,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been rescheduled to {model.Date} {model.Hour}.",
+                Title = "Appointment Rescheduled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = model.DId,
+                ReceiverId = model.PId,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(doctorNotification);
+            _context.Notifications.Add(patientNotification);
+
+            _logger.LogInformation($"******************************\nAppointment with id {Id} rescheduled.\n******************************\n");
+
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Appointment rescheduled successfully.";
+            return RedirectToAction("patient", "care", new { id = patientId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> patient_approve_appointment(int id)
+        {
+            var appointment = _context.Appointments.Find(id);
+
+            var patientId = appointment.PatientId;
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("patients", "care");
+            }
+
+            if (appointment.Status == "Approved")
+            {
+                TempData["ErrorMessage"] = "Appointment already approved.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            if (appointment.Status != "Pending" && appointment.Status != "Approved")
+            {
+                TempData["ErrorMessage"] = "Cannot approve this appointment.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been approved.",
+                Title = "Appointment Approved",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.PatientId,
+                IsRead = false
+            };
+
+            appointment.Status = "Approved";
+
+            _context.Notifications.Add(patientNotification);
+
+            _logger.LogInformation($"******************************\nAppointment with id {id} approved.\n******************************\n");
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Appointment approved successfully.";
+            return RedirectToAction("patient", "care", new { id = patientId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> patient_reject_appointment(int id)
+        {
+            var appointment = _context.Appointments.Find(id);
+
+            var patientId = appointment.PatientId;
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("patients", "care");
+            }
+
+            if (appointment.Status == "Approved")
+            {
+                TempData["ErrorMessage"] = "Approved appointments cannot be rejected.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            if (appointment.Status != "Pending" && appointment.Status != "Rejected")
+            {
+                TempData["ErrorMessage"] = "Cannot reject this appointment.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            appointment.Status = "Rejected";
+
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been rejected.",
+                Title = "Appointment Rejected",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.PatientId,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(patientNotification);
+
+            _logger.LogInformation($"******************************\nAppointment with id {id} rejected.\n******************************\n");
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Appointment rejected successfully.";
+            return RedirectToAction("patient", "care", new { id = patientId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> patient_complete_appointment(int id)
+        {
+            var appointment = _context.Appointments.Find(id);
+
+            var patientId = appointment.PatientId;
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("patients", "care");
+            }
+
+            if (appointment.Status == "Completed")
+            {
+                TempData["ErrorMessage"] = "Appointment already completed.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            if (appointment.Status != "Approved" && appointment.Status != "Completed")
+            {
+                TempData["ErrorMessage"] = "Cannot complete this appointment.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            appointment.Status = "Completed";
+
+            var mhId = _context.MedicalHistories.Max(mh => mh.Id) + 1;
+            var medicalHistory = new MedicalHistory
+            {
+                Id = mhId,
+                Date = appointment.Date,
+                Diagnosis = "Empty",
+                DoctorId = appointment.DoctorId,
+                DoctorFirstName = appointment.DoctorFirstName,
+                DoctorLastName = appointment.DoctorLastName,
+                PatientId = appointment.PatientId,
+                PatientLastName = appointment.PatientLastName,
+                Specialization = appointment.Specialization,
+                Location = appointment.Location
+            };
+
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been completed.",
+                Title = "Appointment Completed",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.PatientId,
+                IsRead = false
+            };
+
+            _context.MedicalHistories.Add(medicalHistory);
+            _context.Notifications.Add(patientNotification);
+
+            _logger.LogInformation($"******************************\nAppointment with id {id} completed.\n******************************\n");
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Appointment completed successfully.";
+            return RedirectToAction("patient", "care", new { id = patientId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> patient_cancel_appointment(int id)
+        {
+            var appointment = _context.Appointments.Find(id);
+
+            if (appointment == null)
+            {
+                TempData["ErrorMessage"] = "Appointment not found.";
+                return RedirectToAction("patients", "care");
+            }
+
+            var patientId = appointment.PatientId;
+
+            var today = DateTime.Today.ToString("yyyy-MM-dd");
+
+            if (DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture) < DateTime.ParseExact(today, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture))
+            {
+                TempData["ErrorMessage"] = "Cannot cancel past appointments.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            if (appointment.Status == "Cancelled")
+            {
+                TempData["ErrorMessage"] = "Appointment already cancelled.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            if (appointment.Status == "Completed")
+            {
+                TempData["ErrorMessage"] = "Cannot cancel completed appointments.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            var appointmentDate = DateTime.ParseExact(appointment.Date, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+            var daysDifference = (appointmentDate - DateTime.Today).TotalDays;
+            if (daysDifference < 1)
+            {
+                _context.Appointments.Remove(appointment);
+                _logger.LogInformation($"******************************\nAppointment with id {id} cancelled.\n******************************\n");
+                await _context.SaveChangesAsync();
+                TempData["WarningMessage"] = "Appointment cancelled successfully. However, please note that you are within the cancellation period. To avoid any penalties, please contact the doctor directly. For more information, please refer to the cancellation policy.";
+                return RedirectToAction("patient", "care", new { id = patientId });
+            }
+
+            var patientNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 1,
+                Content = $"Your appointment with doctor {appointment.DoctorFirstName} {appointment.DoctorLastName} has been cancelled.",
+                Title = "Appointment Cancelled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.DoctorId,
+                ReceiverId = appointment.PatientId,
+                IsRead = false
+            };
+
+            var doctorNotification = new Notification
+            {
+                Id = _context.Notifications.Max(n => n.Id) + 2,
+                Content = $"Your appointment with patient {appointment.PatientFirstName} {appointment.PatientLastName} has been cancelled.",
+                Title = "Appointment Cancelled",
+                Date = DateTime.Now.ToString("yyyy-MM-dd - hh:mm tt"),
+                SenderId = appointment.PatientId,
+                ReceiverId = appointment.DoctorId,
+                IsRead = false
+            };
+
+            _context.Notifications.Add(patientNotification);
+            _context.Notifications.Add(doctorNotification);
+
+            appointment.Status = "Cancelled";
+            _logger.LogInformation($"******************************\nAppointment with id {id} cancelled.\n******************************\n");
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Appointment cancelled successfully.";
+            return RedirectToAction("patient", "care", new { id = patientId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> edit_medical_history(MedicalHistoryInputModel model, int id)
+        {
+            var medicalHistory = _context.MedicalHistories.Find(id);
+
+            if (medicalHistory == null ) 
+            {
+                TempData["ErrorMessage"] = "Medical history not found.";
+                return RedirectToAction("patients", "care");
+            }
+
+            if (ModelState.IsValid)
+            {
+                medicalHistory.Diagnosis = model.Diagnosis;
+
+                _context.MedicalHistories.Update(medicalHistory);
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation($"******************************\nMedical history with id {id} updated.\n******************************\n");
+                TempData["SuccessMessage"] = "Medical history updated successfully.";
+                return RedirectToAction("patient", "care", new { id = medicalHistory.PatientId });
+            }
+            _logger.LogError($"******************************\nFailed to update medical history with id {id}.\n******************************\n");
+            TempData["ErrorMessage"] = "Please fill in all fields.";
+            return RedirectToAction("patient", "care", new { id = medicalHistory.PatientId });
+        }
+
+
 
         // care/doctors.cshtml
         public async Task<IActionResult> doctors([FromQuery] string searchInput, [FromQuery] string searchField)
@@ -790,7 +1164,7 @@ namespace HealthApp.MVC.Controllers
             {
                 Id = mhId,
                 Date = appointment.Date,
-                Diagnosis = "",
+                Diagnosis = "Empty",
                 DoctorId = appointment.DoctorId,
                 DoctorFirstName = appointment.DoctorFirstName,
                 DoctorLastName = appointment.DoctorLastName,

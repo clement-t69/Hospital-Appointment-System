@@ -36,7 +36,7 @@
                         <input type="text" id="searchInput" name="searchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
                         <select id="searchField" name="searchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
                             <option value="Name">Name</option>
-                            <option value="Email">Email</option>S
+                            <option value="Email">Email</option>
                         </select>
                         <button class="btn little-white-button" id="searchButton" onclick="location.href='@Url.Action("patients", "care")?searchInput=' + document.getElementById('searchInput').value + '&searchField=' + document.getElementById('searchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍 Search</button>
                     </section>
@@ -81,6 +81,7 @@
                                                         <div>
                                                             <p class="mb-2"><strong>Email:</strong> @ViewBag.PatientUsers[@patient.UserId]?.UserName</p>
                                                             <p class="mb-2"><strong>Phone:</strong> @ViewBag.PatientUsers[@patient.UserId]?.Phone</p>
+                                                            <p class="mb-2"><strong>Address:</strong> @ViewBag.PatientUsers[@patient.UserId]?.Address</p>
                                                         </div>
                                                     </div>
                                                 </div>
