@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "Messages";
+	var m = ViewBag.Message;
+}
+
+@if (ViewBag.IsLogged == true)
+{
+    @if (ViewBag.UserId == m.ReceiverId)
+    {
+        <div class="container d-flex justify-content-center" style="min-height: 50vh;">
+            <div class="row justify-content-center">
+                <div>
+                    <div style="color: white; user-select: none;">
+                        <a>_________________________________________________________________________________________</a>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
+                            <div class="text-content fs-6 px-2 fw-bold text-center">
+                                <div>&lt; Back</div>
+                            </div>
+                        </a>
+                    </div>
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+
+                    <div class="text-center" style="flex-grow: 1;">
+                        <h1 style="font-weight: 700">@m.Object</h1>
+						<small style="color: gray;">From <strong>@m.SenderFirstName @m.SenderLastName - @m.Date</strong></small>
+                    </div>
+                    <section>
+                        <hr />
+
+                        <div>@m.Content</div>
+                        <hr />
+                        <div style="display: flex;">
+                            <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#replyModal" style="text-decoration: none; box-shadow:none; width:100%">
+                                <span class="icon"></span>
+                                <div class="text-content fs-6 px-2 fw-bold">
+                                    <div>↩️ Reply</div>
+                                </div>
+                            </a>
+
+                            <div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="replyModalLabel" style="margin-left: 8px">Reply to @m.SenderFirstName @m.SenderLastName</h5>
+                                            <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("message", "account", new { id = m.Id })'" aria-label="Close" style="margin-right: 6px"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="replyForm" asp-controller="account" asp-action="reply_message" method="post">
+												<input type="hidden" name="Id" value="@m.Id" />
+												<input type="hidden" name="replySenderId" value="@m.ReceiverId" />
+												<input type="hidden" name="replyReceiverId" value="@m.SenderId" />
+												<input type="hidden" name="replyObject" value="@m.Object" />
+                                                <input type="hidden" name="replyDate" value="@m.Date" />
+												<input type="hidden" name="replyType" value="Reply" />
+                                                <div class="rounded_textarea form-label mb-3">
+                                                    <textarea class="form-control" id="replyMessage" name="replyMessage" rows="4" placeholder="Enter your reply..." required></textarea>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <a class="little-blue-button" href="#" onclick="document.getElementById('replyForm').submit(); return false;" style="text-decoration: none;">
+                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                    <div>📨 Send Reply</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        @section scripts 
+        {
+            <script>
+                function goBack()
+                {
+                    window.history.go(-1);
+                }
+            </script>
+        }
+    }
+    else
+    {
+        <div class="container d-flex justify-content-center" style="min-height: 50vh;">
+            <div class="row justify-content-center">
+                <div>
+                    <div style="color: white; user-select: none;">
+                        <a>_________________________________________________________________________________________</a>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
+                            <div class="text-content fs-6 px-2 fw-bold text-center">
+                                <div>&lt; Back</div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="text-center" style="flex-grow: 1;">
+                        <h1 style="font-weight: 700">@m.Object</h1>
+                        <small style="color: gray;">To <strong>@m.ReceiverFirstName @m.ReceiverLastName - @m.Date</strong></small>
+                    </div>
+                    <section>
+                        <hr />
+                        <div>@m.Content</div>
+                    </section>
+                </div>
+            </div>
+        </div>
+
+        @section scripts
+        {
+            <script>
+                function goBack()
+                {
+                    window.history.go(-1);
+                }
+            </script>
+        }
+    }
+}
+else
+{
+    @section scripts 
+    {
+    <script>
+        window.location.href = '@Url.Action("login_or_register", "account")';
+    </script>
+    }
+}

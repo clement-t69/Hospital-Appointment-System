@@ -1,0 +1,1161 @@
+﻿@model HealthApp.MVC.Models.AppointmentInputModel
+
+@{
+    ViewData["Title"] = "Appointments";
+}
+
+@if (ViewBag.IsLogged == true && ViewBag.IsPatient == true)
+{
+    <div class="container-fluid p-0" style="min-height: 50vh;">
+        <a class="little-white-button mb-2" onclick="window.location.href = '@Url.Action("edit", "account")'" style="text-decoration: none; width: 90px; box-shadow:none; margin-right: 24px;">
+            <div class="text-content fs-6 px-2 fw-bold text-center">
+                <div>&lt; Back</div>
+            </div>
+        </a>
+        <div class="text-center" style="flex-grow: 1;">
+            <h1 style="font-weight: 700">My Appointments</h1>
+        </div>
+        <hr />
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+        }
+        <div class="row m-0">
+            <!-- APPOINTMENT LIST -->
+            <div class="col-md-4" style="border-right: 1px solid #dee2e6; width: 400px">
+                <table class="table">
+                    <tbody>
+                        @if (ViewBag.Appointments == null || (ViewBag.Appointments).Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" style="text-align: center">No appointments found.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var a in ViewBag.Appointments)
+                            {
+                                @if (a.Id == 0)
+                                {
+                                    @if (ViewBag.Appointments.Count == 1)
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="text-align: center">No appointments found.</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <!-- APPOINTMENT DETAILS -->
+                                    <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editAppointmentModal-@a.Id"
+                                    data-date="@a.Date" data-hour="@a.Time"
+                                    data-location="@a.Location" data-specialization="@a.Specialization"
+                                    data-doctorln="@a.DoctorLastName" data-doctorfn=" @a.DoctorFirstName"
+                                    style="cursor: pointer;">
+                                        <td>
+                                            <div style="padding: 8px;" class="mb-3"><strong>@a.Date - @a.Time</strong>
+                                                <br />with <strong>@a.DoctorFirstName @a.DoctorLastName</strong>
+                                                <br />Location: @a.Location
+                                                <br />Specialization: @a.Specialization
+                                            </div>
+                                            @if (a.Status == "Pending")
+                                            {
+                                                <div style="padding: 8px;">Status: <span class="badge bg-warning">@a.Status</span></div>
+                                            }
+                                            else if (a.Status == "Approved")
+                                            {
+                                                <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                            }
+                                            else if (a.Status == "Completed")
+                                            {
+                                                <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                            }
+                                            else if (a.Status == "Cancelled")
+                                            {
+                                                <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                            }
+                                            else if (a.Status == "Rejected")
+                                            {
+                                                <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                            }
+                                            else
+                                            {
+                                                <div style="padding: 8px;">Status: Unknown</div>
+                                            }
+                                        </td>
+                                    </tr>
+
+                                    <!-- EDIT APPOINTMENT MODAL -->
+                                    <div class="modal fade" id="editAppointmentModal-@a.Id" tabindex="-1" aria-labelledby="editAppointmentModalLabel-@a.Id" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="editAppointmentModalLabel-@a.Id" style="margin-left: 8px">Edit an Appointment</h5>
+                                                    <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="editAppointmentForm-@a.Id" asp-controller="care" asp-action="edit_appointment" method="post">
+                                                        <input type="hidden" name="Id" value="@a.Id" />
+                                                        <div class="rounded_fields form-label mb-3">
+                                                            <input type="date" class="form-control" id="editAppointmentDate-@a.Id" name="Date" aria-required="true" style="width:100%;" value="@a.Date">
+                                                        </div>
+                                                        <div class="rounded_fields form-label mb-3">
+                                                            <div class="rounded_fields form-label mb-3">
+                                                                <select class="form-control" id="editAppointmentHour-@a.Id" name="Hour" aria-required="true" style="width:100%;">
+                                                                    <option value="09:00 AM">09:00 AM</option>
+                                                                    <option value="10:00 AM">10:00 AM</option>
+                                                                    <option value="11:00 AM">11:00 AM</option>
+                                                                    <option value="01:00 PM">01:00 PM</option>
+                                                                    <option value="02:00 PM">02:00 PM</option>
+                                                                    <option value="03:00 PM">03:00 PM</option>
+                                                                    <option value="04:00 PM">04:00 PM</option>
+                                                                    <option value="05:00 PM">05:00 PM</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <input type="hidden" id="DId" name="DId" value="@a.DoctorId" />
+                                                        <input type="hidden" id="Spe" name="Spe" value="@a.Specialization" />
+                                                        <input type="hidden" id="Loc" name="Loc" value="@a.Location" />
+
+                                                        <input type="hidden" id="Stat" name="Stat" value="Pending" />
+
+                                                        <input type="hidden" id="PId" name="PId" value="@ViewBag.Patient.Id" />
+                                                        <input type="hidden" id="PLastName" name="PLastName" value="@ViewBag.Patient.LastName" />
+                                                        <input type="hidden" id="PFirstName" name="PFirstName" value="@ViewBag.Patient.FirstName" />
+                                                    </form>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <a class="little-blue-button" href="#" onclick="document.getElementById('editAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                        <div class="text-content fs-6 px-2 fw-bold">
+                                                            <div>🔄 Reschedule Appointment</div>
+                                                        </div>
+                                                    </a>
+                                                    <form id="cancelAppointmentForm-@a.Id" asp-controller="care" asp-action="cancel_appointment" method="post" style="display: none;">
+                                                        <input type="hidden" name="Id" value="@a.Id" />
+                                                    </form>
+                                                    <a class="little-blue-button" href="#" onclick="document.getElementById('cancelAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                        <div class="text-content fs-6 px-2 fw-bold">
+                                                            <div>❌ Cancel Appointment</div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CALENDAR -->
+            <div class="col-md-8" style="justify-content: flex-end; margin-left: 32px">
+                @{
+                    var sunday = (DateTime)ViewBag.Sunday;
+                    var saturday = (DateTime)ViewBag.Saturday;
+                }
+
+                <!-- BOOK APPOINTMENT MODAL -->
+                <div class="modal fade" id="bookAppointmentModal" tabindex="-1" aria-labelledby="bookAppointmentModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="bookAppointmentModalLabel" style="margin-left: 8px">Book an Appointment</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-right: 6px"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="bookAppointmentForm" asp-controller="care" asp-action="book_appointment" method="post">
+                                    <div class="rounded_fields form-label mb-3">
+                                        <input asp-for="bookAppointment.appointmentDate" class="form-control" id="appointmentDate" name="appointmentDate" aria-required="true" placeholder="appointmentDate" style="width:100%;" readonly>
+                                    </div>
+                                    <div class="rounded_fields form-label mb-3">
+                                        <input asp-for="bookAppointment.appointmentHour" class="form-control" id="appointmentHour" name="appointmentHour" aria-required="true" placeholder="appointmentHour" style="width:100%;" readonly>
+                                    </div>
+                                    <div class="mb-3">
+                                        <select class="form-select" style="border-radius: 64px; height: 3rem;" id="Doctor" name="Doctor" required>
+                                            <option value="" selected disabled>Select Doctor</option>
+
+                                            @if (ViewBag.Doctors != null && (ViewBag.Doctors).Count != 0)
+                                            {
+                                                @foreach (var d in ViewBag.Doctors)
+                                                {
+                                                    <option data-id="@d.UserId" data-firstname="@d.FirstName" data-lastname="@d.LastName" data-specialization="@d.Specialization" data-location="@d.Location">@d.FirstName @d.LastName</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <input type="hidden" id="DoctorId" name="DoctorId" />
+                                    <input type="hidden" id="DoctorLastName" name="DoctorLastName" />
+                                    <input type="hidden" id="DoctorFirstName" name="DoctorFirstName" />
+                                    <input type="hidden" id="Specialization" name="Specialization" />
+                                    <input type="hidden" id="Location" name="Location" />
+
+                                    <input type="hidden" id="Status" name="Status" value="Pending" />
+
+                                    <input type="hidden" id="PatientId" name="PatientId" value="@ViewBag.Patient.Id" />
+                                    <input type="hidden" id="PatientLastName" name="PatientLastName" value="@ViewBag.Patient.LastName" />
+                                    <input type="hidden" id="PatientFirstName" name="PatientFirstName" value="@ViewBag.Patient.FirstName" />
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <a class="little-blue-button" href="#" onclick="document.getElementById('bookAppointmentForm').submit(); return false;" style="text-decoration: none;">
+                                    <div class="text-content fs-6 px-2 fw-bold">
+                                        <div>📅 Book an Appointment</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>              
+
+                <!-- TITLE (DATES) -->
+                <row style="display: flex; align-self: center;">
+                    <div class="text-center" style="flex-grow: 1; align-content: center">
+                        <h3 style="font-weight: 700">@sunday.ToString("dd MMM") - @saturday.ToString("dd MMM yyyy")</h3>
+                    </div>
+                    <div class="text-content mb-3" style="display: flex; table-layout: fixed; justify-content: flex-end; border-radius: 64px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="prevButton" onclick="location.href='@Url.Action("appointments", new { sunday = ((DateTime)ViewBag.Sunday).AddDays(-7), doctorId = ViewBag.DoctorId })';" style="width: 64px; height: 40px; border-radius: 64px 0px 0px 64px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">&lt;</button>
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="todayButton" onclick="location.href='@Url.Action("appointments", new { doctorId = ViewBag.DoctorId })';" style="width: 96px; height: 40px; border-radius: 0px 0px 0px 0px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">Today</button>
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="nextButton" onclick="location.href='@Url.Action("appointments", new { sunday = ((DateTime)ViewBag.Sunday).AddDays(7), doctorId = ViewBag.DoctorId })';" style="width: 64px; height: 40px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">&gt;</button>
+                    </div>
+                </row>
+
+                <!-- CALENDAR TABLE -->
+                <table class="table table-bordered" style="border-color: black; width: 100%; table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Hour</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Sun<br />@(((DateTime)ViewBag.Sunday).ToString("MM.dd"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Mon<br />@(((DateTime)ViewBag.Sunday).AddDays(1).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Tue<br />@(((DateTime)ViewBag.Sunday).AddDays(2).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Wed<br />@(((DateTime)ViewBag.Sunday).AddDays(3).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Thu<br />@(((DateTime)ViewBag.Sunday).AddDays(4).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Fri<br />@(((DateTime)ViewBag.Sunday).AddDays(5).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Sat<br />@(((DateTime)ViewBag.Sunday).AddDays(6).ToString("MM.d"))</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int h = 9; h < 12; h++)
+                        {
+                            <tr>
+                                <td style="text-align: center; height: 48px; background-color: darkgray; align-content: center;"><strong>@h:00 AM</strong></td>
+
+                                <td style="background-color: lightgray; height:48px; cursor: not-allowed"></td>
+
+                                @for (int d = 0; d < 5; d++)
+                                {
+                                    var currentDate = ((DateTime)ViewBag.Sunday).AddDays(d + 1);
+                                    string time = h.ToString("00") + ":00 AM";
+
+                                    string buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                    string cellStyle = "";
+                                    string buttonDisabled = "";
+
+                                    DateTime today = DateTime.Today;
+
+                                    if (currentDate.Date < today.Date)
+                                    {
+                                        cellStyle = "background-color: lightgray; cursor: not-allowed";
+                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                        buttonDisabled = "disabled";
+                                    }
+                                    else
+                                    {
+                                        bool isAvailable = true;
+                                        string cellColor = "";
+
+                                        // Logic for logged user
+                                        if ((ViewBag.Appointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.Appointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else
+                                                    {
+                                                        isAvailable = false;
+                                                        if (a.Status == "Pending")
+                                                        {
+                                                            cellColor = "background-color: orange;";
+                                                        }
+                                                        else if (a.Status == "Approved")
+                                                        {
+                                                            cellColor = "background-color: lightgreen;";
+                                                        }
+                                                        else if (a.Status == "Completed")
+                                                        {
+                                                            cellColor = "background-color: green;";
+                                                        }
+                                                        else if (a.Status == "Rejected")
+                                                        {
+                                                            cellColor = "background-color: red;";
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        // Logic for other users appointments
+                                        if ((ViewBag.AllAppointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.AllAppointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else if (ViewBag.DoctorId == a.DoctorId)
+                                                    {
+                                                        isAvailable = false;
+                                                        cellColor = "background-color: lightgray;";
+                                                    }
+                                                    else if (a.Status == "Unavailable" && a.PatientId == ViewBag.DoctorId)
+                                                    {
+                                                        isAvailable = false;
+                                                        cellColor = "background-color: lightgray;";
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (!isAvailable)
+                                        {
+                                            cellStyle = cellColor + " cursor: not-allowed";
+                                            buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                            buttonDisabled = "disabled";
+                                        }
+                                    }
+
+                                    <td style="height: 48px; @cellStyle" class="calendar-slot">
+                                        <button type="button" style="@buttonStyle" class="button" data-bs-toggle="modal" data-bs-target="#bookAppointmentModal" @buttonDisabled />
+                                    </td>
+                                }
+
+                                <td style="background-color: lightgray; height: 48px; cursor: not-allowed"></td>
+                            </tr>
+                        }
+
+                        <tr>
+                            <td style="text-align: center; height: 48px; background-color: darkgray; align-content: center;"><strong>12:00 PM</strong></td>
+
+                            @for (int d = 0; d < 7; d++)
+                            {
+                                <td style="background-color: lightgray; height: 48px; cursor: not-allowed"></td>
+                            }
+                        </tr>
+
+                        @for (int h = 1; h < 6; h++)
+                        {
+                            <tr>
+                                <td style="text-align: center; height: 48px; background-color: darkgray; align-content: center;"><strong>@h:00 PM</strong></td>
+
+                                <td style="background-color: lightgray; height:48px; cursor: not-allowed"></td>
+
+                                @for (int d = 0; d < 5; d++)
+                                {
+                                    var currentDate = ((DateTime)ViewBag.Sunday).AddDays(d + 1);
+                                    string time = h.ToString("00") + ":00 PM";
+
+                                    string buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                    string cellStyle = "";
+                                    string buttonDisabled = "";
+
+                                    DateTime today = DateTime.Today;
+
+                                    if (currentDate.Date < today.Date)
+                                    {
+                                        cellStyle = "background-color: lightgray; cursor: not-allowed";
+                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                        buttonDisabled = "disabled";
+                                    }
+                                    else
+                                    {
+                                        bool isAvailable = true;
+                                        string cellColor = "";
+
+                                        // Logic for logged user
+                                        if ((ViewBag.Appointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.Appointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else
+                                                    {
+                                                        isAvailable = false;
+                                                        if (a.Status == "Pending")
+                                                        {
+                                                            cellColor = "background-color: orange;";
+                                                        }
+                                                        else if (a.Status == "Approved")
+                                                        {
+                                                            cellColor = "background-color: lightgreen;";
+                                                        }
+                                                        else if (a.Status == "Completed")
+                                                        {
+                                                            cellColor = "background-color: green;";
+                                                        }
+                                                        else if (a.Status == "Rejected")
+                                                        {
+                                                            cellColor = "background-color: red;";
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        // Logic for other users appointments
+                                        if ((ViewBag.AllAppointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.AllAppointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else if (ViewBag.DoctorId == a.DoctorId)
+                                                    {
+                                                        isAvailable = false;
+                                                        cellColor = "background-color: lightgray;";
+                                                    }
+                                                    else if (a.Status == "Unavailable" && a.PatientId == ViewBag.DoctorId)
+                                                    {
+                                                        isAvailable = false;
+                                                        cellColor = "background-color: lightgray;";
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (!isAvailable)
+                                        {
+                                            cellStyle = cellColor + " cursor: not-allowed";
+                                            buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                            buttonDisabled = "disabled";
+                                        }
+                                    }
+
+                                    <td style="height: 48px; @cellStyle" class="calendar-slot">
+                                        <button type="button" style="@buttonStyle" class="button" data-bs-toggle="modal" data-bs-target="#bookAppointmentModal" @buttonDisabled />
+                                    </td>
+                                }
+
+                                <td style="background-color: lightgray; height: 48px; cursor: not-allowed;"></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @section scripts
+    {
+    <script>
+        function goBack()
+        {
+            window.history.go(-1);
+        }
+
+        function close()
+        {
+            window.history.reload();
+        }
+
+        $(document).ready(function () 
+        {
+            $('.calendar-slot button').click(function () 
+            {
+                var cell = $(this).parent('td');
+                var day = cell.index();
+                var hour = cell.closest('tr').find('td:first').text().trim();
+
+                var sunday = new Date('@(((DateTime)ViewBag.Sunday).ToString("yyyy-MM-dd"))');
+                var selectedDate = new Date(sunday.setDate(sunday.getDate() + (day - 1)));
+
+                var formattedDate = selectedDate.toISOString().slice(0, 10);
+                var formattedHour = formatHour(hour);
+
+                $('#appointmentDate').val(formattedDate);
+                $('#appointmentHour').val(formattedHour);
+            });
+        });
+
+        function formatHour(hour) 
+        {
+            var parts = hour.split(':');
+            var hours = parseInt(parts[0]);
+            var minutes = parts[1].substring(0, 2);
+            var ampm = parts[1].substring(3, 5);
+
+            if (hours < 10) 
+            {
+                hours = hours.toString().padStart(2, '0');
+            }
+
+            return hours + ':' + minutes + ' ' + ampm;
+        }
+
+        var doctorId = '@ViewBag.DoctorId';
+
+        if (doctorId) 
+        {
+            $('#Doctor').val(function()
+            {
+                return $('option[data-id="' + doctorId + '"]', this).val();
+            });
+
+            var selectedOption = $('#Doctor option:selected');
+            $('#DoctorId').val(selectedOption.data('id'));
+            $('#DoctorFirstName').val(selectedOption.data('firstname'));
+            $('#DoctorLastName').val(selectedOption.data('lastname'));
+            $('#Specialization').val(selectedOption.data('specialization'));
+            $('#Location').val(selectedOption.data('location'));
+        }
+
+        $('#Doctor').change(function()
+        {
+            var selectedOption = $(this).find('option:selected');
+            $('#DoctorId').val(selectedOption.data('id'));
+            $('#DoctorFirstName').val(selectedOption.data('firstname'));
+            $('#DoctorLastName').val(selectedOption.data('lastname'));
+            $('#Specialization').val(selectedOption.data('specialization'));
+            $('#Location').val(selectedOption.data('location'));
+        });
+    </script>
+    }
+}
+else if (ViewBag.IsLogged == true && ViewBag.IsDoctor == true)
+{
+    <div class="container-fluid p-0" style="min-height: 50vh;">
+        <a class="little-white-button mb-2" onclick="window.location.href = '@Url.Action("edit", "account")'" style="text-decoration: none; width: 90px; box-shadow:none; margin-right: 24px;">
+            <div class="text-content fs-6 px-2 fw-bold text-center">
+                <div>&lt; Back</div>
+            </div>
+        </a>
+        <div class="text-center" style="flex-grow: 1;">
+            <h1 style="font-weight: 700">My Appointments</h1>
+        </div>
+        <hr />
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+        }
+        @if (TempData["WarningMessage"] != null)
+        {
+            <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+        }
+        <div class="row m-0">
+            <!-- APPOINTMENT LIST -->
+            <div class="col-md-4" style="border-right: 1px solid #dee2e6; width: 400px">
+                <table class="table">
+                    <tbody>
+                        @if (ViewBag.DoctorAppointments == null || (ViewBag.DoctorAppointments).Count == 0)
+                        {
+                            <tr>
+                                <td colspan="4" style="text-align: center">No appointments found.</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var a in ViewBag.DoctorAppointments)
+                            {
+                                @if (a.Id == 0)
+                                {
+                                    @if (ViewBag.DoctorAppointments.Count == 1)
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="text-align: center">No appointments found.</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <!-- APPOINTMENT DETAILS -->
+                                    @if (a.Status == "Unavailable")
+                                    {
+                                        <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editAppointmentModal-@a.Id"
+                                        data-date="@a.Date" data-hour="@a.Time"
+                                        style="cursor: pointer;">
+                                            <td>
+                                                <div style="padding: 8px; mb-3">
+                                                    <strong>@a.Date - @a.Time</strong>
+                                                </div>
+
+                                                <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                            </td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editAppointmentModal-@a.Id"
+                                        data-date="@a.Date" data-hour="@a.Time"
+                                        data-location="@a.Location" data-specialization="@a.Specialization"
+                                        data-patientln="@a.PatientLastName" data-patientfn=" @a.PatientFirstName"
+                                        style="cursor: pointer;">
+                                            <td>
+                                                <div style="padding: 8px; mb-3">
+                                                    <strong>@a.Date - @a.Time</strong>
+                                                    <br />with <strong>@a.PatientFirstName @a.PatientLastName</strong>
+                                                </div>
+                                                @if (a.Status == "Pending")
+                                                {
+                                                    <div style="padding: 8px;">Status: <span class="badge bg-warning">@a.Status</span></div>
+                                                }
+                                                else if (a.Status == "Approved")
+                                                {
+                                                    <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                }
+                                                else if (a.Status == "Completed")
+                                                {
+                                                    <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                }
+                                                else if (a.Status == "Cancelled")
+                                                {
+                                                    <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                }
+                                                else if (a.Status == "Rejected")
+                                                {
+                                                    <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                }
+                                                else
+                                                {
+                                                    <div style="padding: 8px;">Status: Unknown</div>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+
+                                    <!-- EDIT APPOINTMENT MODAL -->
+                                    <div class="modal fade" id="editAppointmentModal-@a.Id" tabindex="-1" aria-labelledby="editAppointmentModalLabel-@a.Id" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="editAppointmentModalLabel-@a.Id" style="margin-left: 8px">Edit an Appointment</h5>
+                                                    <button type="button" class="btn-close" onclick="goBack()" aria-label="Close" style="margin-right: 6px"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form id="editAppointmentForm-@a.Id" asp-controller="care" asp-action="edit_appointment" method="post">
+                                                        <input type="hidden" name="Id" value="@a.Id" />
+                                                        <div class="rounded_fields form-label mb-3">
+                                                            <input type="date" class="form-control" id="editAppointmentDate-@a.Id" name="Date" aria-required="true" style="width:100%;" value="@a.Date">
+                                                        </div>
+                                                        <div class="rounded_fields form-label mb-3">
+                                                            <div class="rounded_fields form-label mb-3">
+                                                                <select class="form-control" id="editAppointmentHour-@a.Id" name="Hour" aria-required="true" style="width:100%;">
+                                                                    <option value="09:00 AM">09:00 AM</option>
+                                                                    <option value="10:00 AM">10:00 AM</option>
+                                                                    <option value="11:00 AM">11:00 AM</option>
+                                                                    <option value="01:00 PM">01:00 PM</option>
+                                                                    <option value="02:00 PM">02:00 PM</option>
+                                                                    <option value="03:00 PM">03:00 PM</option>
+                                                                    <option value="04:00 PM">04:00 PM</option>
+                                                                    <option value="05:00 PM">05:00 PM</option>
+                                                                </select>
+                                                            </div>
+                                                        </div>
+
+                                                        <input type="hidden" id="DId" name="DId" value="@a.DoctorId" />
+                                                        <input type="hidden" id="Spe" name="Spe" value="@a.Specialization" />
+                                                        <input type="hidden" id="Loc" name="Loc" value="@a.Location" />
+
+                                                        <input type="hidden" id="Stat" name="Stat" value="Pending" />
+
+                                                        <input type="hidden" id="PId" name="PId" value="@a.PatientId" />
+                                                        <input type="hidden" id="PLastName" name="PLastName" value="@ViewBag.Patient.LastName" />
+                                                        <input type="hidden" id="PFirstName" name="PFirstName" value="@ViewBag.Patient.FirstName" />
+                                                    </form>
+                                                </div>
+
+                                                @if (a.Status != "Unavailable")
+                                                {
+                                                    <div class="modal-footer">
+                                                        <a class="little-blue-button" href="#" onclick="location.href='@Url.Action("patient", new { id = @a.PatientId })';" style="text-decoration: none;">
+                                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                                <div>📋 Patient Details</div>
+                                                            </div>
+                                                        </a>
+
+                                                        <form id="approveAppointmentForm-@a.Id" asp-controller="care" asp-action="approve_appointment" method="post" style="display: none;">
+                                                            <input type="hidden" name="Id" value="@a.Id" />
+                                                        </form>
+                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('approveAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                                <div>☑️ Approve Appointment</div>
+                                                            </div>
+                                                        </a>
+
+                                                        <form id="rejectAppointmentForm-@a.Id" asp-controller="care" asp-action="reject_appointment" method="post" style="display: none;">
+                                                            <input type="hidden" name="Id" value="@a.Id" />
+                                                        </form>
+                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('rejectAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                                <div>🚫 Reject Appointment</div>
+                                                            </div>
+                                                        </a>
+
+                                                    </div>
+
+                                                    <div class="modal-footer">
+
+                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('editAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                                <div>🔄 Reschedule Appointment</div>
+                                                            </div>
+                                                        </a>                                                
+
+                                                        <form id="cancelAppointmentForm-@a.Id" asp-controller="care" asp-action="cancel_appointment" method="post" style="display: none;">
+                                                            <input type="hidden" name="Id" value="@a.Id" />
+                                                        </form>
+                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('cancelAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                                <div>❌ Cancel Appointment</div>
+                                                            </div>
+                                                        </a>
+
+                                                        <form id="completeAppointmentForm-@a.Id" asp-controller="care" asp-action="complete_appointment" method="post" style="display: none;">
+                                                            <input type="hidden" name="Id" value="@a.Id" />
+                                                        </form>
+                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('completeAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                                <div>✅ Complete Appointment</div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="modal-footer">
+
+                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('editAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                                <div>🔄 Reschedule Unavailability</div>
+                                                            </div>
+                                                        </a>
+
+                                                        <form id="cancelUnavailabilityForm-@a.Id" asp-controller="care" asp-action="cancel_unavailability" method="post" style="display: none;">
+                                                            <input type="hidden" name="Id" value="@a.Id" />
+                                                        </form>
+                                                        <a class="little-blue-button" href="#" onclick="document.getElementById('cancelUnavailabilityForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                            <div class="text-content fs-6 px-2 fw-bold">
+                                                                <div>❌ Cancel Unavailability</div>
+                                                            </div>
+                                                        </a>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
+                    </tbody>
+
+                    @{
+                        int cancelledCount = 0;
+                        if (ViewBag.DoctorAppointments != null)
+                        {
+                            DateTime currentDate = DateTime.Now;
+                            foreach (var a in ViewBag.DoctorAppointments)
+                            {
+                                DateTime appointmentDate;
+                                if (DateTime.TryParse(a.Date, out appointmentDate) &&
+                                appointmentDate.Year == currentDate.Year &&
+                                appointmentDate.Month == currentDate.Month &&
+                                a.Status == "Cancelled")
+                                {
+                                    cancelledCount++;
+                                }
+                            }
+                        }
+                        <div class="badge bg-danger">
+                            <strong>Cancelled: @cancelledCount</strong>
+                        </div>
+
+                        <hr />
+                    }
+                </table>
+            </div>
+
+            <!-- CALENDAR -->
+            <div class="col-md-8" style="justify-content: flex-end; margin-left: 32px">
+                @{
+                    var sunday = (DateTime)ViewBag.Sunday;
+                    var saturday = (DateTime)ViewBag.Saturday;
+                }
+
+                <!-- UNAVAILABILITY MODAL -->
+                <div class="modal fade" id="unavailabilityModal" tabindex="-1" aria-labelledby="unavailabilityModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="unavailabilityModalLabel" style="margin-left: 8px">Declare an Unavailability</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="margin-right: 6px"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form id="unavailabilityForm" asp-controller="care" asp-action="declare_unavailability" method="post">
+                                    <div class="rounded_fields form-label mb-3">
+                                        <input asp-for="bookAppointment.appointmentDate" class="form-control" id="appointmentDate" name="appointmentDate" aria-required="true" placeholder="appointmentDate" style="width:100%;" readonly>
+                                    </div>
+                                    <div class="rounded_fields form-label mb-3">
+                                        <input asp-for="bookAppointment.appointmentHour" class="form-control" id="appointmentHour" name="appointmentHour" aria-required="true" placeholder="appointmentHour" style="width:100%;" readonly>
+                                    </div>
+
+                                    <input type="hidden" id="DoctorId" name="DoctorId" value="@ViewBag.Patient.Id" />
+                                    <input type="hidden" id="DoctorLastName" name="DoctorLastName" value="@ViewBag.Patient.LastName" />
+                                    <input type="hidden" id="DoctorFirstName" name="DoctorFirstName" value="@ViewBag.Patient.FirstName" />
+                                    <input type="hidden" id="Specialization" name="Specialization" value="null" />
+                                    <input type="hidden" id="Location" name="Location" value="null" />
+
+                                    <input type="hidden" id="Status" name="Status" value="Unavailable" />
+
+                                    <input type="hidden" id="PatientId" name="PatientId" value="f27dde93-f22b-4a81-a322-4336fc5232f4" />
+                                    <input type="hidden" id="PatientLastName" name="PatientLastName" value="patient" />
+                                    <input type="hidden" id="PatientFirstName" name="PatientFirstName" value="patient" />
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <a class="little-blue-button" href="#" onclick="document.getElementById('unavailabilityForm').submit(); return false;" style="text-decoration: none;">
+                                    <div class="text-content fs-6 px-2 fw-bold">
+                                        <div>⛔ Declare an Unavailability</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TITLE (DATES) -->
+                <row style="display: flex; align-self: center;">
+                    <div class="text-center" style="flex-grow: 1; align-content: center">
+                        <h3 style="font-weight: 700">@sunday.ToString("dd MMM") - @saturday.ToString("dd MMM yyyy")</h3>
+                    </div>
+                    <div class="text-content mb-3" style="display: flex; table-layout: fixed; justify-content: flex-end; border-radius: 64px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="prevButton" onclick="location.href='@Url.Action("appointments", new { sunday = ((DateTime)ViewBag.Sunday).AddDays(-7) })';" style="width: 64px; height: 40px; border-radius: 64px 0px 0px 64px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">&lt;</button>
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="todayButton" onclick="location.href='@Url.Action("appointments", "care")';" style="width: 96px; height: 40px; border-radius: 0px 0px 0px 0px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">Today</button>
+                        <button class="btn little-white-button fs-6 px-2 fw-bold" id="nextButton" onclick="location.href='@Url.Action("appointments", new { sunday = ((DateTime)ViewBag.Sunday).AddDays(7) })';" style="width: 64px; height: 40px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px; box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);">&gt;</button>
+                    </div>
+                </row>
+
+                <!-- CALENDAR TABLE -->
+                <table class="table table-bordered" style="border-color: black; width: 100%; table-layout: fixed;">
+                    <thead>
+                        <tr>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Hour</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Sun<br />@(((DateTime)ViewBag.Sunday).ToString("MM.dd"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Mon<br />@(((DateTime)ViewBag.Sunday).AddDays(1).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Tue<br />@(((DateTime)ViewBag.Sunday).AddDays(2).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Wed<br />@(((DateTime)ViewBag.Sunday).AddDays(3).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Thu<br />@(((DateTime)ViewBag.Sunday).AddDays(4).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Fri<br />@(((DateTime)ViewBag.Sunday).AddDays(5).ToString("MM.d"))</th>
+                            <th style="background-color: darkgray; text-align: center; align-content: center; white-space: nowrap;">Sat<br />@(((DateTime)ViewBag.Sunday).AddDays(6).ToString("MM.d"))</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int h = 9; h < 12; h++)
+                        {
+                            <tr>
+                                <td style="text-align: center; height: 48px; background-color: darkgray; align-content: center;"><strong>@h:00 AM</strong></td>
+
+                                <td style="background-color: lightgray; height:48px; cursor: not-allowed"></td>
+
+                                @for (int d = 0; d < 5; d++)
+                                {
+                                    var currentDate = ((DateTime)ViewBag.Sunday).AddDays(d + 1);
+                                    string time = h.ToString("00") + ":00 AM";
+
+                                    string buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                    string cellStyle = "";
+                                    string buttonDisabled = "";
+
+                                    DateTime today = DateTime.Today;
+
+                                    if (currentDate.Date < today.Date)
+                                    {
+                                        cellStyle = "background-color: lightgray; cursor: not-allowed";
+                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                        buttonDisabled = "disabled";
+                                    }
+                                    else
+                                    {
+                                        bool isAvailable = true;
+                                        string cellColor = "";
+
+                                        // Logic for logged user
+                                        if ((ViewBag.DoctorAppointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.DoctorAppointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled" || a.Status == "Rejected")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else
+                                                    {
+                                                        isAvailable = false;
+                                                        if (a.Status == "Pending")
+                                                        {
+                                                            cellColor = "background-color: orange;";
+                                                        }
+                                                        else if (a.Status == "Approved")
+                                                        {
+                                                            cellColor = "background-color: lightgreen;";
+                                                        }
+                                                        else if (a.Status == "Completed")
+                                                        {
+                                                            cellColor = "background-color: green;";
+                                                        }
+														else if (a.Status == "Unavailable")
+														{
+															cellColor = "background-color: lightgray;";
+														}
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if (!isAvailable)
+                                        {
+                                            cellStyle = cellColor + " cursor: not-allowed";
+                                            buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                            buttonDisabled = "disabled";
+                                        }
+                                    }
+
+                                    <td style="height: 48px; @cellStyle" class="calendar-slot">
+                                        <button type="button" style="@buttonStyle" class="button" data-bs-toggle="modal" data-bs-target="#unavailabilityModal" @buttonDisabled />
+                                    </td>
+                                }
+
+                                <td style="background-color: lightgray; height: 48px; cursor: not-allowed"></td>
+                            </tr>
+                        }
+
+                        <tr>
+                            <td style="text-align: center; height: 48px; background-color: darkgray; align-content: center;"><strong>12:00 PM</strong></td>
+
+                            @for (int d = 0; d < 7; d++)
+                            {
+                                <td style="background-color: lightgray; height: 48px; cursor: not-allowed"></td>
+                            }
+                        </tr>
+
+                        @for (int h = 1; h < 6; h++)
+                        {
+                            <tr>
+                                <td style="text-align: center; height: 48px; background-color: darkgray; align-content: center;"><strong>@h:00 PM</strong></td>
+
+                                <td style="background-color: lightgray; height:48px; cursor: not-allowed"></td>
+
+                                @for (int d = 0; d < 5; d++)
+                                {
+                                    var currentDate = ((DateTime)ViewBag.Sunday).AddDays(d + 1);
+                                    string time = h.ToString("00") + ":00 PM";
+
+                                    string buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                    string cellStyle = "";
+                                    string buttonDisabled = "";
+
+                                    DateTime today = DateTime.Today;
+
+                                    if (currentDate.Date < today.Date)
+                                    {
+                                        cellStyle = "background-color: lightgray; cursor: not-allowed";
+                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                        buttonDisabled = "disabled";
+                                    }
+                                    else
+                                    {
+                                        bool isAvailable = true;
+                                        string cellColor = "";
+
+                                        if ((ViewBag.DoctorAppointments).Count != 0)
+                                        {
+                                            foreach (var a in ViewBag.DoctorAppointments)
+                                            {
+                                                if (a.Date == currentDate.ToString("yyyy-MM-dd") && a.Time == time)
+                                                {
+                                                    if (a.Status == "Cancelled" || a.Status == "Rejected")
+                                                    {
+                                                        isAvailable = true;
+                                                        cellColor = "";
+                                                        buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none;";
+                                                        buttonDisabled = "";
+                                                    }
+                                                    else
+                                                    {
+                                                        isAvailable = false;
+                                                        if (a.Status == "Pending")
+                                                        {
+                                                            cellColor = "background-color: orange;";
+                                                        }
+                                                        else if (a.Status == "Approved")
+                                                        {
+                                                            cellColor = "background-color: lightgreen;";
+                                                        }
+                                                        else if (a.Status == "Completed")
+                                                        {
+                                                            cellColor = "background-color: green;";
+                                                        }
+														else if (a.Status == "Unavailable")
+														{
+															cellColor = "background-color: lightgray;";
+														}
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+
+                                        if (!isAvailable)
+                                        {
+                                            cellStyle = cellColor + " cursor: not-allowed";
+                                            buttonStyle = "width: 100%; height: 100%; background-color: transparent; border: none; cursor: not-allowed";
+                                            buttonDisabled = "disabled";
+                                        }
+                                    }
+
+                                    <td style="height: 48px; @cellStyle" class="calendar-slot">
+                                        <button type="button" style="@buttonStyle" class="button" data-bs-toggle="modal" data-bs-target="#unavailabilityModal" @buttonDisabled />
+                                    </td>
+                                }
+
+                                <td style="background-color: lightgray; height: 48px; cursor: not-allowed;"></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @section scripts
+    {
+    <script>
+        function goBack()
+        {
+            window.history.go(-1);
+        }
+
+        function close()
+        {
+            window.history.reload();
+        }
+
+        $(document).ready(function ()
+        {
+            $('.calendar-slot button').click(function ()
+            {
+                var cell = $(this).parent('td');
+                var day = cell.index();
+                var hour = cell.closest('tr').find('td:first').text().trim();
+
+                var sunday = new Date('@(((DateTime)ViewBag.Sunday).ToString("yyyy-MM-dd"))');
+                var selectedDate = new Date(sunday.setDate(sunday.getDate() + (day - 1)));
+
+                var formattedDate = selectedDate.toISOString().slice(0, 10);
+                var formattedHour = formatHour(hour);
+
+                $('#appointmentDate').val(formattedDate);
+                $('#appointmentHour').val(formattedHour);
+            });
+        });
+
+        function formatHour(hour)
+        {
+            var parts = hour.split(':');
+            var hours = parseInt(parts[0]);
+            var minutes = parts[1].substring(0, 2);
+            var ampm = parts[1].substring(3, 5);
+
+            if (hours < 10) {
+                hours = hours.toString().padStart(2, '0');
+            }
+
+            return hours + ':' + minutes + ' ' + ampm;
+        }
+
+        var doctorId = '@ViewBag.DoctorId';
+
+        if (doctorId)
+        {
+            $('#Doctor').val(function()
+            {
+                return $('option[data-id="' + doctorId + '"]', this).val();
+            });
+
+            var selectedOption = $('#Doctor option:selected');
+            $('#DoctorId').val(selectedOption.data('id'));
+            $('#DoctorFirstName').val(selectedOption.data('firstname'));
+            $('#DoctorLastName').val(selectedOption.data('lastname'));
+            $('#Specialization').val(selectedOption.data('specialization'));
+            $('#Location').val(selectedOption.data('location'));
+        }
+
+        $('#Doctor').change(function()
+        {
+            var selectedOption = $(this).find('option:selected');
+            $('#DoctorId').val(selectedOption.data('id'));
+            $('#DoctorFirstName').val(selectedOption.data('firstname'));
+            $('#DoctorLastName').val(selectedOption.data('lastname'));
+            $('#Specialization').val(selectedOption.data('specialization'));
+            $('#Location').val(selectedOption.data('location'));
+        });
+    </script>
+    }
+}
+else
+{
+    @section scripts {
+    <script>
+        window.location.href = '@Url.Action("login_or_register", "account")';
+    </script>
+    }
+}

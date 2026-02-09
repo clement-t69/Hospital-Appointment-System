@@ -1,0 +1,275 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    font-family: 'Segoe UI Variable Display'
+}
+
+header {
+    grid-row: 1;
+}
+
+.container {
+    grid-row: 2;
+}
+
+footer {
+    grid-row: 3;
+}
+
+.little-white-button {
+    border-radius: 64px;
+    background-color: white;
+    color: dodgerblue;
+    text-align: left;
+    padding: 9px;
+    position: relative;
+    display: flex;
+    align-items: start;
+    width: 100%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}
+
+.little-white-button:hover {
+    background-color: #0e43ad;
+    color: white;
+}
+
+.little-white-button .text-content {
+    flex-grow: 1;
+}
+
+.little-blue-button {
+    border-radius: 64px;
+    background-color: dodgerblue;
+    color: white;
+    text-align: left;
+    padding: 9px;
+    position: relative;
+    display: flex;
+    align-items: start;
+    width: 100%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}
+
+.little-blue-button:hover {
+        background-color: #0e43ad;
+        color: white;
+    }
+
+.little-blue-button::after {
+    content: '>';
+    position: absolute;
+    right: 25px;
+    bottom: 10px;
+    color: inherit;
+}
+
+.little-blue-button .text-content {
+        flex-grow: 1;
+    }
+
+.little-red-button {
+    border-radius: 64px;
+    background-color: red;
+    color: white;
+    text-align: left;
+    padding: 9px;
+    position: relative;
+    display: flex;
+    align-items: start;
+    width: 100%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}
+
+.little-red-button:hover {
+        background-color: darkred;
+        color: white;
+    }
+
+.little-red-button::after {
+        content: '>';
+        position: absolute;
+        right: 25px;
+        bottom: 10px;
+        color: inherit;
+    }
+
+.little-red-button .text-content {
+        flex-grow: 1;
+    }
+
+.big-blue-button {
+    border-radius: 64px;
+    background-color: dodgerblue;
+    color: white;
+    text-align: left;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    align-items: start;
+    width: 100%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}
+
+.big-blue-button:hover {
+    background-color: #0e43ad;
+    color: white;
+}
+
+.big-blue-button::after {
+    content: '>';
+    font-weight: 900;
+    font-size: 1.5em;
+    position: absolute;
+    right: 32px;
+    bottom: 11px;
+    color: inherit;
+}
+
+.big-blue-button .text-content {
+    flex-grow: 1;
+}
+
+.big-white-button {
+    color: dodgerblue;
+    text-align: left;
+    border-radius: 64px;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    align-items: start;
+    width: 100%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}
+
+    .big-white-button:hover {
+        background-color: #0e43ad;
+        color: white;
+    }
+
+    .big-white-button::after {
+        content: '>';
+        position: absolute;
+        right: 32px;
+        bottom: 11px;
+        color: inherit;
+    }
+
+.big-white-button .text-content {
+    flex-grow: 1;
+}
+
+.big-white-button-red {
+    color: red;
+    text-align: left;
+    border-radius: 64px;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    align-items: start;
+    width: 100%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}
+
+    .big-white-button-red:hover {
+        background-color: darkred;
+        color: white;
+    }
+
+    .big-white-button-red::after {
+        content: '>';
+        position: absolute;
+        right: 32px;
+        bottom: 11px;
+        color: inherit;
+    }
+
+    .big-white-button-red .text-content {
+        flex-grow: 1;
+    }
+
+.rounded_fields .form-control {
+    border-radius: 64px;
+    height: 3rem;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}
+
+.rounded-checkbox .form-check-input {
+    border-radius: 64px;
+    width: 1.5em;
+    height: 1.5em;
+    appearance: none;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #ced4da;
+    outline: none;
+    margin-right: 0.3rem;
+    margin-top: 0.05rem;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+}
+
+.rounded-checkbox .form-check-input:checked {
+    background-color: forestgreen;
+    border-color: forestgreen;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='white' d='M14.83 4.83a1 1 0 0 1 0 1.41l-6.5 6.5a1 1 0 0 1-1.41 0l-2.5-2.5a1 1 0 1 1 1.41-1.41l1.8 1.8 5.8-5.8a1 1 0 0 1 1.41 0z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position-x: 0.12em;
+    background-position-y: 0.17em;
+    background-size: 1.2em;
+}
+
+.rounded-checkbox .form-check-label {
+    align-items: center;
+}
+
+.big-white-button-table:hover {
+    background-color: #0e43ad;
+    color: white;
+    border-radius: 64px;
+    width: 100%;
+}
+
+.calendar-slot 
+{
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.calendar-slot:hover 
+    {
+        background-color: #0e43ad;
+        cursor: pointer;
+    }
+
+.rounded_textarea .form-control 
+{
+    border-radius: 16px;
+    height: 3rem;
+    box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)
+}

@@ -1,0 +1,190 @@
+﻿✅: DONE
+⏯️: WIP
+❌: TODO
+
+//////////////////////// Views/home //////////////////////// ✅
+
+[✅]	Views/home/index.cshtml:
+		Search bar (field to enter a keyword, a select to choose a category, a button to Search)
+		This search will bring to care/doctors.cshtml and perform a search in the database (filering with the search keyword and category)
+
+[✅]	Views/home/cancellation_policy.cshtml:
+		Title: Cancellation Policy
+		Body: (text)
+
+[✅]	Views/home/contact.cshtml: NEED TO IMPLEMENT THE CONTACT FORM LOGIC (SEND EMAIL TO ALL ADMINS)
+		Title: Contact
+		Form with Name, Email, Subject, Message, Send button
+		This will be sent to all administrators, who can see it in the my_messages page
+
+//////////////////////// Views/Shared //////////////////////// ✅
+
+[✅]	Views/Shared/_layout.cshtml: 
+		When not logged:
+		Title (hyperlink to Home)																		Log in (hyperlink to Choose)
+
+		When logged:
+		Title (hyperlink to Home)		My messages (hyperlink to Messages)			My appointments (hyperlink to Appointments)		My account (hyperlink to Account)		Log out (button to Log out)									
+
+		When logged as an administrator:
+		Title (hyperlink to Home)		Admin panel (hyperlink to Admin Panel)		My account (hyperlink to Account)				Log out (button to Log out)
+
+		Bottom of the page:
+		Cancellation Policy (hyperlink to Cancellation Policy)
+
+//////////////////////// Views/account //////////////////////// ✅
+
+[✅]	Views/account/login_or_register.cshtml:
+		Title: Register or Log in
+		Body: New? (text) Register (button to Register) Already have an account? (text) Log in (button to Log in)
+
+[✅]	Views/account/register.cshtml
+
+[✅]	Views/account/login.cshtml
+
+[⏯️]	Views/account/forgot_password.cshtml: NEED TO CORRECT THE INVALID TOKEN ERROR
+
+//////////////////////// Views/account //////////////////////// (only if logged, if not the case, redirect to Error page) ✅
+
+[✅]	Views/account/edit.cshtml (as a patient):
+		Profile (hyperlink to Profile)
+		My appointments (hyperlink to Appointments)
+		Medical history (hyperlink to Medical History)
+		Prescriptions (hyperlink to Prescriptions)
+		My messages (hyperlink to Messages)
+		Change email (form with current email, new email, confirm new email, Change button) : NEED FIX (POP UP FIXED WHEN ERROR)
+		Change password (form with current password, new password, confirm new password, Change button)
+		Delete account (button to Delete account)
+
+[✅]	Views/account/edit.cshtml (as a doctor):
+		Profile (hyperlink to Profile
+		My appointments (hyperlink to Appointments)
+		My patients (hyperlink to Patients)
+		My messages (hyperlink to Messages)
+		Change email (form with current email, new email, confirm new email, Change button)
+		Change password (form with current password, new password, confirm new password, Change button)
+		Delete account (button opening a pop-up telling to contact an Administrator)
+
+[✅]	Views/account/edit.cshtml (as a doctor):
+		Profile (hyperlink to Profile)
+		My messages (hyperlink to Messages)
+		Change email (form with current email, new email, confirm new email, Change button)
+		Change password (form with current password, new password, confirm new password, Change button)
+		Delete account (button opening a pop-up telling to contact an Administrator)
+
+
+
+[✅]	Views/account/my_profile.cshtml (as a patient):
+		Title: My profile
+		Card with First name, Last name, Address, Phone number with Edit button (opens a form to edit the information)
+
+[✅]	Views/account/my_profile.cshtml (as a doctor):
+		Title: My profile
+		Card with First name, Last name, Address, Phone number, Specialty, Location with Edit button (opens a form to edit the information)
+
+
+
+[✅]	Views/account/my_notifications.cshtml:
+		Notification : Title, Date, Content
+		Button to mark all notifications as read
+		Button to delete a notification
+
+
+[✅]	Views/account/my_messages.cshtml (as a patient): FIX SEARCH
+		List of messages (can be filtered by content, date, sender)
+		Message : Title, Content, Date, Sender
+		Button to write a message (form with Title, Content, Sender, Send button)
+
+[✅]	Views/account/my_messages.cshtml (as a doctor): FIX SEARCH
+		List of messages (can be filtered by content, date, sender)
+		Message : Title, Content, Date, Sender
+		Button to write a message (form with Title, Content, Sender, Send button)
+
+
+
+[✅]	Views/account/my_medical_history.cshtml (as a patient, if not the case, redirect to Error page)
+		List of medical history (can be filtered by date, doctor name, specialty, location)
+
+
+
+[✅]	Views/account/my_prescriptions.cshtml (as a patient, if not the case, redirect to Error page)
+		List of prescriptions (can be filtered by doctor name, name, dosage, frequency, duration, pharmacy)
+
+//////////////////////// Views/care //////////////////////// ✅
+
+[✅]	Views/care/patients.cshtml (only as a doctor, if not the case redirect to Error page):
+		List of patients (can be filtered by name, email)
+		Button to edit a patient, redirect to care/patient/{id}
+
+[✅]	Views/care/patient/{id}.cshtml (only as a doctor, if not the case redirect to Error page):
+		Patient's profile (First name, Last name)
+		3 fields: Appointments, Medical history, Prescriptions
+		Appointments: List of appointments (can be filtered by date, doctor name, status)
+		Medical history: List of medical history (can be filtered by date, doctor name, specialty, location)
+		Prescriptions: List of prescriptions (can be filtered by doctor name, name, dosage, frequency, duration, pharmacy, expiration date)
+		--> Button to send a message to the patient (opens a form with Title, Content, Send button)
+		Send a message when a prescription is issued, updated, or cancelled
+
+[✅]	Views/care/doctors.cshtml (only as a patient, if not the case redirect to Error page): TODO: SEND MESSAGE (just copy the doctor email to the message form)
+		List of doctors (can be filtered by name, specialty, location)
+		For each doctor, button to view profile, send a message, book an appointment (form)
+
+[✅]	Views/care/appointments.cshtml (as a patient):
+		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
+		Clicking on an appointment opens a form to reschedule or cancel the appointment
+		If a patient wants to cancel an appointment in the 48 hours before the appointment --> Pop-up with a warning explaining that the cancellation is not possible, with a link to cancellation policy
+
+		Calendar by week on the right with appointments
+		When an appointment is booked --> Send Message to Patient (can be viewed in Account/Messages)
+		Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
+
+[✅]	Views/care/appointments.cshtml (as a doctor):
+		List on the left of upcoming appointments, past appointments, and cancelled appointments (3 fields)
+		Clicking on an appointment opens a form to mark the appointment as completed, reschedule, or cancel the appointment
+		Doctor can access patient's profile, medical history, prescriptions (redirect to Doctor/Patient/{id})
+
+		Calendar by month on the right with appointment
+		When an appointment is booked by a patient --> Send Message to Doctor (can be viewed in Account/Messages)
+		Can block unavailable slots (button with a form to enter date(s), time, reason)
+		Track the number of no-shows and cancellations (red icon with number per month)
+		Monday to friday between 9am and 5pm only (1 hour slots) but not between 12pm and 1pm
+
+//////////////////////// Views/admin //////////////////////// (only as an administrator, if not the case redirect to Error page) ✅
+
+[✅]	Views/admin/panel.cshtml
+		Buttons to manage users, view appointments, manage doctor schedules, view system logs, send system notifications
+
+[✅]	Views/admin/users.cshtml : NEED TO IMPLEMENT DEACTIVATE/REACTIVATE USERS, PREVENT DUPLICATE EMAIL ADDRESSES AND REPORTS
+		List of users (can be filtered by name, email, role)
+		Create new users (form with First name, Last name, Email, Address, Phone, Role, Password, Create button)
+		Edit user information (form with First name, Last name, Email, Address, Phone, Role, Edit button)
+		Deactivate/reactivate users (button with a pop-up to confirm)
+		Prevent duplicate email addresses (FailMessage)
+		Receive a notification after successful changes (SuccessMessage)
+
+[✅]	Views/admin/appointments.cshtml
+		List of appointments (can be filtered by date, patient name, doctor name, status)
+		Info: Date, Time, Patient name, Doctor name, Status (scheduled, completed, cancelled)
+		For each appointment, button to cancel an appointment on behalf of a patient and override cancellation restrictions
+		When an appointment is cancelled --> Send a notification to the patient
+
+[✅]	Views/admin/medical_histories.cshtml
+		List of medical histories (can be filtered by date, patient name, doctor name, specialty)
+		Info: Date, Patient name, Doctor name, Specialty, Location
+		For each medical history, button to view details
+
+[✅]	Views/admin/prescriptions.cshtml
+		List of prescriptions (can be filtered by date, patient name, doctor name)
+		Info: Date, Patient name, Doctor name, Pharmacy
+		For each prescription, button to view details
+
+[⏯️]	Views/admin/logs.cshtml: NEED FIXES (ERROR IN THE HTTPS CONNECTION)
+		List of logs (can be filtered by date, user, action)
+		Info: Date, User, Action
+		For each log, button to view details
+
+[✅]	Views/admin/messages.cshtml
+		List of notifications (can be filtered by date, user, action)
+		Info: Date, User, Action
+		For each notification, button to view details
+		Button to send a system notification (form with Title, Content, Send button) --> Send a notification to all users

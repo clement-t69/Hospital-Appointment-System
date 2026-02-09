@@ -1,0 +1,161 @@
+﻿@{
+    ViewData["Title"] = "Doctors";
+}
+
+@if (ViewBag.IsLogged == true && ViewBag.IsPatient == true)
+{
+    <div class="container d-flex justify-content-center" style="min-height: 50vh;">
+        <div class="row justify-content-center">
+            <div>
+                <div style="color: white; user-select: none;">
+                    <a>___________________________________________________________________________________________________</a>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
+                        <div class="text-content fs-6 px-2 fw-bold text-center">
+                            <div>&lt; Back</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="text-center" style="flex-grow: 1;">
+                    <h1 style="font-weight: 700">Doctors</h1>
+                </div>
+                <section>
+                    <hr />
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+
+                    <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                        <input type="text" id="searchInput" name="searchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                        <select id="searchField" name="searchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                            <option value="Name">Doctor</option>
+                            <option value="Specialization">Specialization</option>
+                            <option value="Location">Location</option>
+                        </select>
+                        <button class="btn little-white-button" id="searchButton" onclick="location.href='@Url.Action("doctors", "care")?searchInput=' + document.getElementById('searchInput').value + '&searchField=' + document.getElementById('searchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍 Search</button>
+                    </section>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>First Name</th>
+                                <th>Last Name</th>
+                                <th>Location</th>
+                                <th>Specialization</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.Doctors == null || (ViewBag.Doctors).Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" style="text-align: center">No doctors found.</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var d in ViewBag.Doctors)
+                                {
+                                    <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#viewDoctorModal-@d.UserId"
+                                        data-firstname="@d.FirstName" data-lastname="@d.LastName"
+                                        data-location="@d.Location" data-specialization="@d.Specialization"
+                                        style="cursor: pointer;">
+                                        <td>
+                                            <div style="border-radius: 64px; padding: 8px;">@d.FirstName</div>
+                                        </td>
+                                        <td>
+                                            <div style="border-radius: 64px; padding: 8px;">@d.LastName</div>
+                                        </td>
+                                        <td>
+                                            <div style="border-radius: 64px; padding: 8px;">@d.Location</div>
+                                        </td>
+                                        <td>
+                                            <div style="border-radius: 64px; padding: 8px;">@d.Specialization</div>
+                                        </td>
+                                    </tr>                                    
+
+                                    <div class="modal fade" id="viewDoctorModal-@d.UserId" tabindex="-1" aria-labelledby="viewDoctorModalLabel-@d.UserId" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="viewDoctorModalLabel-@d.UserId" style="margin-left: 8px">Doctor's Profile</h5>
+                                                    <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("doctors", "care")'" aria-label="Close" style="margin-right: 6px"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <h5 class="modal-title" style="margin-left: 8px"><strong>Dr @d.FirstName @d.LastName</strong></h5>
+                                                    <div class="d-flex justify-content-between" style="margin-left: 8px; margin-top: 8px">
+                                                        <div>
+                                                            <p class="mb-2"><strong>Email:</strong> @ViewBag.DoctorUsers[@d.UserId]?.UserName</p>
+                                                            <p class="mb-2"><strong>Phone:</strong> @ViewBag.DoctorUsers[@d.UserId]?.Phone</p>
+                                                            <p class="mb-2"><strong>Location:</strong> @d.Location</p>
+                                                            <p class="mb-2"><strong>Specialization:</strong> @d.Specialization</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="modal-footer">
+                                                    <!-- BUTTON TO SEND A MESSAGE -->
+                                                    <a class="little-blue-button" href="#" onclick="window.location.href='@Url.Action("send_message", "account")'; return false;" style="text-decoration: none;">
+                                                        <div class="text-content fs-6 px-2 fw-bold">
+                                                            <div>Send a Message</div>
+                                                        </div>
+                                                    </a>
+
+                                                    <!-- BUTTON TO BOOK AN APPOINTMENT -->
+                                                    <a class="little-blue-button" href="@Url.Action("appointments", "care", new { doctorId = d.UserId })" style="text-decoration: none;">
+                                                        <div class="text-content fs-6 px-2 fw-bold">
+                                                            <div>Book an Appointment</div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    @section scripts {
+    <script>
+        function searchDoctors()
+        {
+            var searchInput = document.getElementById('searchInput').value;
+            var searchField = document.getElementById('searchField').value;
+
+            if (searchInput == "" || searchField == "")
+            {
+            searchField = "";
+            searchInput = "";
+            }
+            else
+            {
+            location.href = '@Url.Action("doctors", "care")?searchInput=' + searchInput + '&searchField=' + searchField;
+            }
+        }
+
+		function goBack()
+		{
+			window.history.go(-1);
+		}
+    </script>
+    }
+}
+else
+{
+    @section scripts
+    {
+    <script>
+        window.location.href = '@Url.Action("error", "home")';
+    </script>
+    }
+}

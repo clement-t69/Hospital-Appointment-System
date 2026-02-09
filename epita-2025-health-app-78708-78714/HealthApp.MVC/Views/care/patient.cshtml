@@ -1,0 +1,544 @@
+﻿@{
+    ViewData["Title"] = "Patient";
+    var patientId = ViewBag.PatientId;
+	var doctorId = ViewBag.DoctorId;
+}
+
+@if (ViewBag.IsLogged == true && ViewBag.IsDoctor == true)
+{
+    <div class="container d-flex justify-content-center" style="min-height: 50vh;">
+        <div class="row justify-content-center">
+            <div>
+                <div style="color: white; user-select: none;">
+                    <a>________________________________________________________________________________________________________________________________________________________________________________________________</a>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <a class="little-white-button" onclick="goBack()" style="text-decoration: none; width: 90px; box-shadow:none">
+                        <div class="text-content fs-6 px-2 fw-bold text-center">
+                            <div>&lt; Back</div>
+                        </div>
+                    </a>
+                </div>
+                <div class="text-center" style="flex-grow: 1;">
+                    <h1 style="font-weight: 700">@ViewBag.Patient.FirstName @ViewBag.Patient.LastName</h1>
+                </div>
+                <section>
+                    <hr />
+
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success mt-4">@TempData["SuccessMessage"]</div>
+                    }
+                    @if (TempData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger mt-4">@TempData["ErrorMessage"]</div>
+                    }
+                    <div class="row m-0">
+                        <div class="col-md-4" style="border-right: 1px solid #dee2e6;">
+                            <div>
+                                <h3 class="text-center">Appointments</h3>
+                                <hr />
+                            </div>
+
+                            <!-- FILTER BY DATE, DOCTOR, STATUS -->
+                            <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                <input type="text" id="appointmentsSearchInput" name="appointmentsSearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                                <select id="appointmentsSearchField" name="appointmentsSearchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                                    <option value="Date">Date</option>
+                                    <option value="DoctorLastName">Doctor</option>
+                                    <option value="Status">Status</option>
+                                </select>
+                                <button class="btn little-white-button" id="apSearchButton" onclick="location.href='@Url.Action("patient", "care", new { id = patientId } )?searchInput=' + document.getElementById('appointmentsSearchInput').value + '&searchField=' + document.getElementById('appointmentsSearchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                            </section>
+
+                            <table class="table">
+                                <!-- APPOINTMENT LIST -->
+                                @if (ViewBag.Appointments == null || (ViewBag.Appointments).Count == 0)
+                                {
+                                    <tr>
+                                        <td colspan="4" style="text-align: center">No appointments found.</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    @foreach (var a in ViewBag.Appointments)
+                                    {
+                                        @if (a.Id == 0)
+                                        {
+                                            @if (ViewBag.Appointments.Count == 1)
+                                            {
+                                                <tr>
+                                                    <td colspan="4" style="text-align: center">No appointments found.</td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <!-- EDIT APPOINTMENT MODAL -->
+                                            @if (a.DoctorId == ViewBag.DoctorId)
+                                            {
+                                                <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editAppointmentModal-@a.Id"
+                                                data-date="@a.Date" data-hour="@a.Time"
+                                                data-location="@a.Location" data-specialization="@a.Specialization"
+                                                data-doctorln="@a.DoctorLastName" data-doctorfn=" @a.DoctorFirstName"
+                                                style="cursor: pointer;">
+                                                    <td>
+                                                        <div style="padding: 8px; mb-3">
+                                                            <strong>@a.Date - @a.Time</strong>
+                                                            <br />with <strong>@a.DoctorFirstName @a.DoctorLastName</strong>
+                                                            <br />Location: @a.Location
+                                                            <br />Specialization: @a.Specialization
+                                                        </div>
+                                                        @if (a.Status == "Pending")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-warning">@a.Status</span></div>
+                                                        }
+                                                        else if (a.Status == "Approved")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                        }
+                                                        else if (a.Status == "Completed")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                        }
+                                                        else if (a.Status == "Cancelled")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                        }
+                                                        else if (a.Status == "Rejected")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div style="padding: 8px;">Status: Unknown</div>
+                                                        }
+                                                    </td>
+                                                </tr>
+
+                                                <div class="modal fade" id="editAppointmentModal-@a.Id" tabindex="-1" aria-labelledby="editAppointmentModalLabel-@a.Id" aria-hidden="true">
+                                                    <div class="modal-dialog">
+                                                        <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                            <div class="modal-header">
+                                                                <h5 class="modal-title" id="editAppointmentModalLabel-@a.Id" style="margin-left: 8px">Edit an Appointment</h5>
+                                                                <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("patient", "care", new { id = patientId })';" aria-label="Close" style="margin-right: 6px"></button>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <form id="editAppointmentForm-@a.Id" asp-controller="care" asp-action="patient_edit_appointment" method="post">
+                                                                    <input type="hidden" name="Id" value="@a.Id" />
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <input type="date" class="form-control" id="editAppointmentDate-@a.Id" name="Date" aria-required="true" style="width:100%;" value="@a.Date">
+                                                                    </div>
+                                                                    <div class="rounded_fields form-label mb-3">
+                                                                        <div class="rounded_fields form-label mb-3">
+                                                                            <select class="form-control" id="editAppointmentHour-@a.Id" name="Hour" aria-required="true" style="width:100%;">
+                                                                                <option value="09:00 AM">09:00 AM</option>
+                                                                                <option value="10:00 AM">10:00 AM</option>
+                                                                                <option value="11:00 AM">11:00 AM</option>
+                                                                                <option value="01:00 PM">01:00 PM</option>
+                                                                                <option value="02:00 PM">02:00 PM</option>
+                                                                                <option value="03:00 PM">03:00 PM</option>
+                                                                                <option value="04:00 PM">04:00 PM</option>
+                                                                                <option value="05:00 PM">05:00 PM</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <input type="hidden" id="DId" name="DId" value="@a.DoctorId" />
+                                                                    <input type="hidden" id="Spe" name="Spe" value="@a.Specialization" />
+                                                                    <input type="hidden" id="Loc" name="Loc" value="@a.Location" />
+
+                                                                    <input type="hidden" id="Stat" name="Stat" value="Pending" />
+
+                                                                    <input type="hidden" id="PId" name="PId" value="@a.PatientId" />
+                                                                    <input type="hidden" id="PLastName" name="PLastName" value="@ViewBag.Patient.LastName" />
+                                                                    <input type="hidden" id="PFirstName" name="PFirstName" value="@ViewBag.Patient.FirstName" />
+                                                                </form>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <form id="approveAppointmentForm-@a.Id" asp-controller="care" asp-action="patient_approve_appointment" method="post" style="display: none;">
+                                                                    <input type="hidden" name="Id" value="@a.Id" />
+                                                                </form>
+                                                                <a class="little-blue-button" href="#" onclick="document.getElementById('approveAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                    <div class="text-content fs-6 px-2 fw-bold">
+                                                                        <div>☑️ Approve Appointment</div>
+                                                                    </div>
+                                                                </a>
+
+                                                                <form id="rejectAppointmentForm-@a.Id" asp-controller="care" asp-action="patient_reject_appointment" method="post" style="display: none;">
+                                                                    <input type="hidden" name="Id" value="@a.Id" />
+                                                                </form>
+                                                                <a class="little-blue-button" href="#" onclick="document.getElementById('rejectAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                    <div class="text-content fs-6 px-2 fw-bold">
+                                                                        <div>🚫 Reject Appointment</div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+
+                                                            <div class="modal-footer">
+                                                                <a class="little-blue-button" href="#" onclick="document.getElementById('editAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                    <div class="text-content fs-6 px-2 fw-bold">
+                                                                        <div>🔄 Reschedule Appointment</div>
+                                                                    </div>
+                                                                </a>
+
+                                                                <form id="cancelAppointmentForm-@a.Id" asp-controller="care" asp-action="patient_cancel_appointment" method="post" style="display: none;">
+                                                                    <input type="hidden" name="Id" value="@a.Id" />
+                                                                </form>
+                                                                <a class="little-blue-button" href="#" onclick="document.getElementById('cancelAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                    <div class="text-content fs-6 px-2 fw-bold">
+                                                                        <div>❌ Cancel Appointment</div>
+                                                                    </div>
+                                                                </a>
+
+                                                                <form id="completeAppointmentForm-@a.Id" asp-controller="care" asp-action="patient_complete_appointment" method="post" style="display: none;">
+                                                                    <input type="hidden" name="Id" value="@a.Id" />
+                                                                </form>
+                                                                <a class="little-blue-button" href="#" onclick="document.getElementById('completeAppointmentForm-@a.Id').submit(); return false;" style="text-decoration: none;">
+                                                                    <div class="text-content fs-6 px-2 fw-bold">
+                                                                        <div>✅ Complete Appointment</div>
+                                                                    </div>
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div style="padding: 8px; mb-3">
+                                                            <strong>@a.Date - @a.Time</strong>
+                                                            <br />with <strong>@a.DoctorFirstName @a.DoctorLastName</strong>
+                                                            <br />Location: @a.Location
+                                                            <br />Specialization: @a.Specialization
+                                                        </div>
+                                                        @if (a.Status == "Pending")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-warning">@a.Status</span></div>
+                                                        }
+                                                        else if (a.Status == "Approved")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                        }
+                                                        else if (a.Status == "Completed")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-success">@a.Status</span></div>
+                                                        }
+                                                        else if (a.Status == "Cancelled")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                        }
+                                                        else if (a.Status == "Rejected")
+                                                        {
+                                                            <div style="padding: 8px;">Status: <span class="badge bg-danger">@a.Status</span></div>
+                                                        }
+                                                        else
+                                                        {
+                                                            <div style="padding: 8px;">Status: Unknown</div>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                }
+                            </table>
+                        </div>
+
+                        <div class="col-md-4" style="border-right: 1px solid #dee2e6;">
+                            <div>
+                                <h3 class="text-center">Medical History</h3>
+                                <hr />
+                            </div>
+                            <!-- FILTER BY DATE, DOCTOR, SPECIALITY, LOCATION -->
+                            <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                <input type="text" id="prescriptionsSearchInput" name="prescriptionsSearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                                <select id="prescriptionsSearchField" name="prescriptionsSearchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                                    <option value="Date">Date</option>
+                                    <option value="DoctorLastName">Doctor</option>
+                                    <option value="Specialization">Speciality</option>
+                                    <option value="Location">Location</option>
+                                </select>
+                                <button class="btn little-white-button" id="mhSearchButton" onclick="location.href='@Url.Action("patient", "care", new { id = patientId })?searchInput=' + document.getElementById('prescriptionsSearchInput').value + '&searchField=' + document.getElementById('prescriptionsSearchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                            </section>
+
+                            <!-- MEDICAL HISTORY LIST -->
+                            <table class="table">
+                                <tbody>
+                                    @if (ViewBag.MedicalHistories == null || ViewBag.MedicalHistories.Count == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="text-align: center">No medical history found.</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <!-- MEDICAL HISTORY LIST -->
+                                        @foreach (var mh in ViewBag.MedicalHistories)
+                                        {
+                                            @if (mh.Id == 0)
+                                            {
+                                                @if (ViewBag.MedicalHistories.Count == 1)
+                                                {
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center">No medical history found.</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @if (mh.DoctorId == ViewBag.DoctorId)
+                                                {
+                                                    <tr class="big-white-button-table" data-bs-toggle="modal" data-bs-target="#editMHModal-@mh.Id"
+                                                    style="cursor: pointer;">
+                                                        <td>
+                                                            <div style="padding: 8px; mb-3">
+                                                                <strong>@mh.Date</strong>
+                                                                <br />with <strong>@mh.DoctorFirstName @mh.DoctorLastName</strong>
+                                                                <br />Location: @mh.Location
+                                                                <br />Specialization: @mh.Specialization
+                                                                <br />Diagnosis: @mh.Diagnosis
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+
+                                                    <div class="modal fade" id="editMHModal-@mh.Id" tabindex="-1" aria-labelledby="editMHModalLabel-@mh.Id" aria-hidden="true">
+                                                        <div class="modal-dialog">
+                                                            <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="editMHModalLabel-@mh.Id" style="margin-left: 8px">Edit a Medical History</h5>
+                                                                    <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("patient", "care", new { id = patientId })';" aria-label="Close" style="margin-right: 6px"></button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <form id="editMHForm-@mh.Id" asp-controller="care" asp-action="edit_medical_history" method="post">
+                                                                        <input type="hidden" name="Id" value="@mh.Id" />
+
+                                                                        <div class="rounded_textarea form-label mb-3">
+                                                                            <textarea class="form-control" id="Diagnosis" name="Diagnosis" rows="4" placeholder="Enter the diagnosis..." required></textarea>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+
+                                                                <div class="modal-footer">
+                                                                    <a class="little-blue-button" href="#" onclick="document.getElementById('editMHForm-@mh.Id').submit(); return false;" style="text-decoration: none;">
+                                                                        <div class="text-content fs-6 px-2 fw-bold">
+                                                                            <div>💾 Save changes</div>
+                                                                        </div>
+                                                                    </a>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <tr>
+                                                        <td>
+                                                            <div style="padding: 8px; mb-3">
+                                                                <strong>@mh.Date</strong>
+                                                                <br />with <strong>@mh.DoctorFirstName @mh.DoctorLastName</strong>
+                                                                <br />Location: @mh.Location
+                                                                <br />Specialization: @mh.Specialization
+                                                                <br />Diagnosis: @mh.Diagnosis
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div>
+                                <h3 class="text-center">Prescriptions</h3>
+                                <hr />
+                            </div>
+
+                            <!-- FILTER BY NAME, DOCTOR -->
+                            <section style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                <input type="text" id="prescriptionsSearchInput" name="prescriptionsSearchInput" class="form-control" placeholder="Search..." data-val="false" style="padding:24px; width: 540px; height: 48px; border-radius: 64px 0px 0px 64px; border:none; box-shadow: -4px 0px 8px -4px rgba(0, 0, 0, 0.1), 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1);" />
+                                <select id="prescriptionsSearchField" name="prescriptionsSearchField" class="form-select rounded-0" style="width: 144px; height: 48px; border-width:1px; box-shadow: 0px 4px 8px -4px rgba(0, 0, 0, 0.1), 0px -4px 8px -4px rgba(0, 0, 0, 0.1); z-index: 1">
+                                    <option value="Name">Name</option>
+                                    <option value="DoctorLastName">Doctor</option>
+                                </select>
+                                <button class="btn little-white-button" id="mhSearchButton" onclick="location.href='@Url.Action("patient", "care", new { id = patientId })?searchInput=' + document.getElementById('prescriptionsSearchInput').value + '&searchField=' + document.getElementById('prescriptionsSearchField').value;" style="width: 112px; height: 48px; border-radius: 0px 64px 64px 0px; display: flex; align-items: center; justify-content: center; border-width:1px;">🔍</button>
+                            </section>
+
+                            <table class="table">
+                                <tbody>
+                                    @if (ViewBag.Prescriptions == null || ViewBag.Prescriptions.Count == 0)
+                                    {
+                                        <tr>
+                                            <td colspan="4" style="text-align: center">No prescription found.</td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <!-- PRESCRIPTIONS LIST -->
+                                        @foreach (var p in ViewBag.Prescriptions)
+                                        {
+                                            @if (p.Id == 0)
+                                            {
+                                                @if (ViewBag.Prescriptions.Count == 1)
+                                                {
+                                                    <tr>
+                                                        <td colspan="4" style="text-align: center">No prescription found.</td>
+                                                    </tr>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div style="padding: 8px; mb-3">
+                                                            <strong>@p.Name</strong>
+                                                            <br />Issued on <strong>@p.Date</strong>
+														    <br />Dosage: @p.Dosage mg
+														    <br />Frequency: @p.Frequency times per day
+														    <br />Duration: @p.Duration days
+														    <br />Pharmacy: @p.Pharmacy
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+
+                            <!-- BUTTON TO ADD A PRESCRIPTION (OPENS A FORM) -->
+                            <a class="little-blue-button mb-1" data-bs-toggle="modal" data-bs-target="#addPrescriptionModal" style="text-decoration: none; box-shadow:none; width:100%">
+                                <span class="icon"></span>
+                                <div class="text-content fs-6 px-2 fw-bold">
+                                    <div>💊 Add a Prescription</div>
+                                </div>
+                            </a>
+
+                            <div class="modal fade" id="addPrescriptionModal" tabindex="-1" aria-labelledby="addPrescriptionModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content" style="border-radius: 32px; box-shadow: 0px 0px 16px rgba(0, 0, 0, 0.1)">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="addPrescriptionModalLabel" style="margin-left: 8px">Add a Prescription</h5>
+                                            <button type="button" class="btn-close" onclick="window.location.href='@Url.Action("patient", "care", new { id = patientId })';" aria-label="Close" style="margin-right: 6px"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form id="addPrescriptionForm" asp-controller="care" asp-action="create_prescription" method="post">
+                                                <input type="hidden" name="DoctorId" value="@doctorId" />
+                                                <input type="hidden" name="PatientId" value="@patientId" />
+                                                <input type="hidden" name="Date" value="@DateTime.Today.ToString("yyyy-MM-dd")" />
+
+												<div class="rounded_fields form-label mb-3">
+													<input type="text" class="form-control" id="Name" name="Name" placeholder="Enter the name of the medicine..." required>
+                                                </div>
+
+                                                <div class="rounded_fields form-label mb-3">
+                                                    <input type="number" class="form-control" id="Dosage" name="Dosage" placeholder="Enter the dosage... (in milligrams)" required>
+												</div>
+
+                                                <div class="rounded_fields form-label mb-3">
+                                                    <input type="number" class="form-control" id="Frequency" name="Frequency" placeholder="Enter the frequency... (times per day)" required>
+												</div>
+
+                                                <div class="rounded_fields form-label mb-3">
+                                                    <input type="number" class="form-control" id="Duration" name="Duration" placeholder="Enter the duration... (number of days)" required>
+												</div>
+
+                                                <div class="rounded_fields form-label mb-3">
+                                                    <input type="text" class="form-control" id="Pharmacy" name="Pharmacy" placeholder="Enter the pharmacy..." required>
+												</div>
+                                            </form>
+                                        </div>
+
+                                        <div class="modal-footer">
+                                            <a class="little-blue-button" href="#" onclick="document.getElementById('addPrescriptionForm').submit(); return false;" style="text-decoration: none;">
+                                                <div class="text-content fs-6 px-2 fw-bold">
+                                                    <div>💊 Add a Prescription</div>
+                                                </div>
+                                            </a>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+        @section scripts 
+    {
+        <script>
+            function searchAppointment()
+            {
+                var appointmentsSearchInput = document.getElementById('appointmentsSearchInput').value;
+                var appointmentsSearchField = document.getElementById('appointmentsSearchField').value;
+
+                if (searchIappointmentsSearchInputnput == "" || appointmentsSearchField == "")
+                {
+                    appointmentsSearchField = "";
+                    appointmentsSearchInput = "";
+                } 
+                else 
+                {
+                    location.href = '@Url.Action("care", "patient")?searchInput=' + appointmentsSearchInput + '&searchField=' + appointmentsSearchField;
+                }
+            }
+
+            function searchPrescriptions()
+            {
+                var prescriptionsSearchInput = document.getElementById('prescriptionsSearchInput').value;
+                var prescriptionsSearchField = document.getElementById('prescriptionsSearchField').value;
+
+                if (prescriptionsSearchInput == "" || prescriptionsSearchField == "")
+                {
+                    prescriptionsSearchField = "";
+                    prescriptionsSearchInput = "";
+                }
+                else
+                {
+                    location.href = '@Url.Action("care", "patient")?searchInput=' + prescriptionsSearchInput + '&searchField=' + prescriptionsSearchField;
+                }
+            }
+
+            function searchMedicalHistory()
+            {
+                var medicalHistoriesSearchInput = document.getElementById('medicalHistoriesSearchInput').value;
+                var medicalHistoriesSearchField = document.getElementById('medicalHistoriesSearchField').value;
+
+                if (medicalHistoriesSearchInput == "" || medicalHistoriesSearchField == "")
+                {
+                    medicalHistoriesSearchField = "";
+                    medicalHistoriesSearchInput = "";
+                }
+                else
+                {
+                location.href = '@Url.Action("care", "patient")?searchInput=' + medicalHistoriesSearchInput + '&searchField=' + medicalHistoriesSearchField;
+                }
+            }
+
+		    function goBack()
+		    {
+			    window.history.go(-1);
+		    }
+        </script>
+    }
+}
+else
+{
+    @section scripts 
+    {
+        <script>
+            window.location.href = '@Url.Action("error", "home")';
+        </script>
+    }
+}

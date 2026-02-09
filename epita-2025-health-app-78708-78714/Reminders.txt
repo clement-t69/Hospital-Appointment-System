@@ -1,0 +1,34 @@
+Migration:
+dotnet ef migrations add Name --project HealthApp.Domain --startup-project HealthApp.MVC --context ApplicationDbContext
+dotnet ef database update --project HealthApp.Domain --startup-project HealthApp.MVC --context ApplicationDbContext
+
+Roles:
+- Administrator:
+	- Name
+	- Email
+- Patient:
+	- Name
+	- Email
+	- Medical history
+	- Prescriptions
+- Doctor:
+	- Name
+	- Email
+	- Specialty
+	- Location
+- Prescription:
+	- Patient name
+	- Doctor name
+	- Name
+	- Dosage
+	- Frequency
+	- Duration
+	- Pharmacy
+	- Expiration date
+
+Appointments:
+- Date
+- Time
+- Patient name
+- Doctor name
+- Status (scheduled, completed, cancelled)
